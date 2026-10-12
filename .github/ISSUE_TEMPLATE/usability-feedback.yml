@@ -1,0 +1,79 @@
+name: Usability feedback
+description: Tell us what was confusing, slow or missing when you tried RoboLang or this website.
+title: "Usability: "
+labels: ["usability"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for trying RoboLang. Feedback about the website, the installation steps and the `robolang` command is all welcome here.
+
+        This issue is public. Please do not include personal information, and remove usernames and home directory paths from any output you paste.
+
+        RoboLang's tools only check and describe task files. Please do not report results from running RoboLang against real hardware; that is outside the scope of the project.
+  - type: dropdown
+    id: area
+    attributes:
+      label: What is this about?
+      options:
+        - Website content or wording
+        - Website layout, navigation or accessibility
+        - Installation
+        - robolang validate
+        - robolang inspect or the JSON IR
+        - A diagnostic message
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened?
+      description: Include the page address or the command you ran, and the full output if there was any.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: false
+  - type: textarea
+    id: file
+    attributes:
+      label: Task file
+      description: If this is about a `.rob` file, paste it here.
+      render: text
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Output of `robolang --version`
+      placeholder: robolang 0.1.0a1 (language 1.1, IR schema 1.0)
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system and Python version, or browser and device
+      placeholder: Windows 11, Python 3.12 / Safari on iPhone
+    validations:
+      required: false
+  - type: dropdown
+    id: impact
+    attributes:
+      label: How much did this get in your way?
+      options:
+        - It stopped me
+        - It slowed me down
+        - It was a minor annoyance
+        - It is a suggestion
+    validations:
+      required: true

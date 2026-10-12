@@ -1,0 +1,20 @@
+// broken_task.rob
+// This file contains several mistakes. Fix them until it validates.
+
+task sort_part(robot r, object part, location bin, region cell) {
+    @safety max_speed 0.4;
+
+    pre {
+        robot_ready r;
+        region_clear cell
+    }
+
+    plan {
+        move r to part;
+        grasp r part;
+        wait for 3;
+        move r to bin;
+        place r part at tray;
+        communicate r to "line" with "";
+    }
+}

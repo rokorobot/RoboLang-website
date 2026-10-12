@@ -1,5 +1,5 @@
 # Netlify build settings for RoboLang.dev.
-# Netlify installs dependencies with "npm ci" because package-lock.json is committed.
+# Netlify installs dependencies from the committed package-lock.json.
 [build]
   command = "npm run build"
   publish = "dist"

@@ -79,6 +79,29 @@ another host. Below 64rem the navigation is a `<details>` menu.
 - The site must not claim that task execution, safety enforcement, ROS 2
   integration or AI generation is available in the supported package.
 
+## Preview readiness
+
+Materials for staging the site and running the first developer evaluation.
+None of them changes the website itself.
+
+| Document | Purpose |
+|---|---|
+| [docs/netlify-staging-checklist.md](docs/netlify-staging-checklist.md) | First Netlify deploy, verification and rollback |
+| [docs/qa-checklist.md](docs/qa-checklist.md) | Manual browser, responsive, keyboard and screen-reader QA |
+| [docs/evaluation/challenge.md](docs/evaluation/challenge.md) | The 25-minute developer challenge, public sample variant |
+| [docs/evaluation/broken_task.rob](docs/evaluation/broken_task.rob) | The deliberately invalid file used in the sample challenge |
+| [docs/evaluation/results-template.md](docs/evaluation/results-template.md) | Anonymous results form for participants |
+| [docs/evaluation/evaluation-criteria.md](docs/evaluation/evaluation-criteria.md) | Readiness criteria and how a round of results is read |
+
+Facilitator reference answers are kept privately and are not in this
+repository. Evaluation sessions use a private variant of the challenge.
+
+Usability feedback on the website, onboarding and documentation is collected
+through this repository's issue template. Defects in the language, the
+validator or the `robolang` command go to the
+[core repository](https://github.com/rokorobot/RoboLang/issues). Completed
+evaluation results are collected privately, not as issues.
+
 ## Deploy
 
 The site is intended for Netlify. The settings are in `netlify.toml`:
@@ -89,8 +112,8 @@ The site is intended for Netlify. The settings are in `netlify.toml`:
 | Publish directory | `dist` |
 | Node version | 22 |
 
-Netlify installs dependencies with `npm ci` because `package-lock.json` is
-committed.
+Netlify installs dependencies from the committed `package-lock.json`. No
+environment variables or secrets are needed in the Netlify UI.
 
 ## License
 
