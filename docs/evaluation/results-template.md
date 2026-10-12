@@ -1,5 +1,8 @@
 # RoboLang evaluation results (anonymous)
 
+Fill this in after the challenge. It is not part of the 25 minutes. Send it
+back privately to the organiser; do not post it as a public issue.
+
 Please do not include your name, employer, email address or anything else that
 identifies you. If you paste terminal output, remove usernames and home
 directory paths first.
@@ -57,7 +60,7 @@ Had you seen RoboLang before today? yes / no
 
 ## Overall
 
-- Total minutes for the whole challenge:
+- Total minutes for Parts 1 to 4 (not counting this form):
 - Where did you get stuck the longest:
 - Was anything on the website wrong, missing or misleading:
 - Was anything on the website particularly clear or useful:

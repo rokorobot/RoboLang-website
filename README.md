@@ -88,12 +88,19 @@ None of them changes the website itself.
 |---|---|
 | [docs/netlify-staging-checklist.md](docs/netlify-staging-checklist.md) | First Netlify deploy, verification and rollback |
 | [docs/qa-checklist.md](docs/qa-checklist.md) | Manual browser, responsive, keyboard and screen-reader QA |
-| [docs/evaluation/challenge.md](docs/evaluation/challenge.md) | The 25-minute developer challenge given to participants |
-| [docs/evaluation/broken_task.rob](docs/evaluation/broken_task.rob) | The deliberately invalid file used in the challenge |
+| [docs/evaluation/challenge.md](docs/evaluation/challenge.md) | The 25-minute developer challenge, public sample variant |
+| [docs/evaluation/broken_task.rob](docs/evaluation/broken_task.rob) | The deliberately invalid file used in the sample challenge |
 | [docs/evaluation/results-template.md](docs/evaluation/results-template.md) | Anonymous results form for participants |
-| [docs/evaluation/facilitator-notes.md](docs/evaluation/facilitator-notes.md) | Reference answers and evaluation criteria (not for participants) |
+| [docs/evaluation/evaluation-criteria.md](docs/evaluation/evaluation-criteria.md) | Readiness criteria and how a round of results is read |
 
-Usability feedback is collected through this repository's issue template.
+Facilitator reference answers are kept privately and are not in this
+repository. Evaluation sessions use a private variant of the challenge.
+
+Usability feedback on the website, onboarding and documentation is collected
+through this repository's issue template. Defects in the language, the
+validator or the `robolang` command go to the
+[core repository](https://github.com/rokorobot/RoboLang/issues). Completed
+evaluation results are collected privately, not as issues.
 
 ## Deploy
 
@@ -105,8 +112,8 @@ The site is intended for Netlify. The settings are in `netlify.toml`:
 | Publish directory | `dist` |
 | Node version | 22 |
 
-Netlify installs dependencies with `npm ci` because `package-lock.json` is
-committed.
+Netlify installs dependencies from the committed `package-lock.json`. No
+environment variables or secrets are needed in the Netlify UI.
 
 ## License
 

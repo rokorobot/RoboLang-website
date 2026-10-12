@@ -1,7 +1,11 @@
 # RoboLang developer evaluation challenge
 
-Thank you for trying RoboLang. This takes about **25 minutes**. You do not
-need a robot, a simulator or ROS 2.
+Thank you for trying RoboLang. The challenge takes about **25 minutes**. You do
+not need a robot, a simulator or ROS 2.
+
+The 25 minutes cover Parts 1 to 4 only. Filling in the results template comes
+afterwards and is not timed. During the challenge, jot down times and
+diagnostic codes as you go; write up everything else at the end.
 
 We are testing the tools and the documentation, not you. If something is
 confusing, that is exactly what we want to learn. Please do not ask the
@@ -77,5 +81,8 @@ Answer from what you have seen. There are no trick questions.
 
 ## Finish
 
-Stop your timer. Complete the results template and send it back as the
-organiser asked. Thank you.
+Stop your timer and note the total. The challenge is over.
+
+Now complete the results template in your own time and send it back privately,
+the way the organiser asked. Please do not post it as a public issue. Thank
+you.

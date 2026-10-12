@@ -25,20 +25,26 @@ separate owner-approved steps. This checklist does not authorize either.
 | Base directory | (empty) |
 | Functions directory | (none) |
 
-- [ ] No environment variables are needed. Do not add any.
+- [ ] No environment variables or secrets are needed in the Netlify UI. Do not
+      add any. `netlify.toml` already sets the build command, the publish
+      directory and Node 22.
 - [ ] Do not add a custom domain.
 - [ ] Deploy previews: enable for pull requests.
 
 ## Verify the first deploy
 
-- [ ] The deploy log shows `npm ci`, not `npm install`.
+- [ ] The deploy log shows dependencies installing without errors from the
+      committed `package-lock.json`. Netlify chooses the install command; do
+      not require a specific one.
 - [ ] The deploy log shows Node 22.
-- [ ] The build reports 7 pages and finishes without errors.
+- [ ] The build reports 7 pages (the six routes and the 404 page) and
+      finishes without errors.
 - [ ] Record the temporary URL: `https://________.netlify.app`
 - [ ] The site loads over HTTPS at that URL.
-- [ ] All seven routes return 200: `/`, `/get-started/`, `/reference/`,
-      `/examples/`, `/roadmap/`, `/contribute/`, and an unknown path shows the
-      404 page with a 404 status.
+- [ ] The six public routes return HTTP 200: `/`, `/get-started/`,
+      `/reference/`, `/examples/`, `/roadmap/`, `/contribute/`.
+- [ ] An unknown path, for example `/no-such-page/`, returns HTTP 404 and
+      shows the Page not found page.
 - [ ] Response headers on `/` include `X-Content-Type-Options`,
       `X-Frame-Options`, `Referrer-Policy` and `Content-Security-Policy`.
 - [ ] The browser console shows no Content Security Policy violations on any
