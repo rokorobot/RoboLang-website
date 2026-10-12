@@ -79,6 +79,22 @@ another host. Below 64rem the navigation is a `<details>` menu.
 - The site must not claim that task execution, safety enforcement, ROS 2
   integration or AI generation is available in the supported package.
 
+## Preview readiness
+
+Materials for staging the site and running the first developer evaluation.
+None of them changes the website itself.
+
+| Document | Purpose |
+|---|---|
+| [docs/netlify-staging-checklist.md](docs/netlify-staging-checklist.md) | First Netlify deploy, verification and rollback |
+| [docs/qa-checklist.md](docs/qa-checklist.md) | Manual browser, responsive, keyboard and screen-reader QA |
+| [docs/evaluation/challenge.md](docs/evaluation/challenge.md) | The 25-minute developer challenge given to participants |
+| [docs/evaluation/broken_task.rob](docs/evaluation/broken_task.rob) | The deliberately invalid file used in the challenge |
+| [docs/evaluation/results-template.md](docs/evaluation/results-template.md) | Anonymous results form for participants |
+| [docs/evaluation/facilitator-notes.md](docs/evaluation/facilitator-notes.md) | Reference answers and evaluation criteria (not for participants) |
+
+Usability feedback is collected through this repository's issue template.
+
 ## Deploy
 
 The site is intended for Netlify. The settings are in `netlify.toml`:

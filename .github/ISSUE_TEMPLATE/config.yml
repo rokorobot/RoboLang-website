@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Bug in the language or the robolang tools
+    url: https://github.com/rokorobot/RoboLang/issues
+    about: Report a wrong validation result, a crash or a specification problem in the core repository.
