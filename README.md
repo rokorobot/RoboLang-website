@@ -93,6 +93,8 @@ None of them changes the website itself.
 | [docs/evaluation/results-template.md](docs/evaluation/results-template.md) | Anonymous results form for participants |
 | [docs/evaluation/evaluation-criteria.md](docs/evaluation/evaluation-criteria.md) | Readiness criteria and how a round of results is read |
 
+QA results are recorded under [docs/qa/](docs/qa/).
+
 Facilitator reference answers are kept privately and are not in this
 repository. Evaluation sessions use a private variant of the challenge.
 
