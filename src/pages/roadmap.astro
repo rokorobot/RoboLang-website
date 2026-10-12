@@ -1,4 +1,5 @@
 ---
+import PageHead from '../components/PageHead.astro';
 import { specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
@@ -7,11 +8,11 @@ import Base from '../layouts/Base.astro';
   title="Vision & Roadmap"
   description="The long-term research direction for RoboLang and the planned stages after the read-only developer tools. Nothing on this page beyond language 1.1 is available yet."
 >
+  <PageHead slot="head" index="05" label="Vision & Roadmap" title="Vision & roadmap">
+    Where RoboLang is trying to go, and how that differs from what you can install today.
+  </PageHead>
+
   <div class="prose">
-    <h1>Vision &amp; roadmap</h1>
-    <p class="lede">
-      Where RoboLang is trying to go, and how that differs from what you can install today.
-    </p>
     <div class="note">
       <p>
         <strong>This page describes plans, not features.</strong> Only the first stage below exists.

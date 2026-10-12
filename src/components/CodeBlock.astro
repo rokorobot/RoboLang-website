@@ -1,17 +1,18 @@
 ---
 import { Code } from 'astro:components';
+import { inkTheme, robGrammar } from '../data/code-theme';
 
 interface Props {
   code: string;
-  /** `.rob` source and command output are shown as plain text. */
-  lang?: 'text' | 'bash' | 'json';
+  /** `rob` is task source; command output is shown as plain `text`. */
+  lang?: 'text' | 'bash' | 'json' | 'rob';
   label?: string;
 }
 
 const { code, lang = 'text', label } = Astro.props;
 ---
 
-<figure class="code">
+<figure class={`code code--${lang}`}>
   {label && <figcaption>{label}</figcaption>}
-  <Code code={code} lang={lang} themes={{ light: 'github-light', dark: 'github-dark' }} />
+  <Code code={code} lang={lang === 'rob' ? robGrammar : lang} theme={inkTheme} />
 </figure>

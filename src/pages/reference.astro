@@ -1,4 +1,5 @@
 ---
+import PageHead from '../components/PageHead.astro';
 import { CORE_COMMIT_SHORT, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
@@ -7,12 +8,11 @@ import Base from '../layouts/Base.astro';
   title="Language Reference"
   description="Where RoboLang is specified: the language 1.1 specification, the grammar and the IR schema, each linked at a fixed version in the core repository."
 >
+  <PageHead slot="head" index="03" label="Language Reference" title="Language reference">
+    The specifications live in the RoboLang core repository. This page points to them at a fixed version and gives a short orientation.
+  </PageHead>
+
   <div class="prose">
-    <h1>Language reference</h1>
-    <p class="lede">
-      The specifications live in the RoboLang core repository. This page points to them at a fixed
-      version and gives a short orientation.
-    </p>
     <div class="note">
       <p>
         <strong>The documents linked here are the authority.</strong> This website does not restate the

@@ -6,10 +6,10 @@ const current = Astro.url.pathname;
 
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="/">
-      <img src="/favicon.svg" alt="" width="28" height="28" />
-      RoboLang
+    <a class="brand" href="/" aria-label="RoboLang home">
+      <span class="marker" aria-hidden="true"></span>RoboLang<span class="tld" aria-hidden="true">.dev</span>
     </a>
+
     <nav class="site-nav" aria-label="Main">
       <ul>
         {
@@ -23,5 +23,25 @@ const current = Astro.url.pathname;
         }
       </ul>
     </nav>
+
+    <details class="mmenu">
+      <summary>
+        <span class="mmenu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        Menu
+      </summary>
+      <nav class="mmenu-panel" aria-label="Menu">
+        <ul>
+          {
+            nav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={current === item.href ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </details>
   </div>
 </header>

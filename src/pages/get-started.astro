@@ -1,4 +1,5 @@
 ---
+import PageHead from '../components/PageHead.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 import { pickAndPlaceInspect, pickAndPlaceValidate, versionOutput } from '../data/examples';
 import { CORE_REPO, specs, versions } from '../data/facts';
@@ -9,12 +10,11 @@ import Base from '../layouts/Base.astro';
   title="Get Started"
   description="Install the RoboLang developer tools from a clone of the repository and validate and inspect your first task file."
 >
+  <PageHead slot="head" index="02" label="Get Started" title="Get started">
+    Install the read-only developer tools and check your first task file. This takes a few minutes and needs no robot, no simulator and no ROS 2.
+  </PageHead>
+
   <div class="prose">
-    <h1>Get started</h1>
-    <p class="lede">
-      Install the read-only developer tools and check your first task file. This takes a few minutes
-      and needs no robot, no simulator and no ROS 2.
-    </p>
 
     <h2>Requirements</h2>
     <ul>

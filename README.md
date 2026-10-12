@@ -22,9 +22,10 @@ shipped to the browser.
 | Path | Contents |
 |---|---|
 | `src/pages/` | The six pages and the 404 page |
-| `src/layouts/`, `src/components/` | Shared layout, header, footer, status banner, code block |
+| `src/layouts/`, `src/components/` | Shared layout, header, footer, status banner, page head, code block |
 | `src/data/facts.ts` | Versions and links into the core repository, pinned to one commit |
 | `src/data/examples.ts` | Example task files and captured `robolang` output |
+| `src/data/code-theme.ts` | Syntax-highlighting theme and a highlighting grammar for `.rob` |
 | `src/styles/global.css` | All styles and the colour tokens |
 | `scripts/` | Checks that run against the built site |
 
@@ -54,9 +55,19 @@ Both checks read the built pages in `dist/`, so run `npm run build` first.
 - `npm run test:links` fails on a broken internal link or fragment, and on any
   link into the core repository that is not pinned to `CORE_COMMIT`. External
   URLs are not fetched.
-- `npm run test:a11y` runs axe-core on every built page in jsdom, then checks
-  that the colour tokens in `global.css` meet WCAG AA contrast in the light and
-  dark themes. jsdom does no layout, so axe cannot measure contrast itself.
+- `npm run test:a11y` runs axe-core on every built page in jsdom. jsdom does no
+  layout, so axe cannot measure contrast itself; instead the script checks the
+  colour tokens in `global.css` and every syntax-highlighting colour found in
+  the built pages against WCAG AA.
+
+## Design
+
+Industrial editorial: a warm near-black "ink" surface for the header, page
+heads, code panels and footer, an off-white "paper" surface for the body, and
+one signal orange for key actions, section numbers and markers. Corners are
+square and structure comes from rules, not shadows. The tokens are at the top
+of `src/styles/global.css`; fonts are system stacks, so nothing is loaded from
+another host. Below 64rem the navigation is a `<details>` menu.
 
 ## Keeping the site accurate
 

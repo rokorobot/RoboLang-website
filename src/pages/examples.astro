@@ -1,4 +1,5 @@
 ---
+import PageHead from '../components/PageHead.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 import * as ex from '../data/examples';
 import { coreFile, specs, versions } from '../data/facts';
@@ -9,12 +10,11 @@ import Base from '../layouts/Base.astro';
   title="Examples"
   description="Valid and invalid RoboLang task files, each shown with the real output of the robolang validate and inspect commands."
 >
+  <PageHead slot="head" index="04" label="Examples" title="Examples">
+    Task files and what the tools say about them. Every output on this page was produced by the real <code>robolang</code> command, distribution {versions.distribution}.
+  </PageHead>
+
   <div class="prose">
-    <h1>Examples</h1>
-    <p class="lede">
-      Task files and what the tools say about them. Every output on this page was produced by the
-      real <code>robolang</code> command, distribution {versions.distribution}.
-    </p>
     <p>
       These examples show how tasks are written and checked. None of them is executed by the supported
       tools, and a task that validates is not thereby safe to run on a robot.
@@ -26,7 +26,7 @@ import Base from '../layouts/Base.astro';
       from the core repository, unchanged. It declares five typed parameters, one safety annotation,
       two preconditions and a five-step plan.
     </p>
-    <CodeBlock code={ex.pickAndPlaceSource} label="examples/pick_and_place.rob" />
+    <CodeBlock lang="rob" code={ex.pickAndPlaceSource} label="examples/pick_and_place.rob" />
 
     <h3>Validate</h3>
     <CodeBlock lang="bash" code="robolang validate examples/pick_and_place.rob" />
@@ -59,7 +59,7 @@ import Base from '../layouts/Base.astro';
       speed limit a unit, and uses the remaining statement and condition forms: <code>inspect</code>,
       both kinds of <code>wait</code>, <code>object_exists</code> and <code>sensor_ok</code>.
     </p>
-    <CodeBlock code={ex.inspectPartSource} label="inspect_part.rob" />
+    <CodeBlock lang="rob" code={ex.inspectPartSource} label="inspect_part.rob" />
     <CodeBlock lang="bash" code="robolang validate inspect_part.rob" />
     <CodeBlock code={ex.inspectPartValidate} label="Output (exit status 0)" />
     <p>With a unit on the limit there is no warning.</p>
@@ -78,11 +78,11 @@ import Base from '../layouts/Base.astro';
 
     <h3>An undeclared name</h3>
     <p>The plan moves to <code>bench</code>, which is not a parameter of the task.</p>
-    <CodeBlock code={ex.undeclaredSource} label="undeclared.rob" />
+    <CodeBlock lang="rob" code={ex.undeclaredSource} label="undeclared.rob" />
     <CodeBlock code={ex.undeclaredValidate} label="Output (exit status 1)" />
 
     <h3>A missing semicolon</h3>
-    <CodeBlock code={ex.missingSemicolonSource} label="missing_semicolon.rob" />
+    <CodeBlock lang="rob" code={ex.missingSemicolonSource} label="missing_semicolon.rob" />
     <CodeBlock code={ex.missingSemicolonValidate} label="Output (exit status 1)" />
 
     <p>

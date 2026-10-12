@@ -1,135 +1,177 @@
 ---
 import CodeBlock from '../components/CodeBlock.astro';
 import { pickAndPlaceSource, pickAndPlaceValidate } from '../data/examples';
-import { CORE_REPO, versions } from '../data/facts';
+import { CORE_REPO, LICENSE_NAME, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
-  title="RoboLang: a task language for robots and AI"
+  title="RoboLang: a common language for robotic tasks"
   description="RoboLang is an open-source task description language for robots. Write tasks, validate their structure and inspect a versioned intermediate representation."
 >
-  <section class="hero">
-    <div>
-      <ul class="eyebrow" aria-label="Project facts">
-        <li>Open source</li>
-        <li>Developer preview</li>
-        <li>Language {versions.language}</li>
+  <section slot="head" class="hero on-ink">
+    <div class="wrap">
+      <ul class="chips" aria-label="Project facts">
+        <li><span class="chip"><span class="marker" aria-hidden="true"></span>Developer preview</span></li>
+        <li><span class="chip">Open source</span></li>
+        <li><span class="chip">Language {versions.language}</span></li>
       </ul>
-      <h1>A task language for robots and AI.</h1>
-      <p class="lede">
-        Write robotic tasks. Validate their structure. Inspect a versioned intermediate
-        representation.
+      <h1>A common language for robotic tasks.</h1>
+      <div class="signal-rules" aria-hidden="true"></div>
+
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="lede">
+            Write, validate and inspect structured robot tasks. Built for developers and AI systems.
+            No hardware required.
+          </p>
+          <p>
+            RoboLang describes <em>what</em> a robot should do in a small, typed, human-readable text
+            format. Today it ships read-only developer tools that check a task file and show exactly
+            what it says, before anything is connected to a robot.
+          </p>
+          <div class="actions">
+            <a class="button" href="/get-started/">Get started</a>
+            <a class="button secondary" href={CORE_REPO}>View on GitHub</a>
+          </div>
+        </div>
+        <div class="cropframe">
+          <CodeBlock lang="rob" code={pickAndPlaceSource} label="examples/pick_and_place.rob" />
+          <CodeBlock code={pickAndPlaceValidate} label="$ robolang validate examples/pick_and_place.rob" />
+        </div>
+      </div>
+
+      <dl class="specstrip">
+        <div><dt>Distribution</dt><dd>{versions.distribution}</dd></div>
+        <div><dt>Language</dt><dd>{versions.language}</dd></div>
+        <div><dt>IR schema</dt><dd>{versions.irSchema}</dd></div>
+        <div><dt>Python</dt><dd>{versions.pythonMinimum}+</dd></div>
+        <div><dt>License</dt><dd>{LICENSE_NAME}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>The problem</h2>
+    <div class="section-body prose">
+      <p>
+        Robot tasks are often written as ad hoc scripts or free-form text. A typo, a missing argument
+        or a name that was never declared is found late, usually when something is already running.
+        That gets worse when the task text is produced by a language model instead of a person.
       </p>
       <p>
-        RoboLang describes <em>what</em> a robot should do in a small, typed, human-readable text
-        format. Today it ships read-only developer tools that check a task file and show exactly what
-        it says, before anything is connected to a robot.
+        RoboLang's purpose is to give a task a precise written form with a published grammar, so that
+        tools can reject a malformed task with a clear message and hand a well-formed one to other
+        software as structured data.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>What works today</h2>
+    <div class="section-body">
+      <p class="prose">
+        Distribution {versions.distribution} installs one command, <code>robolang</code>, with two
+        read-only subcommands. It needs Python {versions.pythonMinimum} or newer and has no other
+        dependencies.
+      </p>
+      <ul class="cards">
+        <li class="card">
+          <p class="syslabel">A / Language</p>
+          <h3>Write</h3>
+          <p>
+            Language {versions.language} has a formal grammar: tasks with typed parameters, <code
+              >@safety</code
+            > annotations, a <code>pre</code> block and a <code>plan</code> of six statement kinds.
+          </p>
+          <p><a href="/reference/">Language reference</a></p>
+        </li>
+        <li class="card">
+          <p class="syslabel">B / Validator</p>
+          <h3>Validate</h3>
+          <p>
+            <code>robolang validate</code> checks syntax, names, types and values, and reports each
+            problem as <code>file:line:column</code> with a stable diagnostic code.
+          </p>
+          <p><a href="/examples/#invalid">See diagnostics</a></p>
+        </li>
+        <li class="card">
+          <p class="syslabel">C / IR</p>
+          <h3>Inspect</h3>
+          <p>
+            <code>robolang inspect</code> shows what a valid file describes, as text or as JSON in IR
+            schema {versions.irSchema}, for use by other tools.
+          </p>
+          <p><a href="/examples/#json-ir">See the JSON IR</a></p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id="limitations">What it does not do</h2>
+    <div class="section-body">
+      <p class="prose">
+        These limits are deliberate for the developer preview. Please read them before you start.
+      </p>
+      <dl class="readout">
+        <div>
+          <dt>Execution <span class="status status--off">Not available</span></dt>
+          <dd>
+            <strong>It does not execute tasks.</strong> The supported package contains no code that can
+            run a task or move a robot, and there is no command that does.
+          </dd>
+        </div>
+        <div>
+          <dt>Safety enforcement <span class="status status--off">Not available</span></dt>
+          <dd>
+            <strong>It does not enforce safety.</strong>
+            <code>@safety</code> limits and <code>pre</code> conditions are parsed and checked as text.
+            They are not evaluated or enforced by anything. A file that validates is well formed; it is
+            not thereby safe to run.
+          </dd>
+        </div>
+        <div>
+          <dt>ROS 2 <span class="status status--off">Not supported</span></dt>
+          <dd>
+            <strong>It has no ROS 2 integration.</strong> The core repository keeps an early, never
+            validated ROS 2 adapter as historical source. It is not installed and not supported.
+          </dd>
+        </div>
+        <div>
+          <dt>AI generation <span class="status status--off">Not included</span></dt>
+          <dd>
+            <strong>It does not generate tasks with AI.</strong> The language is designed to be easy
+            for language models to write, but no model or planner is included.
+          </dd>
+        </div>
+        <div>
+          <dt>Release <span class="status status--on">Alpha</span></dt>
+          <dd>
+            <strong>It is an alpha.</strong> It is installed from a clone of the repository and is not
+            published on PyPI. Details may change between versions.
+          </dd>
+        </div>
+      </dl>
+      <p class="prose">
+        Execution, interoperability and AI-assisted authoring are research directions, described on
+        the <a href="/roadmap/">Vision &amp; Roadmap</a> page.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Who it is for</h2>
+    <div class="section-body prose">
+      <p>
+        Robotics developers, ROS 2 engineers and researchers who want to experiment with a checkable
+        task format, including as a target for tasks written by language models. Feedback on the
+        language and the tools is the main thing the project needs right now.
       </p>
       <div class="actions">
-        <a class="button" href="/get-started/">Get started</a>
-        <a class="button secondary" href={CORE_REPO}>View on GitHub</a>
+        <a class="button" href="/get-started/">Install and try it</a>
+        <a class="button secondary" href="/contribute/">Give feedback</a>
       </div>
-    </div>
-    <div>
-      <CodeBlock code={pickAndPlaceSource} label="examples/pick_and_place.rob" />
-      <CodeBlock code={pickAndPlaceValidate} label="robolang validate examples/pick_and_place.rob" />
-    </div>
-  </section>
-
-  <section class="prose">
-    <h2>The problem</h2>
-    <p>
-      Robot tasks are often written as ad hoc scripts or free-form text. A typo, a missing argument or
-      a name that was never declared is found late, usually when something is already running. That
-      gets worse when the task text is produced by a language model instead of a person.
-    </p>
-    <p>
-      RoboLang's purpose is to give a task a precise written form with a published grammar, so that
-      tools can reject a malformed task with a clear message and hand a well-formed one to other
-      software as structured data.
-    </p>
-  </section>
-
-  <section>
-    <h2>What works today</h2>
-    <p class="prose">
-      Distribution {versions.distribution} installs one command, <code>robolang</code>, with two
-      read-only subcommands. It needs Python {versions.pythonMinimum} or newer and has no other
-      dependencies.
-    </p>
-    <ul class="cards">
-      <li class="card">
-        <h3>Write</h3>
-        <p>
-          Language {versions.language} has a formal grammar: tasks with typed parameters, <code
-            >@safety</code
-          > annotations, a <code>pre</code> block and a <code>plan</code> of six statement kinds.
-        </p>
-        <p><a href="/reference/">Language reference</a></p>
-      </li>
-      <li class="card">
-        <h3>Validate</h3>
-        <p>
-          <code>robolang validate</code> checks syntax, names, types and values, and reports each
-          problem as <code>file:line:column</code> with a stable diagnostic code.
-        </p>
-        <p><a href="/examples/#invalid">See diagnostics</a></p>
-      </li>
-      <li class="card">
-        <h3>Inspect</h3>
-        <p>
-          <code>robolang inspect</code> shows what a valid file describes, as text or as JSON in IR
-          schema {versions.irSchema}, for use by other tools.
-        </p>
-        <p><a href="/examples/#json-ir">See the JSON IR</a></p>
-      </li>
-    </ul>
-  </section>
-
-  <section class="prose">
-    <h2 id="limitations">What it does not do</h2>
-    <p>These limits are deliberate for the developer preview. Please read them before you start.</p>
-    <ul>
-      <li>
-        <strong>It does not execute tasks.</strong> The supported package contains no code that can run
-        a task or move a robot, and there is no command that does.
-      </li>
-      <li>
-        <strong>It does not enforce safety.</strong>
-        <code>@safety</code> limits and <code>pre</code> conditions are parsed and checked as text. They
-        are not evaluated or enforced by anything. A file that validates is well formed; it is not
-        thereby safe to run.
-      </li>
-      <li>
-        <strong>It has no ROS 2 integration.</strong> The core repository keeps an early, never
-        validated ROS 2 adapter as historical source. It is not installed and not supported.
-      </li>
-      <li>
-        <strong>It does not generate tasks with AI.</strong> The language is designed to be easy for
-        language models to write, but no model or planner is included.
-      </li>
-      <li>
-        <strong>It is an alpha.</strong> It is installed from a clone of the repository and is not
-        published on PyPI. Details may change between versions.
-      </li>
-    </ul>
-    <p>
-      Execution, interoperability and AI-assisted authoring are research directions, described on the
-      <a href="/roadmap/">Vision &amp; Roadmap</a> page.
-    </p>
-  </section>
-
-  <section class="prose">
-    <h2>Who it is for</h2>
-    <p>
-      Robotics developers, ROS 2 engineers and researchers who want to experiment with a checkable
-      task format, including as a target for tasks written by language models. Feedback on the
-      language and the tools is the main thing the project needs right now.
-    </p>
-    <div class="actions">
-      <a class="button" href="/get-started/">Install and try it</a>
-      <a class="button secondary" href="/contribute/">Give feedback</a>
     </div>
   </section>
 </Base>

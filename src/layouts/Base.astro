@@ -19,6 +19,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#131210" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -31,10 +32,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <StatusBanner />
-    <Header />
+    <div class="on-ink">
+      <StatusBanner />
+      <Header />
+    </div>
     <main id="main">
-      <div class="wrap">
+      <!-- Full-width ink band: the home hero or a PageHead. -->
+      <slot name="head" />
+      <div class="wrap body">
         <slot />
       </div>
     </main>
