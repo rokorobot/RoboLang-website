@@ -12,12 +12,16 @@ are outstanding gates, listed at the end.
 
 | | Count |
 |---|---|
-| FAIL | 1 (accessible name of the header brand link, defect D1) |
+| FAIL on the production site | 1 (accessible name of the header brand link, defect D1) |
+| Fixed in this pull request, not yet in production | 1 (D1) |
+| Unresolved observations | 1 (plain HTTP is not redirected, follow-up F1) |
 | Follow-up items | 6 |
 | Outstanding manual gates | 4 |
 
-No website behaviour was changed. The correction for D1 is proposed below and
-waits for owner approval.
+The owner approved the correction for D1 and it is applied in this pull
+request. **The production site is unmodified and still has the defect** until
+this pull request is merged and deployed. No other website behaviour was
+changed.
 
 ## Test conditions
 
@@ -140,7 +144,8 @@ Deployed site, Chromium, real key events.
 | Item | Result | Evidence |
 |---|---|---|
 | axe-core in CI (jsdom) on the built pages | PASS | 0 violations, but see follow-up F5 |
-| axe-core in Chromium, local build, seven pages at 375 px (menu closed and open) and 1440 px, 21 runs, WCAG 2 A/AA, 2.1, 2.2 AA and best-practice rules | **FAIL: 1 rule** | `label-content-name-mismatch` (serious) on the header brand link, on every page. Defect D1 |
+| axe-core in Chromium, local build of production commit `b5ab8de`, seven pages at 375 px (menu closed and open) and 1440 px, 21 runs, WCAG 2 A/AA, 2.1, 2.2 AA and best-practice rules | **FAIL: 1 rule** | `label-content-name-mismatch` (serious) on the header brand link, on every page. Defect D1 |
+| The same 21 runs on a local build of this pull request with the D1 correction | PASS | 0 violations in all 21 runs; `label-content-name-mismatch` passes on every page; no new violations |
 | Colour contrast on rendered pages | PASS with items for human review | 0 contrast violations in all 21 runs; 19 to 334 text nodes passed per page. axe could not decide some nodes (up to 63 on Examples at 375 px, mostly text inside code panels). Follow-up F6 |
 
 ## 7. Content
@@ -177,16 +182,30 @@ Deployed site, Chromium, real key events.
   A speech-input user who says the visible label may not activate the link.
 - Why CI missed it: the rule depends on what is visibly rendered, and jsdom
   does not render.
-- Proposed correction, **not applied**: change the label so that it starts
-  with the visible text, `aria-label="RoboLang.dev home"`, and remove
-  `aria-hidden` from the `.dev` span. One line in one file; no visual change.
 - Suggested severity: fix before external testers are invited. It does not
   block the internal pilot.
+
+**Status: fixed in this pull request; still present on the production site.**
+
+- Correction, approved by the owner and applied in `src/components/Header.astro`:
+  the label is now `aria-label="RoboLang.dev home"` and `aria-hidden` is
+  removed from the `.dev` span. The decorative square marker keeps
+  `aria-hidden`. No visual or layout change.
+- Verification on a local build of this pull request, Chromium:
+  - The browser's accessibility tree reports the link as `link "RoboLang.dev
+    home"`.
+  - axe-core 4.14.0, seven pages at 375 px with the menu closed and open and
+    at 1440 px, 21 runs: 0 violations; `label-content-name-mismatch` passes
+    in all 21.
+  - `astro check`, the build, the link check and the CI accessibility check
+    pass.
+- Not yet verified: the production site after deployment. Re-run the browser
+  axe check there once this is merged and published.
 
 ## Follow-up items
 
 - **F1. Plain HTTP is served without a redirect** on the `netlify.app`
-  address. HSTS is sent, so browsers upgrade after the first HTTPS visit, and
+  address. **Unresolved.** This is an open observation, not a pass. HSTS is sent, so browsers upgrade after the first HTTPS visit, and
   `.dev` domains are HTTPS-only in browsers, so the custom domain is not
   affected. Check the HTTPS setting in Netlify when the domain is configured.
 - **F2. The status strip is three lines** when the content width is 360 px or
@@ -207,8 +226,9 @@ Deployed site, Chromium, real key events.
 
 ## Outstanding gates
 
-1. **Published deploy commit**: confirm in the Netlify dashboard that the
-   published deploy is `b5ab8de`.
+1. **Published deploy commit**: confirm in the Netlify dashboard which commit
+   is published. After this pull request is merged, confirm the D1 fix is
+   live and re-run the browser axe check on the production site.
 2. **Human screen-reader pass** (checklist section 5), including how the
    CSS-generated section numbers and status brackets are spoken.
 3. **Safari, iOS, Android, Firefox and Edge** (checklist section 1), plus the
