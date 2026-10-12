@@ -1,0 +1,30 @@
+{
+  "name": "robolang-website",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Source for RoboLang.dev, the developer website for the RoboLang task language.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test:links": "node scripts/check-links.mjs",
+    "test:a11y": "node scripts/check-a11y.mjs",
+    "test": "npm run test:links && npm run test:a11y",
+    "verify": "npm run check && npm run build && npm run test"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "astro": "^7.3.8",
+    "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "axe-core": "^4.14.0",
+    "jsdom": "^29.1.1"
+  }
+}

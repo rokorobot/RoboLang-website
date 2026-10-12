@@ -1,0 +1,94 @@
+---
+import CodeBlock from '../components/CodeBlock.astro';
+import * as ex from '../data/examples';
+import { coreFile, specs, versions } from '../data/facts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Examples"
+  description="Valid and invalid RoboLang task files, each shown with the real output of the robolang validate and inspect commands."
+>
+  <div class="prose">
+    <h1>Examples</h1>
+    <p class="lede">
+      Task files and what the tools say about them. Every output on this page was produced by the
+      real <code>robolang</code> command, distribution {versions.distribution}.
+    </p>
+    <p>
+      These examples show how tasks are written and checked. None of them is executed by the supported
+      tools, and a task that validates is not thereby safe to run on a robot.
+    </p>
+
+    <h2 id="pick-and-place">Pick and place</h2>
+    <p>
+      This is <a href={coreFile('examples/pick_and_place.rob')}><code>examples/pick_and_place.rob</code></a>
+      from the core repository, unchanged. It declares five typed parameters, one safety annotation,
+      two preconditions and a five-step plan.
+    </p>
+    <CodeBlock code={ex.pickAndPlaceSource} label="examples/pick_and_place.rob" />
+
+    <h3>Validate</h3>
+    <CodeBlock lang="bash" code="robolang validate examples/pick_and_place.rob" />
+    <CodeBlock code={ex.pickAndPlaceValidate} label="Output (exit status 0)" />
+    <p>
+      The file is valid, with one warning. <code>W401</code> points at line 5, column 23: the
+      <code>max_speed</code> limit has no unit. A unitless limit is deprecated in language {
+        versions.language
+      } and, as the message says, is never treated as an enforced limit. The example is kept as it is
+      so that files written for the earlier version of RoboLang stay valid.
+    </p>
+
+    <h3>Inspect</h3>
+    <CodeBlock lang="bash" code="robolang inspect examples/pick_and_place.rob" />
+    <CodeBlock code={ex.pickAndPlaceInspect} label="Output" />
+
+    <h3 id="json-ir">Inspect as JSON IR</h3>
+    <CodeBlock lang="bash" code="robolang inspect examples/pick_and_place.rob --json" />
+    <CodeBlock lang="json" code={ex.pickAndPlaceJson} label="Output (line breaks condensed for display)" />
+    <p>
+      The intermediate representation names its schema and version, so a consuming program can check
+      what it has been given. Notice that the unitless limit appears with
+      <code>"unit": null</code> and that the number is kept as the text <code>"0.5"</code>. The fields
+      are defined in the <a href={specs.irSchema}>IR schema specification</a>.
+    </p>
+
+    <h2 id="inspect-part">Inspection with a wait</h2>
+    <p>
+      This example was written for this page. It starts with the optional version marker, gives the
+      speed limit a unit, and uses the remaining statement and condition forms: <code>inspect</code>,
+      both kinds of <code>wait</code>, <code>object_exists</code> and <code>sensor_ok</code>.
+    </p>
+    <CodeBlock code={ex.inspectPartSource} label="inspect_part.rob" />
+    <CodeBlock lang="bash" code="robolang validate inspect_part.rob" />
+    <CodeBlock code={ex.inspectPartValidate} label="Output (exit status 0)" />
+    <p>With a unit on the limit there is no warning.</p>
+    <CodeBlock lang="bash" code="robolang inspect inspect_part.rob" />
+    <CodeBlock code={ex.inspectPartInspect} label="Output" />
+    <p>
+      The tool states that the limit is "declared only; not enforced by this tool". That is the
+      accurate reading of every <code>@safety</code> annotation today.
+    </p>
+
+    <h2 id="invalid">Invalid files</h2>
+    <p>
+      When a file is not valid, <code>validate</code> prints a diagnostic with a position and a code
+      and returns exit status 1.
+    </p>
+
+    <h3>An undeclared name</h3>
+    <p>The plan moves to <code>bench</code>, which is not a parameter of the task.</p>
+    <CodeBlock code={ex.undeclaredSource} label="undeclared.rob" />
+    <CodeBlock code={ex.undeclaredValidate} label="Output (exit status 1)" />
+
+    <h3>A missing semicolon</h3>
+    <CodeBlock code={ex.missingSemicolonSource} label="missing_semicolon.rob" />
+    <CodeBlock code={ex.missingSemicolonValidate} label="Output (exit status 1)" />
+
+    <p>
+      The core repository has a larger set of valid and invalid files used by its own tests, in
+      <a href={coreFile('tests/fixtures/README.md')}><code>tests/fixtures</code></a>. The meaning of
+      each code is listed in the <a href={specs.language}>language specification</a>.
+    </p>
+  </div>
+</Base>

@@ -1,0 +1,118 @@
+---
+import { specs, versions } from '../data/facts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Vision & Roadmap"
+  description="The long-term research direction for RoboLang and the planned stages after the read-only developer tools. Nothing on this page beyond language 1.1 is available yet."
+>
+  <div class="prose">
+    <h1>Vision &amp; roadmap</h1>
+    <p class="lede">
+      Where RoboLang is trying to go, and how that differs from what you can install today.
+    </p>
+    <div class="note">
+      <p>
+        <strong>This page describes plans, not features.</strong> Only the first stage below exists.
+        Nothing here about execution, simulation, safety enforcement, interoperability, multi-robot
+        communication or AI is available in the supported package, and plans may change.
+      </p>
+    </div>
+
+    <h2>Vision</h2>
+    <p>
+      The research question behind RoboLang is whether one small, precisely specified task language
+      can sit between the people and AI systems that decide what a robot should do and the varied
+      software that makes robots move.
+    </p>
+    <ul>
+      <li>
+        <strong>Interoperable tasks.</strong> The same task description, checked once, understood by
+        different robots through adapters that declare what each robot can do.
+      </li>
+      <li>
+        <strong>Multi-robot communication.</strong> Structured, versioned messages for handing work
+        from one robot to another, in place of free text.
+      </li>
+      <li>
+        <strong>AI-generated programs.</strong> A language strict enough that a task written by a
+        language model can be rejected with a precise reason before it reaches anything physical.
+      </li>
+    </ul>
+    <p>
+      The project builds toward this in order: a correct language first, then execution in simulation,
+      then interoperability. Each stage is meant to be verifiable before the next begins.
+    </p>
+
+    <h2>Stages</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Stage</th>
+            <th scope="col">Focus</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">v1.1</th>
+            <td>
+              Language correctness: specification and grammar, parser, static validation, versioned IR,
+              the read-only <code>validate</code> and <code>inspect</code> commands and an installable
+              package.
+            </td>
+            <td>
+              <strong>Available</strong> as distribution {versions.distribution}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">v1.2</th>
+            <td>
+              Execution correctness: an executor with explicit states, evaluated preconditions, a
+              deterministic simulator and audit trail, and a robust ROS 2 adapter.
+            </td>
+            <td>Planned. Not started.</td>
+          </tr>
+          <tr>
+            <th scope="row">v1.3</th>
+            <td>
+              Interoperability: robot capability descriptors, more than one simulated robot running the
+              same task, and a structured communication and handoff protocol.
+            </td>
+            <td>Planned. Not started.</td>
+          </tr>
+          <tr>
+            <th scope="row">v2.0</th>
+            <td>AI-native RoboLang: generation and checking of tasks with language models.</td>
+            <td>Planned. Not started.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      The stage numbers are language and project milestones. They are separate from the distribution
+      version of the Python package; see
+      <a href="/get-started/#versions">the three version numbers</a>.
+    </p>
+    <p>
+      The full plan, with the scope and exit criteria proposed for each stage, is the
+      <a href={specs.developmentPlan}>development plan</a> in the core repository.
+    </p>
+
+    <h2>Physical robots</h2>
+    <p>
+      Running RoboLang against real hardware is outside the current scope of the project. The supported
+      package cannot do it, and the older prototype code in the repository has never been validated
+      against ROS 2, a simulator or a robot. Please do not connect RoboLang to physical equipment.
+    </p>
+
+    <h2>Help shape it</h2>
+    <p>
+      The most useful input at this stage is on the language itself: what is awkward to express, which
+      diagnostics are unclear and what a consumer of the JSON IR needs. See
+      <a href="/contribute/">Contribute</a>.
+    </p>
+  </div>
+</Base>

@@ -1,0 +1,17 @@
+---
+import { Code } from 'astro:components';
+
+interface Props {
+  code: string;
+  /** `.rob` source and command output are shown as plain text. */
+  lang?: 'text' | 'bash' | 'json';
+  label?: string;
+}
+
+const { code, lang = 'text', label } = Astro.props;
+---
+
+<figure class="code">
+  {label && <figcaption>{label}</figcaption>}
+  <Code code={code} lang={lang} themes={{ light: 'github-light', dark: 'github-dark' }} />
+</figure>

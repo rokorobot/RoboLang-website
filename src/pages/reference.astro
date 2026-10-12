@@ -1,0 +1,126 @@
+---
+import { CORE_COMMIT_SHORT, specs, versions } from '../data/facts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Language Reference"
+  description="Where RoboLang is specified: the language 1.1 specification, the grammar and the IR schema, each linked at a fixed version in the core repository."
+>
+  <div class="prose">
+    <h1>Language reference</h1>
+    <p class="lede">
+      The specifications live in the RoboLang core repository. This page points to them at a fixed
+      version and gives a short orientation.
+    </p>
+    <div class="note">
+      <p>
+        <strong>The documents linked here are the authority.</strong> This website does not restate the
+        grammar or the rules. If anything on this site disagrees with a specification, the
+        specification is right. All links point to core commit <code>{CORE_COMMIT_SHORT}</code>, the
+        version this site was checked against.
+      </p>
+    </div>
+  </div>
+
+  <h2>Specifications</h2>
+  <ul class="cards">
+    <li class="card">
+      <h3><a href={specs.language}>Language specification {versions.language}</a></h3>
+      <p>
+        Source text, tokens, grammar, static rules, the full list of diagnostics, the abstract syntax
+        tree and compatibility with earlier RoboLang sources.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.grammar}>Grammar (EBNF)</a></h3>
+      <p>The syntactic and lexical grammar in ISO-style EBNF, including the reserved words.</p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.irSchema}>IR schema {versions.irSchema}</a></h3>
+      <p>
+        The versioned JSON produced by <code>robolang inspect --json</code>, for tools that consume
+        validated tasks.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.decisions}>Language decisions</a></h3>
+      <p>The recorded design decisions behind language {versions.language}.</p>
+    </li>
+  </ul>
+
+  <div class="prose">
+    <h2>Orientation</h2>
+    <p>
+      This summary is informal and only meant to help you find your way around the specification. See
+      the <a href="/examples/">Examples</a> page for complete files.
+    </p>
+    <ul>
+      <li>
+        A file contains one or more <strong>tasks</strong>, optionally preceded by a version marker,
+        <code>robolang 1.1;</code>.
+      </li>
+      <li>
+        A task has <strong>typed parameters</strong>. The four types are <code>robot</code>,
+        <code>object</code>, <code>location</code> and <code>region</code>.
+      </li>
+      <li>
+        A task may carry <strong><code>@safety</code> annotations</strong> and a
+        <strong><code>pre</code> block</strong> of conditions, and must have a
+        <strong><code>plan</code> block</strong> with at least one statement.
+      </li>
+      <li>
+        The six <strong>statements</strong> are <code>move</code>, <code>grasp</code>,
+        <code>place</code>, <code>inspect</code>, <code>wait</code> and <code>communicate</code>.
+      </li>
+      <li>
+        The four <strong>conditions</strong> are <code>robot_ready</code>, <code>region_clear</code>,
+        <code>object_exists</code> and <code>sensor_ok</code>.
+      </li>
+      <li>Comments start with <code>//</code> and run to the end of the line.</li>
+    </ul>
+
+    <h2>Diagnostics</h2>
+    <p>
+      Every problem the tools report has a stable code and a <code>file:line:column</code> position.
+      The specification lists each code and its meaning.
+    </p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Codes</th><th scope="col">Kind</th><th scope="col">Example</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>E1xx</code></td>
+            <td>Lexical errors</td>
+            <td>An unterminated string</td>
+          </tr>
+          <tr>
+            <td><code>E2xx</code></td>
+            <td>Syntax errors</td>
+            <td><code>E202</code>, a missing semicolon</td>
+          </tr>
+          <tr>
+            <td><code>E3xx</code></td>
+            <td>Static errors</td>
+            <td><code>E303</code>, an undeclared name</td>
+          </tr>
+          <tr>
+            <td><code>W4xx</code></td>
+            <td>Warnings</td>
+            <td><code>W401</code>, <code>max_speed</code> without a unit</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>What the rules do not cover</h2>
+    <p>
+      Language {versions.language} defines what a well-formed task file is. It does not define how a
+      task is executed, how a named location becomes a motion, or how a safety limit is enforced.
+      Those semantics are deferred in the specification and are not implemented by the supported
+      tools. Validation covers the text of the program only.
+    </p>
+  </div>
+</Base>

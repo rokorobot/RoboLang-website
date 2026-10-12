@@ -1,0 +1,27 @@
+---
+import { nav } from '../data/facts';
+
+const current = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img src="/favicon.svg" alt="" width="28" height="28" />
+      RoboLang
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={current === item.href ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
