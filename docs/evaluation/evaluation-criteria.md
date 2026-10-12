@@ -4,8 +4,8 @@ How a round of the [developer evaluation challenge](challenge.md) is run and
 read. This file contains no answers. Facilitator reference answers are kept
 privately and are not in this repository.
 
-Status: **proposed**. The project owner finalizes these criteria before any
-external tester is invited, and they are not changed after results are seen.
+Status: **final**, approved by the project owner on 2026-10-12. The criteria
+are not changed after results are seen.
 
 ## Purpose
 
@@ -18,7 +18,6 @@ its documentation, not about the participant.
 
 - The deployed site has passed the [manual QA checklist](../qa-checklist.md).
 - An internal pilot has been run (see below).
-- The criteria in this file have been finalized.
 
 ## The challenge variant
 
@@ -74,8 +73,7 @@ There are two kinds of criterion, and they are read differently.
 ### Usability targets
 
 - At least **80%** of participants complete all three practical parts
-  (Parts 1, 2 and 3) unaided. This threshold is provisional for a first round
-  of five to eight participants.
+  (Parts 1, 2 and 3) unaided.
 - The **median** time for Parts 1 to 4 is **25 minutes or less**.
 
 These are targets for the product. The 25 minutes is not a pass or fail mark
