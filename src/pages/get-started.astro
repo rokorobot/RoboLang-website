@@ -1,0 +1,155 @@
+---
+import PageHead from '../components/PageHead.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import { pickAndPlaceInspect, pickAndPlaceValidate, versionOutput } from '../data/examples';
+import { CORE_REPO, specs, versions } from '../data/facts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Get Started"
+  description="Install the RoboLang developer tools from a clone of the repository and validate and inspect your first task file."
+>
+  <PageHead slot="head" index="02" label="Get Started" title="Get started">
+    Install the read-only developer tools and check your first task file. This takes a few minutes and needs no robot, no simulator and no ROS 2.
+  </PageHead>
+
+  <div class="prose">
+
+    <h2>Requirements</h2>
+    <ul>
+      <li>Python {versions.pythonMinimum} or newer</li>
+      <li>Git</li>
+    </ul>
+    <p>
+      The package has no runtime dependencies. It is tested on Ubuntu and Windows with Python 3.11
+      and 3.13.
+    </p>
+
+    <h2>1. Install</h2>
+    <p>
+      RoboLang is installed from a clone of the repository. It is <strong>not published on PyPI</strong
+      >, so <code>pip install robolang</code> will not install this project.
+    </p>
+    <CodeBlock lang="bash" code={`git clone ${CORE_REPO}.git`} />
+    <CodeBlock lang="bash" code="cd RoboLang" />
+    <CodeBlock lang="bash" code="python -m pip install ." />
+    <p>
+      Installing into a <a href="https://docs.python.org/3/library/venv.html">virtual environment</a>
+      is recommended. Then confirm the command is available:
+    </p>
+    <CodeBlock lang="bash" code="robolang --version" />
+    <CodeBlock code={versionOutput} label="Output" />
+
+    <h2>2. Validate a task file</h2>
+    <p>The repository includes a small example. From the clone, run:</p>
+    <CodeBlock lang="bash" code="robolang validate examples/pick_and_place.rob" />
+    <CodeBlock code={pickAndPlaceValidate} label="Output" />
+    <p>Three things to notice in that output:</p>
+    <ul>
+      <li>
+        The file is <strong>valid</strong>. <code>validate</code> checked its syntax, names, types and
+        values.
+      </li>
+      <li>
+        There is one <strong>warning</strong>, <code>W401</code>. The example writes
+        <code>max_speed 0.5</code> with no unit, which language {versions.language} still accepts but
+        has deprecated. Writing <code>0.5 m/s</code> removes the warning. Warnings do not make a file
+        invalid.
+      </li>
+      <li>
+        The last line is printed every time: validation covers the text of the program only. It does
+        not make a task safe to run on a robot.
+      </li>
+    </ul>
+
+    <h2>3. Inspect what it describes</h2>
+    <CodeBlock lang="bash" code="robolang inspect examples/pick_and_place.rob" />
+    <CodeBlock code={pickAndPlaceInspect} label="Output" />
+    <p>
+      <code>inspect</code> validates first, then prints the tasks in the file. Nothing is executed. To
+      get the same information as JSON for another program, add <code>--json</code>:
+    </p>
+    <CodeBlock lang="bash" code="robolang inspect examples/pick_and_place.rob --json" />
+    <p>
+      The JSON is tagged with its schema version. The <a href="/examples/#json-ir"
+        >Examples page shows the result</a
+      >, and the <a href={specs.irSchema}>IR schema specification</a> defines it. Use
+      <code>--task NAME</code> to show a single task from a file that contains several.
+    </p>
+
+    <h2>Exit status</h2>
+    <p>Both commands return the same exit status, so they can be used in scripts and CI.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Status</th><th scope="col">Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>0</code></td><td>The file is valid. Warnings do not change this.</td></tr>
+          <tr><td><code>1</code></td><td>The file is not valid. Diagnostics are printed to stderr.</td></tr>
+          <tr><td><code>2</code></td><td>Bad arguments, an unreadable file or an unknown task name.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="versions">Three version numbers</h2>
+    <p>
+      <code>robolang --version</code> prints three versions. They identify different things and change
+      independently.
+    </p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Version</th>
+            <th scope="col">Current</th>
+            <th scope="col">What it identifies</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Distribution</th>
+            <td><code>{versions.distribution}</code></td>
+            <td>The installable Python package. <code>a1</code> means first alpha, a pre-release.</td>
+          </tr>
+          <tr>
+            <th scope="row">Language</th>
+            <td><code>{versions.language}</code></td>
+            <td>The syntax and rules of <code>.rob</code> files.</td>
+          </tr>
+          <tr>
+            <th scope="row">IR schema</th>
+            <td><code>{versions.irSchema}</code></td>
+            <td>The shape of the JSON printed by <code>inspect --json</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      So "RoboLang 1.1" refers to the language, while the software you installed is the alpha
+      distribution {versions.distribution}.
+    </p>
+
+    <h2>Without installing</h2>
+    <p>The same commands run straight from the clone:</p>
+    <CodeBlock lang="bash" code="python src/robolang validate examples/pick_and_place.rob" />
+
+    <div class="note">
+      <p>
+        <strong>What is installed.</strong> The installed package is the <code>robolang</code> tooling
+        only: lexer, parser, validator, IR and the two commands. The repository also contains an older
+        v1 prototype interpreter and an unvalidated ROS 2 adapter. They are kept as historical source,
+        are not installed and are not supported. The
+        <a href={specs.readme}>core README</a> explains the split.
+      </p>
+    </div>
+
+    <h2>Next</h2>
+    <ul>
+      <li><a href="/examples/">Examples</a>: valid and invalid task files with real tool output.</li>
+      <li><a href="/reference/">Language reference</a>: where the grammar and rules are specified.</li>
+      <li><a href="/contribute/">Contribute</a>: report a problem or suggest a change.</li>
+    </ul>
+  </div>
+</Base>

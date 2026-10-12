@@ -1,0 +1,898 @@
+/* RoboLang.dev design tokens and styles.
+
+   Visual language: industrial editorial. Two surfaces are used together on
+   every page: a warm near-black "ink" surface (header, page head, code,
+   footer) and an off-white "paper" surface (body). One signal orange is kept
+   for key actions, section numbers and live markers.
+
+   scripts/check-a11y.mjs reads the colour tokens from :root below and fails
+   the build if a text/background pair it lists drops under WCAG AA contrast,
+   so keep the colours as plain six-digit hex values. */
+:root {
+  /* Surfaces */
+  --ink: #131210;
+  --ink-2: #1d1b18;
+  --paper: #efebe2;
+  --paper-2: #f7f4ec;
+
+  /* Text */
+  --paper-ink: #e7e3d8; /* text on ink */
+  --dim: #bdb7ab; /* secondary text on ink */
+  --muted: #635e53; /* secondary text on paper */
+
+  /* Signal */
+  --signal: #ff4a00; /* fills and rules; text only on ink */
+  --signal-ink: #c33200; /* signal as text on paper */
+
+  /* Rules */
+  --line: #131210;
+  --line-soft: #d6d1c6;
+  --line-ink: #47433b; /* hairlines on ink */
+
+  --font-display: 'Didot', 'Bodoni MT', 'Bodoni 72', Georgia, 'Times New Roman', serif;
+  --font-heading: Bahnschrift, 'Avenir Next Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, SFMono-Regular, Menlo, monospace;
+
+  --fs-label: 0.72rem;
+  --tracking-label: 0.14em;
+  --width: 76rem;
+  --gutter: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 2rem;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 1rem;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ---- Links and focus ----------------------------------------------------- */
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--signal-ink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--signal-ink);
+}
+
+.on-ink a {
+  color: var(--paper-ink);
+  text-decoration-color: var(--signal);
+}
+
+.on-ink a:hover {
+  color: var(--signal);
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.on-ink :focus-visible {
+  outline-color: var(--signal);
+}
+
+/* ---- Type ---------------------------------------------------------------- */
+h1,
+h2,
+h3 {
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1,
+h2 {
+  font-family: var(--font-heading);
+  font-stretch: 80%;
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 1.5rem + 4vw, 4.25rem);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 1.3rem + 1.4vw, 2.25rem);
+}
+
+h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 2.25rem 0 0.6rem;
+}
+
+p,
+ul,
+ol {
+  margin: 0 0 1rem;
+}
+
+ul,
+ol {
+  padding-left: 1.25rem;
+}
+
+ul {
+  list-style: square;
+}
+
+li + li {
+  margin-top: 0.4rem;
+}
+
+li::marker {
+  color: var(--signal-ink);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+:not(pre) > code {
+  background: var(--paper-2);
+  border: 1px solid var(--line-soft);
+  padding: 0.05em 0.35em;
+  overflow-wrap: anywhere;
+}
+
+.on-ink :not(pre) > code {
+  background: var(--ink-2);
+  border-color: var(--line-ink);
+}
+
+/* Machine layer: uppercase monospace labels. */
+.syslabel,
+.chip,
+.site-nav a,
+.mmenu summary,
+.mmenu-panel a,
+.code figcaption,
+th,
+.site-footer nav a,
+.readout dt,
+.specstrip dt,
+.status {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.syslabel {
+  margin: 0 0 0.75rem;
+  color: var(--signal-ink);
+}
+
+.on-ink .syslabel {
+  color: var(--signal);
+}
+
+.marker {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 0.6em;
+  background: var(--signal);
+}
+
+.lede {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  max-width: 38rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -5rem;
+  z-index: 50;
+  background: var(--signal);
+  color: var(--ink);
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* ---- Ink surface --------------------------------------------------------- */
+.on-ink {
+  background: var(--ink);
+  color: var(--paper-ink);
+}
+
+/* Status strip: the developer-preview and hardware warning, kept to one or
+   two lines at phone width. */
+.status-banner {
+  background: var(--ink-2);
+  border-bottom: 1px solid var(--line-ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1.5;
+}
+
+.status-banner p {
+  margin: 0;
+  padding-block: 0.45rem;
+}
+
+.status-banner strong {
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  margin-right: 0.5em;
+}
+
+/* Header */
+.site-header {
+  position: relative;
+  border-bottom: 1px solid var(--line-ink);
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.5rem;
+}
+
+.site-header a.brand {
+  display: inline-flex;
+  align-items: baseline;
+  min-height: 44px;
+  padding-block: 0.6rem;
+  color: var(--paper-ink);
+  font-family: var(--font-heading);
+  font-stretch: 80%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.brand .marker {
+  align-self: center;
+}
+
+.brand .tld {
+  color: var(--dim);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin-left: 0.15em;
+}
+
+.site-nav {
+  display: none;
+}
+
+.site-nav ul {
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav li,
+.mmenu-panel li {
+  margin: 0;
+}
+
+.site-nav a {
+  display: block;
+  padding: 0.9rem 0.6rem;
+  color: var(--dim);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current='page'] {
+  color: var(--signal);
+}
+
+/* Compact menu below 64rem: a <details> element, so it needs no JavaScript. */
+.mmenu summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--line-ink);
+  color: var(--paper-ink);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.mmenu summary::-webkit-details-marker {
+  display: none;
+}
+
+.mmenu[open] summary {
+  background: var(--paper-ink);
+  color: var(--ink);
+}
+
+.mmenu-icon {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mmenu-icon i {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+}
+
+.mmenu-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 40;
+  background: var(--ink);
+  border-top: 1px solid var(--line-ink);
+  border-bottom: 3px solid var(--signal);
+}
+
+.mmenu-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mmenu-panel a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: var(--gutter);
+  border-bottom: 1px solid var(--ink-2);
+  text-decoration: none;
+}
+
+.mmenu-panel a[aria-current='page'] {
+  color: var(--signal);
+}
+
+@media (min-width: 64rem) {
+  .mmenu {
+    display: none;
+  }
+
+  .site-nav {
+    display: block;
+  }
+}
+
+/* Page head (inner pages) */
+.page-head {
+  padding-block: 2.75rem 3rem;
+  border-bottom: 3px solid var(--signal);
+}
+
+.page-head .lede {
+  margin: 1.25rem 0 0;
+  color: var(--dim);
+}
+
+/* ---- Home hero ----------------------------------------------------------- */
+.hero {
+  padding-block: 2.5rem 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+
+.chips li {
+  margin: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line-ink);
+  padding: 0.25rem 0.6rem;
+  color: var(--paper-ink);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-stretch: normal;
+  font-weight: 500;
+  font-size: clamp(2.75rem, 1rem + 8.4vw, 7.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  max-width: 13ch;
+}
+
+.signal-rules {
+  width: 7rem;
+  margin: 2rem 0;
+  border-top: 3px solid var(--signal);
+  border-bottom: 1px solid var(--signal);
+  height: 8px;
+}
+
+.hero-grid {
+  display: grid;
+  gap: 2.5rem;
+  padding-bottom: 3rem;
+}
+
+.hero-grid > * {
+  min-width: 0;
+}
+
+@media (min-width: 60rem) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 4rem;
+    align-items: start;
+  }
+}
+
+.hero .lede {
+  color: var(--paper-ink);
+  font-size: 1.25rem;
+}
+
+.hero-copy p:not(.lede) {
+  color: var(--dim);
+  max-width: 34rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+a.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.5rem 1.15rem;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper-ink);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+a.button:hover {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--ink);
+}
+
+a.button.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+a.button.secondary:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-ink);
+}
+
+.on-ink a.button {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--ink);
+}
+
+.on-ink a.button:hover {
+  background: var(--paper-ink);
+  border-color: var(--paper-ink);
+  color: var(--ink);
+}
+
+.on-ink a.button.secondary {
+  background: transparent;
+  border-color: var(--paper-ink);
+  color: var(--paper-ink);
+}
+
+.on-ink a.button.secondary:hover {
+  background: var(--paper-ink);
+  color: var(--ink);
+}
+
+/* Crop-mark corners around the hero code demonstration. */
+.cropframe {
+  position: relative;
+}
+
+.cropframe::before,
+.cropframe::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 0 solid var(--signal);
+  pointer-events: none;
+}
+
+.cropframe::before {
+  top: -7px;
+  left: -7px;
+  border-width: 2px 0 0 2px;
+}
+
+.cropframe::after {
+  right: -7px;
+  bottom: -7px;
+  border-width: 0 2px 2px 0;
+}
+
+.cropframe .code {
+  margin: 0;
+}
+
+.cropframe .code + .code {
+  border-top: 0;
+}
+
+/* Machine readout along the foot of the hero. */
+.specstrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--line-ink);
+}
+
+.specstrip div {
+  padding: 0.9rem 1rem 1rem 0;
+}
+
+.specstrip dt {
+  color: var(--dim);
+}
+
+.specstrip dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+}
+
+/* ---- Paper body ---------------------------------------------------------- */
+.body {
+  padding-block: 1rem 5rem;
+  counter-reset: section;
+}
+
+.prose {
+  max-width: 46rem;
+}
+
+/* Numbered sections: a 2px ink rule, a signal index, then the heading. */
+.body h2 {
+  counter-increment: section;
+  margin: 4rem 0 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 2px solid var(--line);
+}
+
+.body h2::before {
+  content: counter(section, decimal-leading-zero) ' /';
+  display: block;
+  margin-bottom: 0.6rem;
+  color: var(--signal-ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-stretch: normal;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+}
+
+.body > :first-child > h2:first-child,
+.body > h2:first-child {
+  margin-top: 2.5rem;
+}
+
+/* Home sections: heading in a narrow left column, content on the right. */
+.section {
+  display: grid;
+  gap: 0 3rem;
+  margin-top: 4rem;
+  border-top: 2px solid var(--line);
+}
+
+.section > * {
+  min-width: 0;
+}
+
+.section > h2 {
+  margin: 0 0 1.25rem;
+  border-top: 0;
+}
+
+.section-body {
+  padding-top: 0.85rem;
+}
+
+.section-body > :last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 60rem) {
+  .section {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+
+  .section-body {
+    padding-top: 2.4rem;
+  }
+}
+
+/* Technical panels: one ruled grid, square, no shadows. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.card {
+  margin: 0;
+  padding: 1.1rem 1.25rem 1.35rem;
+  background: var(--paper-2);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.card h3 {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-heading);
+  font-stretch: 80%;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.card p:last-child {
+  margin-bottom: 0;
+}
+
+.status {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status::before {
+  content: '[ ';
+}
+
+.status::after {
+  content: ' ]';
+}
+
+.status--off {
+  color: var(--muted);
+}
+
+.status--on {
+  color: var(--signal-ink);
+}
+
+/* Label / description rows for limitations. */
+.readout {
+  margin: 1.25rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.readout > div {
+  display: grid;
+  gap: 0.4rem 2rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.readout > div:last-child {
+  border-bottom-color: var(--line);
+}
+
+.readout dt .status {
+  display: block;
+  margin-top: 0.3rem;
+}
+
+.readout dd {
+  margin: 0;
+}
+
+@media (min-width: 40rem) {
+  .readout > div {
+    grid-template-columns: 13rem minmax(0, 1fr);
+  }
+}
+
+.note {
+  margin: 1.75rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--signal);
+}
+
+.note p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Code panels (always on ink) ----------------------------------------- */
+.code {
+  margin: 1rem 0 1.5rem;
+  background: var(--ink-2);
+  border: 1px solid var(--line-ink);
+  color: var(--paper-ink);
+}
+
+.code figcaption {
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid var(--line-ink);
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+
+.code pre {
+  margin: 0;
+  padding: 0.9rem;
+  overflow-x: auto;
+  background: transparent !important;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  tab-size: 4;
+  color-scheme: dark;
+  scrollbar-color: var(--line-ink) var(--ink-2);
+  scrollbar-width: thin;
+}
+
+.code pre:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: -3px;
+}
+
+.code pre code {
+  font-size: inherit;
+}
+
+/* Shell prompt for commands. It is generated content, so it is not copied. */
+.code--bash .line::before {
+  content: '$ ';
+  color: var(--signal);
+}
+
+/* ---- Tables -------------------------------------------------------------- */
+.table-scroll {
+  overflow-x: auto;
+  margin: 1.25rem 0 1.75rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9375rem;
+}
+
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.7rem 1rem 0.7rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+thead th {
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+
+tbody th {
+  color: var(--ink);
+}
+
+/* ---- Footer -------------------------------------------------------------- */
+.site-footer {
+  padding-block: 2.5rem 3rem;
+  border-top: 3px solid var(--signal);
+  color: var(--dim);
+  font-size: 0.875rem;
+}
+
+.site-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.site-footer li {
+  margin: 0;
+}
+
+.site-footer nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.site-footer p {
+  max-width: 46rem;
+}
+
+.site-footer p:last-child {
+  margin-bottom: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skip-link {
+    transition: top 0.15s ease;
+  }
+}

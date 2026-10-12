@@ -1,0 +1,18 @@
+---
+interface Props {
+  /** Two-digit position of the page in the navigation, e.g. "02". */
+  index: string;
+  label: string;
+  title: string;
+}
+
+const { index, label, title } = Astro.props;
+---
+
+<header class="page-head on-ink">
+  <div class="wrap">
+    <p class="syslabel">{index} / {label}</p>
+    <h1>{title}</h1>
+    <p class="lede"><slot /></p>
+  </div>
+</header>

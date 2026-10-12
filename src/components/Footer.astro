@@ -1,0 +1,30 @@
+---
+import { CORE_COMMIT_SHORT, CORE_REPO, LICENSE_NAME, WEBSITE_REPO, coreTree, versions } from '../data/facts';
+---
+
+<footer class="site-footer on-ink">
+  <div class="wrap">
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href={CORE_REPO}>RoboLang on GitHub</a></li>
+        <li><a href={`${CORE_REPO}/issues`}>Issues</a></li>
+        <li><a href={WEBSITE_REPO}>Website source</a></li>
+        <li><a href="/contribute/">Contribute</a></li>
+      </ul>
+    </nav>
+    <p>
+      RoboLang's tools check and describe task files. They do not execute tasks, and validation does
+      not make a task safe to run on a robot. Do not use RoboLang to control real hardware.
+    </p>
+    <p>
+      RoboLang is open source under the {LICENSE_NAME} license. It is experimental software, provided
+      without warranty, and is not a robot controller.
+    </p>
+    <p>
+      Technical facts on this site describe distribution {versions.distribution} (language {
+        versions.language
+      }, IR schema {versions.irSchema}) and were verified against core commit
+      <a href={coreTree('')}><code>{CORE_COMMIT_SHORT}</code></a>.
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,85 @@
+---
+import PageHead from '../components/PageHead.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import { CORE_REPO, LICENSE_NAME, WEBSITE_REPO, specs } from '../data/facts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Contribute"
+  description="How to report problems, give feedback and contribute to RoboLang and to this website, and how the project is licensed."
+>
+  <PageHead slot="head" index="06" label="Contribute" title="Contribute">
+    RoboLang is an early open-source project. Trying the tools and telling us what you found is a real contribution.
+  </PageHead>
+
+  <div class="prose">
+
+    <h2>Where things live</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Repository</th><th scope="col">Contains</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href={CORE_REPO}>rokorobot/RoboLang</a></th>
+            <td>
+              The language specification, the grammar, the IR schema, the Python implementation and
+              its tests.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><a href={WEBSITE_REPO}>rokorobot/RoboLang-website</a></th>
+            <td>This website.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Report a problem or give feedback</h2>
+    <p>
+      Open an issue in the <a href={`${CORE_REPO}/issues`}>core repository's issue tracker</a> for
+      anything about the language or the tools. Useful reports include:
+    </p>
+    <ul>
+      <li>A task file that is accepted but should not be, or rejected but should not be.</li>
+      <li>A diagnostic message that is unclear or points at the wrong place.</li>
+      <li>Something you wanted to express in a task and could not.</li>
+      <li>Something a consumer of the JSON IR needs that is missing.</li>
+    </ul>
+    <p>
+      Please include the <code>.rob</code> file, the command you ran, the full output and the result of
+      <code>robolang --version</code>.
+    </p>
+    <p>
+      For a mistake on this website, open an issue in the
+      <a href={`${WEBSITE_REPO}/issues`}>website repository</a>.
+    </p>
+
+    <h2>Work on the code</h2>
+    <p>From a clone of the core repository:</p>
+    <CodeBlock lang="bash" code="python -m pip install -r requirements-dev.txt" />
+    <CodeBlock lang="bash" code="python -m pytest -q" />
+    <CodeBlock lang="bash" code="python -m ruff check ." />
+    <p>
+      Before you start on a larger change, open an issue to discuss it. The
+      <a href={specs.language}>language specification</a> and the
+      <a href={specs.developmentPlan}>development plan</a> describe the current design and scope.
+      Changes to the language begin with the specification.
+    </p>
+    <div class="note">
+      <p>
+        <strong>Scope.</strong> Contributions that add task execution, ROS 2 control or hardware support
+        to the installed package are outside the current scope. Those areas are planned as later
+        stages; see <a href="/roadmap/">Vision &amp; Roadmap</a>.
+      </p>
+    </div>
+
+    <h2>License</h2>
+    <p>
+      RoboLang and this website are licensed under the
+      <a href={specs.license}>{LICENSE_NAME} license</a>. The software is provided without warranty.
+    </p>
+  </div>
+</Base>
