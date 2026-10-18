@@ -10,10 +10,22 @@ file has been done yet unless it says so.
 
 ## 1. Confirm the published deployment in Netlify
 
-Open: the tester had no access to the Netlify dashboard or API, so the
-published deploy has never been matched to a commit.
+**Closed on 2026-10-18** from a screenshot of the Netlify project activity
+provided by the owner:
 
-Steps for the owner:
+- The **Published** production deploy is `main@8eff572`, "RL-11F-C: QA
+  addendum for D1 production verification (#4)". This is the current head of
+  `main` (`8eff57268c2928712faa3ffc2963806fae2d7599`).
+- Every merge to `main` produced a production deploy, each shown as
+  successful: `6c41b3b` (deployed from the Netlify app), `b5ab8de` (#2),
+  `ceb4166` (#3) and `8eff572` (#4).
+- This also settles the earlier open question in the QA report: production
+  did serve builds of `b5ab8de` and `ceb4166`.
+
+The deploy log items in step 6 (dependency install, Node 22, 7 pages) were not
+visible in the screenshot and remain unchecked.
+
+Steps, for future releases:
 
 1. On GitHub, open the repository's commit list for `main` and copy the full
    SHA of the latest commit.
