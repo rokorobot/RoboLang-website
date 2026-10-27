@@ -6,7 +6,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Language Reference"
-  description="Where RoboLang is specified: the language 1.1 specification, the grammar and the IR schema, each linked at a fixed version in the core repository."
+  description="Where RoboLang is specified: the language 1.1 and 1.2 specifications, grammars, IR schemas, simulation semantics and the experimental Core 0.1 contracts, each linked at a fixed version in the core repository."
 >
   <PageHead slot="head" index="03" label="Language Reference" title="Language reference">
     The specifications live in the RoboLang core repository. This page points to them at a fixed version and gives a short orientation.
@@ -26,26 +26,88 @@ import Base from '../layouts/Base.astro';
   <h2>Specifications</h2>
   <ul class="cards">
     <li class="card">
-      <h3><a href={specs.language}>Language specification {versions.language}</a></h3>
+      <h3><a href={specs.language}>Language specification 1.1</a></h3>
       <p>
         Source text, tokens, grammar, static rules, the full list of diagnostics, the abstract syntax
         tree and compatibility with earlier RoboLang sources.
       </p>
     </li>
     <li class="card">
-      <h3><a href={specs.grammar}>Grammar (EBNF)</a></h3>
-      <p>The syntactic and lexical grammar in ISO-style EBNF, including the reserved words.</p>
-    </li>
-    <li class="card">
-      <h3><a href={specs.irSchema}>IR schema {versions.irSchema}</a></h3>
+      <h3><a href={specs.language12}>Language specification 1.2</a></h3>
       <p>
-        The versioned JSON produced by <code>robolang inspect --json</code>, for tools that consume
-        validated tasks.
+        What 1.2 adds to 1.1: conditions combined with <code>and</code>, <code>or</code> and
+        <code>not</code>, evaluated in three-valued logic.
       </p>
     </li>
     <li class="card">
-      <h3><a href={specs.decisions}>Language decisions</a></h3>
-      <p>The recorded design decisions behind language {versions.language}.</p>
+      <h3>Grammars (EBNF)</h3>
+      <p>
+        The syntactic and lexical grammar in ISO-style EBNF, including the reserved words:
+        <a href={specs.grammar}>1.1</a> and <a href={specs.grammar12}>1.2</a>.
+      </p>
+    </li>
+    <li class="card">
+      <h3>IR schemas</h3>
+      <p>
+        The versioned JSON produced by <code>robolang inspect --json</code>, for tools that consume
+        validated tasks: <a href={specs.irSchema}>1.0</a> for a 1.1 source and
+        <a href={specs.irSchema11}>1.1</a> for a 1.2 source.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.simulation}>Simulation semantics</a></h3>
+      <p>
+        What <code>robolang simulate</code> does: executor states, world file {versions.worldFile} and
+        run record {versions.runRecord}.
+      </p>
+    </li>
+    <li class="card">
+      <h3>Decisions</h3>
+      <p>
+        The recorded design decisions behind the specifications, for example
+        <a href={specs.decisions}>language 1.1</a> and <a href={specs.decisionsLang12}>language 1.2</a>.
+        All of them are in the <a href={specs.decisionsDir}>decision records</a>.
+      </p>
+    </li>
+  </ul>
+
+  <h2>Experimental: Core {versions.core}</h2>
+  <div class="prose">
+    <p>
+      Core defines what AI agents and robots exchange, separately from the <code>.rob</code> language.
+      Core {versions.core} is a draft, implemented as per-message checks and exercised only by the
+      in-process reference simulation. It is not a network protocol, and a valid Core document is never
+      permission to operate a robot.
+    </p>
+  </div>
+  <ul class="cards">
+    <li class="card">
+      <h3><a href={specs.core}>Core {versions.core}</a></h3>
+      <p>
+        Goals, capabilities, messages, authority, commitments and custody, and evidence-backed
+        outcomes, with the order in which a receiver checks each message and its rejection codes.
+      </p>
+    </li>
+    <li class="card">
+      <h3>Core schemas</h3>
+      <p>
+        JSON Schema draft 2020-12: the <a href={specs.coreMessageSchema}>message</a> envelope for A2R
+        and R2R exchanges, and the <a href={specs.coreDescriptorSchema}>capability descriptor</a>.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.referenceSimulation}>Reference simulation 0.1</a></h3>
+      <p>
+        The RFC-001 scenario run by <code>robolang arch02</code>: participants, symbolic world,
+        behavior rules and the failure variants.
+      </p>
+    </li>
+    <li class="card">
+      <h3>Evidence</h3>
+      <p>
+        The signed-off exit gates: <a href={specs.foundation1Evidence}>Foundation 1</a> and
+        <a href={specs.gate1Evidence}>RL-ARCH-02 gate 1</a>.
+      </p>
     </li>
   </ul>
 
@@ -58,7 +120,7 @@ import Base from '../layouts/Base.astro';
     <ul>
       <li>
         A file contains one or more <strong>tasks</strong>, optionally preceded by a version marker,
-        <code>robolang 1.1;</code>.
+        <code>robolang 1.1;</code> or <code>robolang 1.2;</code>. Without a marker a file is 1.1.
       </li>
       <li>
         A task has <strong>typed parameters</strong>. The four types are <code>robot</code>,
@@ -75,7 +137,8 @@ import Base from '../layouts/Base.astro';
       </li>
       <li>
         The four <strong>conditions</strong> are <code>robot_ready</code>, <code>region_clear</code>,
-        <code>object_exists</code> and <code>sensor_ok</code>.
+        <code>object_exists</code> and <code>sensor_ok</code>. In language 1.2 they can be combined
+        with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.
       </li>
       <li>Comments start with <code>//</code> and run to the end of the line.</li>
     </ul>
@@ -117,10 +180,10 @@ import Base from '../layouts/Base.astro';
 
     <h2>What the rules do not cover</h2>
     <p>
-      Language {versions.language} defines what a well-formed task file is. It does not define how a
-      task is executed, how a named location becomes a motion, or how a safety limit is enforced.
-      Those semantics are deferred in the specification and are not implemented by the supported
-      tools. Validation covers the text of the program only.
+      The language specifications define what a well-formed task file is, and the simulation
+      specification defines how a task runs against a symbolic world. Neither defines how a named
+      location becomes a motion or how a safety limit is enforced on a robot. Those semantics are not
+      specified or implemented. Validation covers the text of the program only.
     </p>
   </div>
 </Base>

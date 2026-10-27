@@ -1,13 +1,13 @@
 ---
 import CodeBlock from '../components/CodeBlock.astro';
 import { pickAndPlaceSource, pickAndPlaceValidate } from '../data/examples';
-import { CORE_REPO, LICENSE_NAME, versions } from '../data/facts';
+import { CORE_REPO, LICENSE_NAME, milestone, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="RoboLang: a common language for robotic tasks"
-  description="RoboLang is an open-source task description language for robots. Write tasks, validate their structure and inspect a versioned intermediate representation."
+  description="RoboLang is an open-source, robot-independent language for robotic tasks. Validate tasks, inspect a versioned intermediate representation and run them in a deterministic symbolic simulation. Not for real hardware."
 >
   <section slot="head" class="hero on-ink">
     <div class="wrap">
@@ -22,13 +22,14 @@ import Base from '../layouts/Base.astro';
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="lede">
-            Write, validate and inspect structured robot tasks. Built for developers and AI systems.
+            Write, validate and simulate structured robot tasks. Built for developers and AI systems.
             No hardware required.
           </p>
           <p>
             RoboLang describes <em>what</em> a robot should do in a small, typed, human-readable text
-            format. Today it ships read-only developer tools that check a task file and show exactly
-            what it says, before anything is connected to a robot.
+            format. Today its tools check a task file, show exactly what it says and run it in a
+            deterministic symbolic simulation. An experimental Core {versions.core} shows, in simulation
+            only, how AI agents and robots could exchange goals, capabilities and verified outcomes.
           </p>
           <div class="actions">
             <a class="button" href="/get-started/">Get started</a>
@@ -71,18 +72,22 @@ import Base from '../layouts/Base.astro';
     <h2>What works today</h2>
     <div class="section-body">
       <p class="prose">
-        Distribution {versions.distribution} installs one command, <code>robolang</code>, with two
-        read-only subcommands. It needs Python {versions.pythonMinimum} or newer and has no other
-        dependencies.
+        Distribution {versions.distribution} installs one command, <code>robolang</code>, with four
+        subcommands: <code>validate</code>, <code>inspect</code>, <code>simulate</code> and
+        <code>arch02</code>. It needs Python {versions.pythonMinimum} or newer and has no other
+        dependencies. Nothing it does reaches a robot.
       </p>
+      <h3>Available</h3>
       <ul class="cards">
         <li class="card">
           <p class="syslabel">A / Language</p>
           <h3>Write</h3>
           <p>
-            Language {versions.language} has a formal grammar: tasks with typed parameters, <code
+            Languages {versions.language} have a formal grammar: tasks with typed parameters, <code
               >@safety</code
             > annotations, a <code>pre</code> block and a <code>plan</code> of six statement kinds.
+            Language 1.2 adds conditions combined with <code>and</code>, <code>or</code> and
+            <code>not</code>.
           </p>
           <p><a href="/reference/">Language reference</a></p>
         </li>
@@ -104,7 +109,37 @@ import Base from '../layouts/Base.astro';
           </p>
           <p><a href="/examples/#json-ir">See the JSON IR</a></p>
         </li>
+        <li class="card">
+          <p class="syslabel">D / Simulation</p>
+          <h3>Simulate</h3>
+          <p>
+            <code>robolang simulate</code> runs a validated task against a declared world file. It
+            fails closed: a false or unknown precondition stops the run. The same inputs always give
+            the same run record and run ID.
+          </p>
+          <p><a href="/examples/#simulate">See a simulation</a></p>
+        </li>
       </ul>
+      <h3>Experimental, simulation only</h3>
+      <ul class="cards">
+        <li class="card">
+          <p class="syslabel">E / Core {versions.core}</p>
+          <h3>Exchange</h3>
+          <p>
+            A draft Core {versions.core} defines checked messages between AI agents and robots (A2R)
+            and between robots (R2R). <code>robolang arch02</code> runs the reference scenario in one
+            process: stub participants, local authorization, and success only with evidence. Gate
+            1 of RL-ARCH-02 passed on {milestone.date}.
+          </p>
+          <p><a href="/examples/#arch02">See the reference simulation</a></p>
+        </li>
+      </ul>
+      <h3>Future</h3>
+      <p class="prose">
+        Real transports and network interoperability, independently built implementations,
+        physical-robot execution and richer world models. None of these exists yet. The
+        <a href="/roadmap/">Vision &amp; Roadmap</a> page shows the status of each stage.
+      </p>
     </div>
   </section>
 
@@ -116,19 +151,30 @@ import Base from '../layouts/Base.astro';
       </p>
       <dl class="readout">
         <div>
-          <dt>Execution <span class="status status--off">Not available</span></dt>
+          <dt>Robot execution <span class="status status--off">Not available</span></dt>
           <dd>
-            <strong>It does not execute tasks.</strong> The supported package contains no code that can
-            run a task or move a robot, and there is no command that does.
+            <strong>It does not run tasks on robots.</strong> Nothing in the supported package moves a
+            robot. <code>simulate</code> and <code>arch02</code> track symbolic facts only: no motion
+            planning, kinematics, collisions or physics.
           </dd>
         </div>
         <div>
           <dt>Safety enforcement <span class="status status--off">Not available</span></dt>
           <dd>
             <strong>It does not enforce safety.</strong>
-            <code>@safety</code> limits and <code>pre</code> conditions are parsed and checked as text.
-            They are not evaluated or enforced by anything. A file that validates is well formed; it is
-            not thereby safe to run.
+            <code>@safety</code> limits are checked against the simulated robot profile and reported in
+            the run record, never enforced. <code>pre</code> conditions are evaluated only against the
+            symbolic world file. A file that validates, or a run that succeeds in simulation, is not
+            thereby safe to run on hardware.
+          </dd>
+        </div>
+        <div>
+          <dt>Interoperability <span class="status status--on">Experimental</span></dt>
+          <dd>
+            <strong>It is not a robot protocol.</strong> Core {versions.core} is a draft, exercised only
+            in one process with simulation-only signatures. There is no network transport and no
+            independent implementation yet. A valid Core message is never permission to operate a
+            robot. See the <a href={specs.core}>Core {versions.core} specification</a>.
           </dd>
         </div>
         <div>
@@ -142,7 +188,8 @@ import Base from '../layouts/Base.astro';
           <dt>AI generation <span class="status status--off">Not included</span></dt>
           <dd>
             <strong>It does not generate tasks with AI.</strong> The language is designed to be easy
-            for language models to write, but no model or planner is included.
+            for language models to write, but no model is included. The planner in the reference
+            simulation is a scripted stub.
           </dd>
         </div>
         <div>
@@ -154,8 +201,8 @@ import Base from '../layouts/Base.astro';
         </div>
       </dl>
       <p class="prose">
-        Execution, interoperability and AI-assisted authoring are research directions, described on
-        the <a href="/roadmap/">Vision &amp; Roadmap</a> page.
+        Robot execution, networked interoperability and AI-assisted authoring are research
+        directions, described on the <a href="/roadmap/">Vision &amp; Roadmap</a> page.
       </p>
     </div>
   </section>
