@@ -8,7 +8,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Examples"
-  description="Valid and invalid RoboLang task files, each shown with the real output of the robolang validate and inspect commands."
+  description="Valid and invalid RoboLang task files, symbolic simulations and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
 >
   <PageHead slot="head" index="04" label="Examples" title="Examples">
     Task files and what the tools say about them. Every output on this page was produced by the real <code>robolang</code> command, distribution {versions.distribution}.
@@ -16,8 +16,9 @@ import Base from '../layouts/Base.astro';
 
   <div class="prose">
     <p>
-      These examples show how tasks are written and checked. None of them is executed by the supported
-      tools, and a task that validates is not thereby safe to run on a robot.
+      These examples show how tasks are written, checked and simulated. Simulation is symbolic and
+      nothing here runs on a robot. A task that validates, or succeeds in simulation, is not thereby
+      safe to run on a robot.
     </p>
 
     <h2 id="pick-and-place">Pick and place</h2>
@@ -53,6 +54,46 @@ import Base from '../layouts/Base.astro';
       are defined in the <a href={specs.irSchema}>IR schema specification</a>.
     </p>
 
+    <h2 id="simulate">Simulate</h2>
+    <p>
+      The same file, run against the world file
+      <a href={coreFile('tests/fixtures/simulation/worlds/base.json')}><code>base.json</code></a>
+      from the core repository. It binds <code>r</code> to a ready robot <code>arm1</code> and
+      declares the region <code>cell</code> clear.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate examples/pick_and_place.rob --world tests/fixtures/simulation/worlds/base.json"
+    />
+    <CodeBlock code={ex.pickAndPlaceSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.pickAndPlaceSimulateRecord}
+      label="Standard output: selected fields of the run record, line breaks condensed"
+    />
+    <p>
+      The record shows each executor state in order. The unitless speed limit is reported as
+      <code>unit_unspecified_not_enforced</code>: checked, recorded and never enforced. The full
+      record also lists every step and the final world; its fields are defined in the
+      <a href={specs.simulation}>simulation specification</a>.
+    </p>
+
+    <h3 id="fail-closed">A run that fails closed</h3>
+    <p>
+      With <a href={coreFile('tests/fixtures/simulation/worlds/not_ready.json')}><code>not_ready.json</code></a>,
+      the robot is not ready. The first precondition is false, so the run stops before any step.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate examples/pick_and_place.rob --world tests/fixtures/simulation/worlds/not_ready.json"
+    />
+    <CodeBlock code={ex.pickAndPlaceNotReady} label="Standard error (exit status 4)" />
+    <CodeBlock
+      lang="json"
+      code={ex.pickAndPlaceNotReadyRecord}
+      label="Standard output: selected fields of the run record, line breaks condensed"
+    />
+
     <h2 id="inspect-part">Inspection with a wait</h2>
     <p>
       This example was written for this page. It starts with the optional version marker, gives the
@@ -68,6 +109,71 @@ import Base from '../layouts/Base.astro';
     <p>
       The tool states that the limit is "declared only; not enforced by this tool". That is the
       accurate reading of every <code>@safety</code> annotation today.
+    </p>
+
+    <h2 id="combined">Combined conditions (language 1.2)</h2>
+    <p>
+      This is <a href={coreFile('tests/fixtures/v1.2/simulation/sources/pre_or.rob')}><code>pre_or.rob</code></a>
+      from the core repository's tests, unchanged. The marker <code>robolang 1.2;</code> makes it a 1.2
+      file, and its precondition holds if either region is clear.
+    </p>
+    <div class="note">
+      <p>
+        <strong>Known limitation.</strong> In the version this site describes, text-mode
+        <code>robolang inspect</code> stops with an error on a file that contains a combined
+        condition. <code>validate</code>, <code>inspect --json</code> and <code>simulate</code> work,
+        and are the commands shown below.
+      </p>
+    </div>
+    <CodeBlock lang="rob" code={ex.preOrSource} label="tests/fixtures/v1.2/simulation/sources/pre_or.rob" />
+    <CodeBlock lang="bash" code="robolang validate tests/fixtures/v1.2/simulation/sources/pre_or.rob" />
+    <CodeBlock code={ex.preOrValidate} label="Output (exit status 0)" />
+    <CodeBlock lang="bash" code="robolang inspect tests/fixtures/v1.2/simulation/sources/pre_or.rob --json" />
+    <CodeBlock lang="json" code={ex.preOrJson} label="Output (line breaks condensed for display)" />
+    <p>
+      A 1.2 source produces IR schema 1.1, where a combined condition is a node with a
+      <code>kind</code> of <code>and</code>, <code>or</code> or <code>not</code>. The fields are
+      defined in the <a href={specs.irSchema11}>IR schema 1.1 specification</a>.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate tests/fixtures/v1.2/simulation/sources/pre_or.rob --world tests/fixtures/v1.2/simulation/worlds/base.json"
+    />
+    <CodeBlock code={ex.preOrSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.preOrSimulateRecord}
+      label="Standard output: selected fields of the run record, line breaks condensed"
+    />
+
+    <h2 id="arch02">Reference simulation (experimental)</h2>
+    <p>
+      <code>robolang arch02</code> runs one case of the RFC-001 reference scenario with
+      Core {versions.core} messages between an AI planner stub, a fixed arm and a mobile robot, in one
+      process. The scenario and cases are in
+      <a href={coreFile('tests/fixtures/arch02/README.md')}><code>tests/fixtures/arch02</code></a>.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang arch02 --scenario tests/fixtures/arch02/scenario.json --cases tests/fixtures/arch02/cases.json --case happy_path"
+    />
+    <CodeBlock code={ex.arch02HappyPath} label="Standard error (exit status 0)" />
+    <p>
+      In the happy path the planner records the goal as succeeded, which Core {versions.core} allows
+      only with a verification that cites observations. Case
+      <code>v06_partition_before_release</code> cuts the link between the two robots during the
+      custody handover:
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang arch02 --scenario tests/fixtures/arch02/scenario.json --cases tests/fixtures/arch02/cases.json --case v06_partition_before_release"
+    />
+    <CodeBlock code={ex.arch02Partition} label="Standard error (exit status 0)" />
+    <p>
+      The planner records <code>unknown</code>, not success: custody of the container could not be
+      confirmed. The full run record of each case, printed to standard output, lists every message
+      and event. The rules are in the <a href={specs.referenceSimulation}>reference simulation
+      specification</a>.
     </p>
 
     <h2 id="invalid">Invalid files</h2>

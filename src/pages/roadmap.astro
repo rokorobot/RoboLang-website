@@ -6,7 +6,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Vision & Roadmap"
-  description="The long-term research direction for RoboLang and the planned stages after the read-only developer tools. Nothing on this page beyond language 1.1 is available yet."
+  description="The long-term research direction for RoboLang and the status of each stage: what is delivered, what runs in simulation only, and what is planned. Nothing on this page runs on a robot."
 >
   <PageHead slot="head" index="05" label="Vision & Roadmap" title="Vision & roadmap">
     Where RoboLang is trying to go, and how that differs from what you can install today.
@@ -15,9 +15,9 @@ import Base from '../layouts/Base.astro';
   <div class="prose">
     <div class="note">
       <p>
-        <strong>This page describes plans, not features.</strong> Only the first stage below exists.
-        Nothing here about execution, simulation, safety enforcement, interoperability, multi-robot
-        communication or AI is available in the supported package, and plans may change.
+        <strong>Plans and features are marked apart.</strong> Stages marked Delivered or Simulation only
+        are in the core repository today. Nothing on this page runs on a robot, enforces a safety
+        limit or includes an AI model, and plans may change.
       </p>
     </div>
 
@@ -58,61 +58,100 @@ import Base from '../layouts/Base.astro';
         </thead>
         <tbody>
           <tr>
-            <th scope="row">v1.1</th>
+            <th scope="row">Language 1.1 (RL-11)</th>
             <td>
               Language correctness: specification and grammar, parser, static validation, versioned IR,
-              the read-only <code>validate</code> and <code>inspect</code> commands and an installable
-              package.
+              the <code>validate</code> and <code>inspect</code> commands and an installable package.
             </td>
             <td>
-              <strong>Available</strong> as distribution {versions.distribution}
+              <strong>Delivered</strong> as distribution {versions.distribution}
             </td>
           </tr>
           <tr>
-            <th scope="row">v1.2</th>
+            <th scope="row">Foundation 1 (RL-BASIC-01)</th>
             <td>
-              Execution correctness: an executor with explicit states, evaluated preconditions, a
-              deterministic simulator and audit trail, and a robust ROS 2 adapter.
+              Simulation-only execution: an executor with explicit states, preconditions evaluated
+              against a declared world file, fail-closed behavior and a deterministic run record
+              (<code>robolang simulate</code>).
             </td>
-            <td>Planned. Not started.</td>
+            <td>
+              <strong>Delivered</strong>, simulation only. Signed off 2026-10-27
+              (<a href={specs.foundation1Evidence}>evidence</a>)
+            </td>
           </tr>
           <tr>
-            <th scope="row">v1.3</th>
+            <th scope="row">Language 1.2 (LANG-1)</th>
             <td>
-              Interoperability: robot capability descriptors, more than one simulated robot running the
-              same task, and a structured communication and handoff protocol.
+              Conditions combined with <code>and</code>, <code>or</code> and <code>not</code>, and IR
+              schema 1.1. A language version, separate from the milestones in this table.
             </td>
-            <td>Planned. Not started.</td>
+            <td><strong>Delivered</strong></td>
           </tr>
           <tr>
-            <th scope="row">v2.0</th>
-            <td>AI-native RoboLang: generation and checking of tasks with language models.</td>
-            <td>Planned. Not started.</td>
+            <th scope="row">Gate 1 (RL-ARCH-02)</th>
+            <td>
+              Core {versions.core} message and capability contracts, and an in-process reference
+              simulation in which an AI planner stub and two robot stubs exchange A2R and R2R messages
+              (<code>robolang arch02</code>).
+            </td>
+            <td>
+              <strong>Simulation only.</strong> Gate 1 passed, signed off 2026-10-27
+              (<a href={specs.gate1Evidence}>evidence</a>)
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Gate 2 (RL-INTEROP-01)</th>
+            <td>
+              Independent interoperability: a participant built in a different codebase, from the
+              published documents alone, works with the reference implementation.
+            </td>
+            <td>
+              Specification approved 2026-10-27 (<a href={specs.gate2}>gate 2 specification</a>).
+              Implementation not started and not yet authorized
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Foundation 2</th>
+            <td>
+              Intelligent behavior: goal execution, observations, a knowledge store, reasoner
+              proposals, bounded recovery and a deeper world model.
+            </td>
+            <td>Planned. Not started</td>
+          </tr>
+          <tr>
+            <th scope="row">Physical robots</th>
+            <td>Running tasks on real hardware, through adapters and local safety controls.</td>
+            <td>Not started and not authorized</td>
           </tr>
         </tbody>
       </table>
     </div>
     <p>
-      The stage numbers are language and project milestones. They are separate from the distribution
-      version of the Python package; see
-      <a href="/get-started/#versions">the three version numbers</a>.
+      Milestones are named by their work packages. Language versions (1.1, 1.2) name the syntax of
+      <code>.rob</code> files and are separate from the milestones. An earlier version of this plan
+      used "v1.2" for the execution milestone; that milestone is Foundation 1 above and is unrelated
+      to language 1.2. All of these are separate from the distribution version of the Python package;
+      see <a href="/get-started/#versions">the version numbers</a>.
     </p>
     <p>
-      The full plan, with the scope and exit criteria proposed for each stage, is the
-      <a href={specs.developmentPlan}>development plan</a> in the core repository.
+      The full plan, with the scope and exit criteria for each stage, is the
+      <a href={specs.developmentPlan}>development plan</a> in the core repository. The architecture
+      the stages build toward is <a href={specs.rfc001}>RFC-001</a>.
     </p>
 
     <h2>Physical robots</h2>
     <p>
       Running RoboLang against real hardware is outside the current scope of the project. The supported
-      package cannot do it, and the older prototype code in the repository has never been validated
-      against ROS 2, a simulator or a robot. Please do not connect RoboLang to physical equipment.
+      package cannot do it: its simulations are symbolic and run in one process. The older prototype
+      code in the repository has never been validated against ROS 2 or a robot. Please do not connect
+      RoboLang to physical equipment.
     </p>
 
     <h2>Help shape it</h2>
     <p>
-      The most useful input at this stage is on the language itself: what is awkward to express, which
-      diagnostics are unclear and what a consumer of the JSON IR needs. See
+      The most useful input at this stage is on the language and the contracts: what is awkward to
+      express, which diagnostics are unclear, what a consumer of the JSON IR or a run record needs, and
+      where Core {versions.core} is ambiguous. See
       <a href="/contribute/">Contribute</a>.
     </p>
   </div>

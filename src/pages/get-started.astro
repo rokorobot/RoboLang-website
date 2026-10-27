@@ -1,17 +1,23 @@
 ---
 import PageHead from '../components/PageHead.astro';
 import CodeBlock from '../components/CodeBlock.astro';
-import { pickAndPlaceInspect, pickAndPlaceValidate, versionOutput } from '../data/examples';
+import {
+  arch02HappyPath,
+  pickAndPlaceInspect,
+  pickAndPlaceSimulate,
+  pickAndPlaceValidate,
+  versionOutput,
+} from '../data/examples';
 import { CORE_REPO, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="Get Started"
-  description="Install the RoboLang developer tools from a clone of the repository and validate and inspect your first task file."
+  description="Install the RoboLang developer tools from a clone of the repository, validate and inspect your first task file and run it in a symbolic simulation."
 >
   <PageHead slot="head" index="02" label="Get Started" title="Get started">
-    Install the read-only developer tools and check your first task file. This takes a few minutes and needs no robot, no simulator and no ROS 2.
+    Install the developer tools, check your first task file and run it in a symbolic simulation. This takes a few minutes and needs no robot, no external simulator and no ROS 2.
   </PageHead>
 
   <div class="prose">
@@ -53,8 +59,8 @@ import Base from '../layouts/Base.astro';
       </li>
       <li>
         There is one <strong>warning</strong>, <code>W401</code>. The example writes
-        <code>max_speed 0.5</code> with no unit, which language {versions.language} still accepts but
-        has deprecated. Writing <code>0.5 m/s</code> removes the warning. Warnings do not make a file
+        <code>max_speed 0.5</code> with no unit, which the language still accepts but has
+        deprecated. Writing <code>0.5 m/s</code> removes the warning. Warnings do not make a file
         invalid.
       </li>
       <li>
@@ -67,7 +73,7 @@ import Base from '../layouts/Base.astro';
     <CodeBlock lang="bash" code="robolang inspect examples/pick_and_place.rob" />
     <CodeBlock code={pickAndPlaceInspect} label="Output" />
     <p>
-      <code>inspect</code> validates first, then prints the tasks in the file. Nothing is executed. To
+      <code>inspect</code> validates first, then prints the tasks in the file. Nothing is run. To
       get the same information as JSON for another program, add <code>--json</code>:
     </p>
     <CodeBlock lang="bash" code="robolang inspect examples/pick_and_place.rob --json" />
@@ -78,8 +84,47 @@ import Base from '../layouts/Base.astro';
       <code>--task NAME</code> to show a single task from a file that contains several.
     </p>
 
+    <h2>4. Simulate it</h2>
+    <p>
+      <code>simulate</code> runs a validated task against a world file that declares the robots,
+      objects, regions and sensors. The repository includes one:
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate examples/pick_and_place.rob --world tests/fixtures/simulation/worlds/base.json"
+    />
+    <CodeBlock code={pickAndPlaceSimulate} label="Output (standard error)" />
+    <p>
+      The summary line goes to standard error and the full run record, as JSON, to standard output.
+      The run record lists every state, precondition and step and the final world. The same source,
+      world, task and <code>--seed</code> always give the same record and run ID. The simulation is
+      symbolic: no motion planning, kinematics, collisions or physics, and a simulated success is not
+      evidence that a task is safe on hardware. The <a href="/examples/#simulate">Examples page</a>
+      shows the record and a failing run.
+    </p>
+
+    <h2 id="arch02">5. Run the reference simulation (experimental)</h2>
+    <p>
+      <code>arch02</code> runs one case of the RFC-001 reference scenario. An AI planner stub asks a
+      fixed arm to deliver a container, the arm hands custody to a mobile robot, and every message is a
+      checked Core {versions.core} document.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang arch02 --scenario tests/fixtures/arch02/scenario.json --cases tests/fixtures/arch02/cases.json --case happy_path"
+    />
+    <CodeBlock code={arch02HappyPath} label="Output (standard error)" />
+    <p>
+      This is simulation only: one process, a symbolic world, no network and simulation-only
+      signatures. The same scenario, case and seed give a byte-identical run record. Other cases in
+      the same file, such as <code>v06_partition_before_release</code>, inject faults.
+    </p>
+
     <h2>Exit status</h2>
-    <p>Both commands return the same exit status, so they can be used in scripts and CI.</p>
+    <p>
+      <code>validate</code> and <code>inspect</code> return the same exit status, so they can be used
+      in scripts and CI.
+    </p>
     <div class="table-scroll">
       <table>
         <thead>
@@ -92,11 +137,31 @@ import Base from '../layouts/Base.astro';
         </tbody>
       </table>
     </div>
-
-    <h2 id="versions">Three version numbers</h2>
+    <p><code>simulate</code> reports how the run ended:</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Status</th><th scope="col">Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>0</code></td><td>The run succeeded.</td></tr>
+          <tr><td><code>1</code></td><td>The source file is not valid.</td></tr>
+          <tr><td><code>2</code></td><td>Usage error.</td></tr>
+          <tr><td><code>3</code></td><td>The world file is not valid.</td></tr>
+          <tr><td><code>4</code></td><td>The run failed.</td></tr>
+          <tr><td><code>5</code></td><td>The run was cancelled.</td></tr>
+        </tbody>
+      </table>
+    </div>
     <p>
-      <code>robolang --version</code> prints three versions. They identify different things and change
-      independently.
+      <code>arch02</code> returns <code>0</code> when the case ran, whatever outcome it recorded,
+      <code>2</code> for a usage error and <code>3</code> for an invalid scenario or cases file.
+    </p>
+
+    <h2 id="versions">Version numbers</h2>
+    <p>
+      <code>robolang --version</code> prints the distribution, language and IR schema versions. They
+      identify different things and change independently.
     </p>
     <div class="table-scroll">
       <table>
@@ -116,18 +181,37 @@ import Base from '../layouts/Base.astro';
           <tr>
             <th scope="row">Language</th>
             <td><code>{versions.language}</code></td>
-            <td>The syntax and rules of <code>.rob</code> files.</td>
+            <td>
+              The syntax and rules of <code>.rob</code> files. A file is 1.2 only if it starts with the
+              marker <code>robolang 1.2;</code>.
+            </td>
           </tr>
           <tr>
             <th scope="row">IR schema</th>
             <td><code>{versions.irSchema}</code></td>
-            <td>The shape of the JSON printed by <code>inspect --json</code>.</td>
+            <td>
+              The shape of the JSON printed by <code>inspect --json</code>: 1.0 for a 1.1 source, 1.1
+              for a 1.2 source.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">World file and run record</th>
+            <td><code>{versions.worldFile}</code> / <code>{versions.runRecord}</code></td>
+            <td>
+              The input and output of <code>simulate</code>. The run record is 1.0 for a 1.1 source and
+              1.1 for a 1.2 source.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Core</th>
+            <td><code>{versions.core}</code></td>
+            <td>The experimental message and capability contracts used by <code>arch02</code>.</td>
           </tr>
         </tbody>
       </table>
     </div>
     <p>
-      So "RoboLang 1.1" refers to the language, while the software you installed is the alpha
+      So "RoboLang 1.2" refers to the language, while the software you installed is the alpha
       distribution {versions.distribution}.
     </p>
 
@@ -138,7 +222,8 @@ import Base from '../layouts/Base.astro';
     <div class="note">
       <p>
         <strong>What is installed.</strong> The installed package is the <code>robolang</code> tooling
-        only: lexer, parser, validator, IR and the two commands. The repository also contains an older
+        only: lexer, parser, validator, IR, the symbolic simulator, the Core {versions.core} checks and
+        the reference simulation, behind the four commands. The repository also contains an older
         v1 prototype interpreter and an unvalidated ROS 2 adapter. They are kept as historical source,
         are not installed and are not supported. The
         <a href={specs.readme}>core README</a> explains the split.
@@ -147,7 +232,7 @@ import Base from '../layouts/Base.astro';
 
     <h2>Next</h2>
     <ul>
-      <li><a href="/examples/">Examples</a>: valid and invalid task files with real tool output.</li>
+      <li><a href="/examples/">Examples</a>: valid and invalid task files and simulations, with real tool output.</li>
       <li><a href="/reference/">Language reference</a>: where the grammar and rules are specified.</li>
       <li><a href="/contribute/">Contribute</a>: report a problem or suggest a change.</li>
     </ul>

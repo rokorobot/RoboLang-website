@@ -13,8 +13,9 @@ import { CORE_COMMIT_SHORT, CORE_REPO, LICENSE_NAME, WEBSITE_REPO, coreTree, ver
       </ul>
     </nav>
     <p>
-      RoboLang's tools check and describe task files. They do not execute tasks, and validation does
-      not make a task safe to run on a robot. Do not use RoboLang to control real hardware.
+      RoboLang's tools check and describe task files and run them in a symbolic simulation. They do
+      not run tasks on robots, and neither validation nor a simulated success makes a task safe to run
+      on a robot. Do not use RoboLang to control real hardware.
     </p>
     <p>
       RoboLang is open source under the {LICENSE_NAME} license. It is experimental software, provided
@@ -23,7 +24,7 @@ import { CORE_COMMIT_SHORT, CORE_REPO, LICENSE_NAME, WEBSITE_REPO, coreTree, ver
     <p>
       Technical facts on this site describe distribution {versions.distribution} (language {
         versions.language
-      }, IR schema {versions.irSchema}) and were verified against core commit
+      }, IR schema {versions.irSchema}, Core {versions.core}) and were verified against core commit
       <a href={coreTree('')}><code>{CORE_COMMIT_SHORT}</code></a>.
     </p>
   </div>
