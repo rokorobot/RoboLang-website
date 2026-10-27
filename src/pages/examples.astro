@@ -117,6 +117,14 @@ import Base from '../layouts/Base.astro';
       from the core repository's tests, unchanged. The marker <code>robolang 1.2;</code> makes it a 1.2
       file, and its precondition holds if either region is clear.
     </p>
+    <div class="note">
+      <p>
+        <strong>Known limitation.</strong> In the version this site describes, text-mode
+        <code>robolang inspect</code> stops with an error on a file that contains a combined
+        condition. <code>validate</code>, <code>inspect --json</code> and <code>simulate</code> work,
+        and are the commands shown below.
+      </p>
+    </div>
     <CodeBlock lang="rob" code={ex.preOrSource} label="tests/fixtures/v1.2/simulation/sources/pre_or.rob" />
     <CodeBlock lang="bash" code="robolang validate tests/fixtures/v1.2/simulation/sources/pre_or.rob" />
     <CodeBlock code={ex.preOrValidate} label="Output (exit status 0)" />
