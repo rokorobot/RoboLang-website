@@ -54,8 +54,8 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
       <p>
         <strong>A dated snapshot.</strong> The statuses below were read from the core repository at
         commit <a href={snapshotUrl}><code>{snapshotShort}</code></a> on {roadmapSnapshot.date}. The
-        command examples and technical facts elsewhere on this site stay pinned to core commit
-        <code>{CORE_COMMIT_SHORT}</code>, which they were captured and verified against.
+        command examples and technical facts elsewhere on this site stay pinned to core
+        commit <code>{CORE_COMMIT_SHORT}</code>, which they were captured and verified against.
       </p>
       <p>
         <strong>Delivered</strong> means merged into the core repository. <strong>Approved</strong>
@@ -318,15 +318,15 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
       is started today.
     </p>
     <p>
-      Milestones are named by their work packages. Language versions (1.1, 1.2) name the syntax of
-      <code>.rob</code> files and are separate from the milestones. An earlier version of this plan
+      Milestones are named by their work packages. Language versions (1.1, 1.2) name the syntax
+      of <code>.rob</code> files and are separate from the milestones. An earlier version of this plan
       used "v1.2" for the execution milestone; that milestone is Foundation 1 above and is unrelated
       to language 1.2. All of these are separate from the distribution version of the Python package;
       see <a href="/get-started/#versions">the version numbers</a>.
     </p>
     <p>
-      The full plan, with the scope and exit criteria for each stage, is the
-      <a href={specs.developmentPlan}>development plan</a> in the core repository, linked as it was at
+      The full plan, with the scope and exit criteria for each stage, is
+      the <a href={specs.developmentPlan}>development plan</a> in the core repository, linked as it was at
       core commit <code>{CORE_COMMIT_SHORT}</code>; the status snapshot above is newer. The architecture
       the stages build toward is <a href={specs.rfc001}>RFC-001</a>.
     </p>
@@ -343,8 +343,7 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
     <p>
       The most useful input at this stage is on the language and the contracts: what is awkward to
       express, which diagnostics are unclear, what a consumer of the JSON IR or a run record needs, and
-      where Core {versions.core} is ambiguous. See
-      <a href="/contribute/">Contribute</a>.
+      where Core {versions.core} is ambiguous. See <a href="/contribute/">Contribute</a>.
     </p>
   </div>
 </Base>
