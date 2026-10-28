@@ -1,12 +1,15 @@
 ---
 import PageHead from '../components/PageHead.astro';
-import { specs, versions } from '../data/facts';
+import { CORE_COMMIT_SHORT, CORE_REPO, roadmapSnapshot, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
+
+const snapshotUrl = `${CORE_REPO}/commit/${roadmapSnapshot.commit}`;
+const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
 ---
 
 <Base
   title="Vision & Roadmap"
-  description="The long-term research direction for RoboLang and the status of each stage: what is delivered, what runs in simulation only, and what is planned. Nothing on this page runs on a robot."
+  description="RoboLang's research direction, its development status on 28 October 2026, the Gate 2 interoperability sequence and the planned work beyond it. Nothing on this page runs on a robot."
 >
   <PageHead slot="head" index="05" label="Vision & Roadmap" title="Vision & roadmap">
     Where RoboLang is trying to go, and how that differs from what you can install today.
@@ -46,7 +49,22 @@ import Base from '../layouts/Base.astro';
       then interoperability. Each stage is meant to be verifiable before the next begins.
     </p>
 
-    <h2>Stages</h2>
+    <h2 id="status">Development status, {roadmapSnapshot.date}</h2>
+    <div class="note">
+      <p>
+        <strong>A dated snapshot.</strong> The statuses below were read from the core repository at
+        commit <a href={snapshotUrl}><code>{snapshotShort}</code></a> on {roadmapSnapshot.date}. The
+        command examples and technical facts elsewhere on this site stay pinned to core
+        commit <code>{CORE_COMMIT_SHORT}</code>, which they were captured and verified against.
+      </p>
+      <p>
+        <strong>Delivered</strong> means merged into the core repository. <strong>Approved</strong>
+        means a decision is recorded; it does not authorize implementation. <strong>Pending</strong>
+        and <strong>Planned</strong> mean the work has not started.
+      </p>
+    </div>
+
+    <h3>Milestones</h3>
     <div class="table-scroll">
       <table>
         <thead>
@@ -100,23 +118,39 @@ import Base from '../layouts/Base.astro';
             </td>
           </tr>
           <tr>
-            <th scope="row">Gate 2 (RL-INTEROP-01)</th>
+            <th scope="row">Gate 2 specification (RL-INTEROP-01)</th>
             <td>
               Independent interoperability: a participant built in a different codebase, from the
               published documents alone, works with the reference implementation.
             </td>
             <td>
-              Specification approved 2026-10-27 (<a href={specs.gate2}>gate 2 specification</a>).
-              Implementation not started and not yet authorized
+              <strong>Approved</strong> 2026-10-27 (<a href={specs.gate2}>gate 2 specification</a>).
+              Gate 2 itself has not passed
             </td>
           </tr>
           <tr>
-            <th scope="row">Foundation 2</th>
+            <th scope="row">
+              <a href={roadmapSnapshot.interop1}>INTEROP-1</a>
+            </th>
             <td>
-              Intelligent behavior: goal execution, observations, a knowledge store, reasoner
-              proposals, bounded recovery and a deeper world model.
+              External-process reference self-test: the reference amr-07 runs as a separate process
+              through the <code>robolang-sim-stdio</code> test binding, and all 24 reference cases
+              reproduce their golden records.
             </td>
-            <td>Planned. Not started</td>
+            <td><strong>Delivered</strong> 28 October 2026, simulation only</td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <a href={roadmapSnapshot.interop2a}>INTEROP-2a</a>
+            </th>
+            <td>
+              Decision review of the Gate 2 specification bundle, and a traceability audit of the
+              reference amr-07 against it.
+            </td>
+            <td>
+              <strong>Completed.</strong> PR #38 merged as <code>{snapshotShort}</code> on 28 October
+              2026
+            </td>
           </tr>
           <tr>
             <th scope="row">Physical robots</th>
@@ -126,16 +160,174 @@ import Base from '../layouts/Base.astro';
         </tbody>
       </table>
     </div>
+
+    <h3>What INTEROP-2a decided and found</h3>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Item</th>
+            <th scope="col">What it is</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">N1–N14</th>
+            <td>
+              Fourteen clarifications to the Gate 2 specification, the reference simulation and
+              Core {versions.core}, recorded in decision record 0011. Writing them into the
+              specification text is separate work.
+            </td>
+            <td><strong>Approved</strong> 28 October 2026 (technical approval)</td>
+          </tr>
+          <tr>
+            <th scope="row">Traceability audit</th>
+            <td>
+              Every behavior of the reference amr-07 traced to the specification: 144 rows, of
+              which 59 are traced, 67 ambiguous and 18 missing.
+            </td>
+            <td><strong>Completed</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">D1–D7</th>
+            <td>
+              Defects found in the reference implementation. Their correction approaches have been
+              reviewed.
+            </td>
+            <td>Not implemented. Each needs separate authorization</td>
+          </tr>
+          <tr>
+            <th scope="row">H1, H2</th>
+            <td>Refinements to how the test harness compares observations and claims.</td>
+            <td>Pending. Not authorized by the decision approval</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="gate-2">Gate 2 development sequence</h2>
+    <div class="note">
+      <p>
+        <strong>Gate 2 has not passed.</strong> No independent implementation exists yet, and Gate 2
+        verification has not been run. Gate 2 tests interoperability in simulation, through a test
+        binding between processes. It does not cover a real network transport, production
+        authentication (signatures stay simulation-only), hardware safety or physical execution.
+      </p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Step</th>
+            <th scope="col">Work</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1. INTEROP-1</th>
+            <td>External-process binding and the reference self-test.</td>
+            <td><strong>Delivered</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">2. INTEROP-2a</th>
+            <td>Specification decisions and the traceability audit.</td>
+            <td><strong>Approved and merged</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">3. Corrections</th>
+            <td>
+              Reference and harness corrections: silence and hold expiry, receiver-check ordering,
+              the other reference defects, regression tests, and harness refinements H1 and H2.
+            </td>
+            <td>Pending separate authorization</td>
+          </tr>
+          <tr>
+            <th scope="row">4. INTEROP-2b</th>
+            <td>
+              Frozen specification bundle: implementation-independent specifications, examples,
+              conformance fixtures and a SHA-256 manifest.
+            </td>
+            <td>Planned. Not authorized</td>
+          </tr>
+          <tr>
+            <th scope="row">5. INTEROP-3</th>
+            <td>
+              An independent amr-07, written in a separate codebase from the frozen bundle alone,
+              behind an auditable clean-room information barrier. TypeScript is the preferred
+              language.
+            </td>
+            <td>Planned. Not authorized</td>
+          </tr>
+          <tr>
+            <th scope="row">6. INTEROP-4</th>
+            <td>
+              Verification: conformance tests, interoperability scenarios, deterministic repetition,
+              evidence and owner sign-off.
+            </td>
+            <td>Planned. Not authorized</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="beyond">Beyond Gate 2</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Priority</th>
+            <th scope="col">Workstream</th>
+            <th scope="col">Planned capabilities</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>High</td>
+            <th scope="row">CORE-1</th>
+            <td>Task IR reader and re-validation</td>
+          </tr>
+          <tr>
+            <td>High</td>
+            <th scope="row">LANG-2 to LANG-6</th>
+            <td>Branching, bounded loops, typed values, local bindings and structured data</td>
+          </tr>
+          <tr>
+            <td>Next</td>
+            <th scope="row">Foundation 2</th>
+            <td>Goals, observations, reasoning, knowledge and bounded recovery</td>
+          </tr>
+          <tr>
+            <td>Later</td>
+            <th scope="row">Foundation 3</th>
+            <td>Concurrency, portable skills, ROS 2 backends and heterogeneous robot support</td>
+          </tr>
+          <tr>
+            <td>Later</td>
+            <th scope="row">AI-native v2.0</th>
+            <td>Provider-independent AI task generation, validation and benchmarking</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <p>
-      Milestones are named by their work packages. Language versions (1.1, 1.2) name the syntax of
-      <code>.rob</code> files and are separate from the milestones. An earlier version of this plan
+      <strong>These priorities are planning guidance.</strong> They do not authorize implementation
+      and are not release commitments. Each workstream starts only with its own authorization and,
+      where it changes the language, the IR or Core, its own versioned specification. None of them
+      is started today.
+    </p>
+    <p>
+      Milestones are named by their work packages. Language versions (1.1, 1.2) name the syntax
+      of <code>.rob</code> files and are separate from the milestones. An earlier version of this plan
       used "v1.2" for the execution milestone; that milestone is Foundation 1 above and is unrelated
       to language 1.2. All of these are separate from the distribution version of the Python package;
       see <a href="/get-started/#versions">the version numbers</a>.
     </p>
     <p>
-      The full plan, with the scope and exit criteria for each stage, is the
-      <a href={specs.developmentPlan}>development plan</a> in the core repository. The architecture
+      The full plan, with the scope and exit criteria for each stage, is
+      the <a href={specs.developmentPlan}>development plan</a> in the core repository, linked as it was at
+      core commit <code>{CORE_COMMIT_SHORT}</code>; the status snapshot above is newer. The architecture
       the stages build toward is <a href={specs.rfc001}>RFC-001</a>.
     </p>
 
@@ -151,8 +343,7 @@ import Base from '../layouts/Base.astro';
     <p>
       The most useful input at this stage is on the language and the contracts: what is awkward to
       express, which diagnostics are unclear, what a consumer of the JSON IR or a run record needs, and
-      where Core {versions.core} is ambiguous. See
-      <a href="/contribute/">Contribute</a>.
+      where Core {versions.core} is ambiguous. See <a href="/contribute/">Contribute</a>.
     </p>
   </div>
 </Base>
