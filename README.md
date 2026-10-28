@@ -46,11 +46,11 @@ npm run verify
 ```
 
 `npm run verify` runs everything CI runs: `astro check`, the build, the link
-check and the accessibility check.
+check, the accessibility check and the whitespace check.
 
 ## Checks
 
-Both checks read the built pages in `dist/`, so run `npm run build` first.
+The checks read the built pages in `dist/`, so run `npm run build` first.
 
 - `npm run test:links` fails on a broken internal link or fragment, and on any
   link into the core repository that is not pinned to `CORE_COMMIT`. External
@@ -59,6 +59,11 @@ Both checks read the built pages in `dist/`, so run `npm run build` first.
   layout, so axe cannot measure contrast itself; instead the script checks the
   colour tokens in `global.css` and every syntax-highlighting colour found in
   the built pages against WCAG AA.
+- `npm run test:whitespace` fails when text runs into a link or inline code
+  without a space, outside code blocks, and checks a few sentences that once
+  rendered that way. `astro.config.mjs` sets `compressHTML: true` because
+  Astro 7's default (`'jsx'`) drops the line break before an inline element
+  that starts a source line.
 
 ## Design
 

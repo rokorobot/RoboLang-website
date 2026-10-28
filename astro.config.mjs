@@ -6,4 +6,5 @@ export default defineConfig({
   site: 'https://robolang.dev',
   output: 'static',
   trailingSlash: 'always',
+  compressHTML: true,
 });
