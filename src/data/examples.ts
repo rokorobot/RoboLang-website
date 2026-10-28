@@ -214,6 +214,23 @@ task pre_or(robot r, location dst, region left, region right) {
 export const preOrValidate = `tests/fixtures/v1.2/simulation/sources/pre_or.rob: valid RoboLang 1.2 (1 task)
 Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
 
+export const preOrInspect = `tests/fixtures/v1.2/simulation/sources/pre_or.rob
+RoboLang 1.2 | IR schema 1.1 | 1 task
+
+task pre_or
+  parameters:
+    robot r
+    location dst
+    region left
+    region right
+  safety: (none)
+  preconditions:
+    region_clear left or region_clear right
+  plan:
+    1. move r to dst
+
+This is a description only. Nothing was executed.`;
+
 export const preOrJson = `{
   "ir_schema": "robolang.task-ir",
   "ir_schema_version": "1.1",
