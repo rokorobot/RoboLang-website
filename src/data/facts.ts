@@ -6,7 +6,7 @@
 // version or a link into the core repository.
 
 export const CORE_REPO = 'https://github.com/rokorobot/RoboLang';
-export const CORE_COMMIT = '9512135e6edff29a327426cf6cfed028319762ce';
+export const CORE_COMMIT = '1bac8c766be2ae629cbe5e8750491fdf0935e693';
 export const CORE_COMMIT_SHORT = CORE_COMMIT.slice(0, 7);
 
 export const WEBSITE_REPO = 'https://github.com/rokorobot/RoboLang-website';
