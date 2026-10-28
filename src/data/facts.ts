@@ -27,6 +27,19 @@ export const milestone = {
   date: '2026-10-27',
 } as const;
 
+/**
+ * The dated development-status snapshot on the roadmap page. It is read from a
+ * later core commit than CORE_COMMIT, which stays the baseline for the CLI
+ * facts and captured outputs. Links for it go to immutable pull request and
+ * commit pages, never to files at a moving branch.
+ */
+export const roadmapSnapshot = {
+  date: '28 October 2026',
+  commit: '6d22085144e3d83d9240d4767c491c1181eb38c3',
+  interop1: `${CORE_REPO}/pull/36`,
+  interop2a: `${CORE_REPO}/pull/38`,
+} as const;
+
 export const LICENSE_NAME = 'Apache-2.0';
 
 /** Link to a file in the core repository, pinned to the verified commit. */
