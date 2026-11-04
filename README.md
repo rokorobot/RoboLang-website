@@ -11,7 +11,9 @@ authoritative source for all specifications.
 
 ## Status
 
-The website is under development and is not published yet.
+The website is published at [robolang.dev](https://robolang.dev). It describes
+the latest RoboLang release on PyPI; see `src/data/facts.ts` for the pinned
+core version.
 
 ## How it is built
 

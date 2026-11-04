@@ -2,13 +2,13 @@
 import PageHead from '../components/PageHead.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 import * as ex from '../data/examples';
-import { coreFile, specs, versions } from '../data/facts';
+import { coreFile, coreTree, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="Examples"
-  description="Valid and invalid RoboLang task files, symbolic simulations and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
+  description="Valid and invalid RoboLang task files, goals, branching plans, symbolic simulations, goal delegation and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
 >
   <PageHead slot="head" index="04" label="Examples" title="Examples">
     Task files and what the tools say about them. Every output on this page was produced by the real <code>robolang</code> command, distribution {versions.distribution}.
@@ -144,6 +144,128 @@ import Base from '../layouts/Base.astro';
       code={ex.preOrSimulateRecord}
       label="Standard output: selected fields of the run record, line breaks condensed"
     />
+
+    <h2 id="goals">Goals decide success (language 1.3)</h2>
+    <p>
+      This is <a href={coreFile('examples/handover.rob')}><code>examples/handover.rob</code></a> from
+      the core repository, unchanged. The <code>goal</code> block says what must be true when the task
+      is done; the plan is only the way there.
+    </p>
+    <CodeBlock lang="rob" code={ex.handoverSource} label="examples/handover.rob" />
+    <CodeBlock lang="bash" code="robolang validate examples/handover.rob" />
+    <CodeBlock code={ex.handoverValidate} label="Output (exit status 0)" />
+    <p>
+      Its parameters are bound in
+      <a href={coreFile('examples/world.json')}><code>examples/world.json</code></a>, where the
+      handoff zone becomes clear after 5 seconds.
+    </p>
+    <CodeBlock lang="bash" code="robolang simulate examples/handover.rob --world examples/world.json" />
+    <CodeBlock code={ex.handoverSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.handoverSimulateRecord}
+      label="Standard output: selected fields of the run record"
+    />
+    <p>
+      Every 1.3 run record ends with <code>core_outcome</code>: the same verdict as a Core
+      {versions.core} outcome, citing signed observations of the final world as its evidence.
+    </p>
+    <CodeBlock
+      lang="json"
+      code={ex.handoverCoreOutcome}
+      label="Standard output: the outcome in core_outcome, evidence list omitted"
+    />
+
+    <h3 id="goal-false">Every step succeeds, the goal does not</h3>
+    <p>
+      This example was written for this page. The goal asks for the box at <code>dst</code> and the
+      robot back at <code>src</code>, but the plan never returns.
+    </p>
+    <CodeBlock lang="rob" code={ex.goalMissSource} label="deliver_and_return.rob" />
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate deliver_and_return.rob --world examples/world.json --bind r=arm1 box=box1 src=shelf dst=table"
+    />
+    <CodeBlock code={ex.goalMissSimulate} label="Standard error (exit status 4)" />
+    <CodeBlock
+      lang="json"
+      code={ex.goalMissRecord}
+      label="Standard output: selected fields of the run record, each step cut down to its index and status"
+    />
+    <p>
+      All four steps succeeded, yet the run is <code>FAILED</code> with <code>S301</code>: a goal
+      condition is false in the final world. An unknown goal condition fails the run too, with
+      <code>S302</code>.
+    </p>
+
+    <h2 id="branching">Branching (language 1.4)</h2>
+    <p>
+      This is <a href={coreFile('tests/fixtures/v1.4/valid/branch_route.rob')}><code
+        >branch_route.rob</code
+      ></a> from the core repository's tests, unchanged. Each branch carries its own goal, the
+      task goal applies to every path, and the last branch reports and stops with <code>fail</code>.
+    </p>
+    <CodeBlock lang="rob" code={ex.routeSource} label="tests/fixtures/v1.4/valid/branch_route.rob" />
+    <CodeBlock lang="bash" code="robolang inspect tests/fixtures/v1.4/valid/branch_route.rob" />
+    <CodeBlock code={ex.routeInspect} label="Output (exit status 0)" />
+    <p>
+      Run against <code>examples/world.json</code> with the region bound on the command line. With
+      <code>cell</code>, which is clear, the first branch runs:
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate tests/fixtures/v1.4/valid/branch_route.rob --world examples/world.json --bind r=arm1 box=box1 src=shelf a=table b=handoff cell=cell"
+    />
+    <CodeBlock code={ex.routeClearSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.routeClearRecord}
+      label="Standard output: selected fields of the run record"
+    />
+    <p>
+      With <code>handoff_zone</code>, which is not clear at the start, the run takes the
+      <code>else if</code> branch and checks that branch's goal instead:
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate tests/fixtures/v1.4/valid/branch_route.rob --world examples/world.json --bind r=arm1 box=box1 src=shelf a=table b=handoff cell=handoff_zone"
+    />
+    <CodeBlock code={ex.routeBlockedSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.routeBlockedRecord}
+      label="Standard output: selected fields of the run record"
+    />
+    <p>
+      The record lists every decision with the condition's result. A condition that is
+      <code>unknown</code> fails the run with <code>S261</code>, and <code>fail</code> ends it with
+      <code>S262</code>. The rules are in the <a href={specs.language14}>language 1.4
+      specification</a>.
+    </p>
+
+    <h2 id="delegate">Delegating a goal (experimental)</h2>
+    <p>
+      <code>robolang delegate</code> sends the goal of <code>handover.rob</code>, not its plan, to the
+      arm as a signed Core {versions.core} <code>propose_goal</code>. The arm looks in its own plan
+      library, <a href={coreTree('examples/plans')}><code>examples/plans</code></a>, finds
+      <code>relocate_box</code> with the same goal, runs it and reports an outcome. The planner
+      accepts <code>succeeded</code> only after re-checking the signed evidence itself.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang delegate examples/handover.rob --world examples/world.json --from rl:agent:planner-1 --to rl:robot:arm1 --plans examples/plans"
+    />
+    <CodeBlock code={ex.handoverDelegate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.handoverDelegateRecord}
+      label="Standard output: selected fields of the delegate record, each message cut down to its time, type and sender"
+    />
+    <p>
+      A plan that needs a second robot brings it in as a peer, with a commitment, a lease and a
+      custody transfer. This is simulation only: one process and simulation-only signatures. The
+      rules are in the <a href={specs.delegate}>delegate specification</a>.
+    </p>
 
     <h2 id="arch02">Reference simulation (experimental)</h2>
     <p>

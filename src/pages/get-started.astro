@@ -3,18 +3,20 @@ import PageHead from '../components/PageHead.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 import {
   arch02HappyPath,
+  handoverDelegate,
+  handoverSimulate,
   pickAndPlaceInspect,
   pickAndPlaceSimulate,
   pickAndPlaceValidate,
   versionOutput,
 } from '../data/examples';
-import { CORE_REPO, specs, versions } from '../data/facts';
+import { CORE_RELEASE_TAG, CORE_REPO, PYPI_URL, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="Get Started"
-  description="Install the RoboLang developer tools from a clone of the repository, validate and inspect your first task file and run it in a symbolic simulation."
+  description="Install RoboLang from PyPI, validate and inspect your first task file, run it in a symbolic simulation and delegate its goal to a simulated robot."
 >
   <PageHead slot="head" index="02" label="Get Started" title="Get started">
     Install the developer tools, check your first task file and run it in a symbolic simulation. This takes a few minutes and needs no robot, no external simulator and no ROS 2.
@@ -25,7 +27,7 @@ import Base from '../layouts/Base.astro';
     <h2>Requirements</h2>
     <ul>
       <li>Python {versions.pythonMinimum} or newer</li>
-      <li>Git</li>
+      <li>Git, to get the example files</li>
     </ul>
     <p>
       The package has no runtime dependencies. It is tested on Ubuntu and Windows with Python 3.11
@@ -34,16 +36,17 @@ import Base from '../layouts/Base.astro';
 
     <h2>1. Install</h2>
     <p>
-      RoboLang is installed from a clone of the repository. It is <strong>not published on PyPI</strong
-      >, so <code>pip install robolang</code> will not install this project.
+      RoboLang {versions.distribution} is published on <a href={PYPI_URL}>PyPI</a>. Installing into a
+      <a href="https://docs.python.org/3/library/venv.html">virtual environment</a> is recommended.
     </p>
-    <CodeBlock lang="bash" code={`git clone ${CORE_REPO}.git`} />
-    <CodeBlock lang="bash" code="cd RoboLang" />
-    <CodeBlock lang="bash" code="python -m pip install ." />
+    <CodeBlock lang="bash" code="python -m pip install robolang" />
     <p>
-      Installing into a <a href="https://docs.python.org/3/library/venv.html">virtual environment</a>
-      is recommended. Then confirm the command is available:
+      The example files and test worlds used below are in the repository. Check out the release tag so
+      they match the installed version:
     </p>
+    <CodeBlock lang="bash" code={`git clone --branch ${CORE_RELEASE_TAG} ${CORE_REPO}.git`} />
+    <CodeBlock lang="bash" code="cd RoboLang" />
+    <p>Then confirm the command is available:</p>
     <CodeBlock lang="bash" code="robolang --version" />
     <CodeBlock code={versionOutput} label="Output" />
 
@@ -103,7 +106,36 @@ import Base from '../layouts/Base.astro';
       shows the record and a failing run.
     </p>
 
-    <h2 id="arch02">5. Run the reference simulation (experimental)</h2>
+    <h2 id="goals">5. Check a goal</h2>
+    <p>
+      From language 1.3 a task declares a <code>goal</code>, and a run succeeds only when every goal
+      condition is true in the final world. <code>examples/handover.rob</code> is a 1.3 task: an arm
+      brings a box to a handoff point, and a mobile robot carries it on once the zone is clear. Its
+      bindings are in <code>examples/world.json</code>.
+    </p>
+    <CodeBlock lang="bash" code="robolang simulate examples/handover.rob --world examples/world.json" />
+    <CodeBlock code={handoverSimulate} label="Output (standard error)" />
+    <p>
+      The run record lists each goal condition with its result. A run whose steps all succeed but
+      whose goal is false ends <code>FAILED</code> with <code>S301</code>; the
+      <a href="/examples/#goals">Examples page</a> shows one. Use <code>--bind P=ID</code> to bind
+      task parameters on the command line instead of in the world file.
+    </p>
+
+    <h2 id="delegate">6. Delegate the goal (experimental)</h2>
+    <p>
+      <code>delegate</code> sends only the task's goal to a simulated robot as a signed
+      Core {versions.core} message. The robot matches it to a plan in its own library, runs it and
+      reports an outcome with evidence, and the planner checks that evidence before it accepts
+      success.
+    </p>
+    <CodeBlock
+      lang="bash"
+      code="robolang delegate examples/handover.rob --world examples/world.json --from rl:agent:planner-1 --to rl:robot:arm1 --plans examples/plans"
+    />
+    <CodeBlock code={handoverDelegate} label="Output (standard error)" />
+
+    <h2 id="arch02">7. Run the reference simulation (experimental)</h2>
     <p>
       <code>arch02</code> runs one case of the RFC-001 reference scenario. An AI planner stub asks a
       fixed arm to deliver a container, the arm hands custody to a mobile robot, and every message is a
@@ -154,6 +186,10 @@ import Base from '../layouts/Base.astro';
       </table>
     </div>
     <p>
+      <code>export-goal</code> and <code>delegate</code> use the same codes <code>1</code> to
+      <code>3</code>, and add <code>6</code> when the goal has no Core form. <code>delegate</code>
+      returns <code>0</code> only for a verified success, <code>4</code> for a failed or unknown
+      outcome and <code>7</code> when the robot or a participant rejects the goal.
       <code>arch02</code> returns <code>0</code> when the case ran, whatever outcome it recorded,
       <code>2</code> for a usage error and <code>3</code> for an invalid scenario or cases file.
     </p>
@@ -176,54 +212,60 @@ import Base from '../layouts/Base.astro';
           <tr>
             <th scope="row">Distribution</th>
             <td><code>{versions.distribution}</code></td>
-            <td>The installable Python package. <code>a1</code> means first alpha, a pre-release.</td>
+            <td>The installable Python package, published on PyPI. Still an alpha.</td>
           </tr>
           <tr>
             <th scope="row">Language</th>
             <td><code>{versions.language}</code></td>
             <td>
-              The syntax and rules of <code>.rob</code> files. A file is 1.2 only if it starts with the
-              marker <code>robolang 1.2;</code>.
+              The syntax and rules of <code>.rob</code> files. A file without a marker is 1.1; a later
+              version needs its marker, for example <code>robolang 1.4;</code>.
             </td>
           </tr>
           <tr>
             <th scope="row">IR schema</th>
             <td><code>{versions.irSchema}</code></td>
             <td>
-              The shape of the JSON printed by <code>inspect --json</code>: 1.0 for a 1.1 source, 1.1
-              for a 1.2 source.
+              The shape of the JSON printed by <code>inspect --json</code>, one per language version:
+              1.0 for a 1.1 source up to 1.3 for a 1.4 source.
             </td>
           </tr>
           <tr>
             <th scope="row">World file and run record</th>
             <td><code>{versions.worldFile}</code> / <code>{versions.runRecord}</code></td>
             <td>
-              The input and output of <code>simulate</code>. The run record is 1.0 for a 1.1 source and
-              1.1 for a 1.2 source.
+              The input and output of <code>simulate</code>. The run record version also follows the
+              language: 1.0 for a 1.1 source up to 1.3 for a 1.4 source.
             </td>
           </tr>
           <tr>
             <th scope="row">Core</th>
             <td><code>{versions.core}</code></td>
-            <td>The experimental message and capability contracts used by <code>arch02</code>.</td>
+            <td>
+              The experimental message and capability contracts used by <code>export-goal</code>,
+              <code>delegate</code> and <code>arch02</code>.
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
     <p>
-      So "RoboLang 1.2" refers to the language, while the software you installed is the alpha
-      distribution {versions.distribution}.
+      So "RoboLang {versions.latestLanguage}" refers to the language, while the software you installed
+      is the alpha distribution {versions.distribution}.
     </p>
 
     <h2>Without installing</h2>
-    <p>The same commands run straight from the clone:</p>
+    <p>The same commands run straight from the clone, with no install at all:</p>
     <CodeBlock lang="bash" code="python src/robolang validate examples/pick_and_place.rob" />
 
     <div class="note">
       <p>
         <strong>What is installed.</strong> The installed package is the <code>robolang</code> tooling
-        only: lexer, parser, validator, IR, the symbolic simulator, the Core {versions.core} checks and
-        the reference simulation, behind the four commands. The repository also contains an older
+        only: lexer, parser, validator, IR reader, the symbolic simulator, the Core {versions.core}
+        checks, the goal bridge and the reference simulation, behind the seven commands
+        <code>reference</code>, <code>validate</code>, <code>inspect</code>, <code>simulate</code>,
+        <code>export-goal</code>, <code>delegate</code> and <code>arch02</code>. The repository also
+        contains an older
         v1 prototype interpreter and an unvalidated ROS 2 adapter. They are kept as historical source,
         are not installed and are not supported. The
         <a href={specs.readme}>core README</a> explains the split.

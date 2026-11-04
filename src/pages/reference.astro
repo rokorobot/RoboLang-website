@@ -1,12 +1,12 @@
 ---
 import PageHead from '../components/PageHead.astro';
-import { CORE_COMMIT_SHORT, specs, versions } from '../data/facts';
+import { CORE_COMMIT_SHORT, CORE_RELEASE_TAG, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="Language Reference"
-  description="Where RoboLang is specified: the language 1.1 and 1.2 specifications, grammars, IR schemas, simulation semantics and the experimental Core 0.1 contracts, each linked at a fixed version in the core repository."
+  description="Where RoboLang is specified: the language 1.1 to 1.4 specifications, grammars, IR schemas, simulation semantics, the goal bridge and the experimental Core 0.1 contracts, each linked at a fixed version in the core repository."
 >
   <PageHead slot="head" index="03" label="Language Reference" title="Language reference">
     The specifications live in the RoboLang core repository. This page points to them at a fixed version and gives a short orientation.
@@ -17,14 +17,21 @@ import Base from '../layouts/Base.astro';
       <p>
         <strong>The documents linked here are the authority.</strong> This website does not restate the
         grammar or the rules. If anything on this site disagrees with a specification, the
-        specification is right. All links point to core commit <code>{CORE_COMMIT_SHORT}</code>, the
-        version this site was checked against.
+        specification is right. All links point to core commit <code>{CORE_COMMIT_SHORT}</code>, release
+        tag <code>{CORE_RELEASE_TAG}</code>, the version this site was checked against.
       </p>
     </div>
   </div>
 
   <h2>Specifications</h2>
   <ul class="cards">
+    <li class="card">
+      <h3><a href={specs.languageReference}>Language reference</a></h3>
+      <p>
+        Everything a task author needs on one page, tested against the tools. The installed package
+        prints the same text with <code>robolang reference</code>.
+      </p>
+    </li>
     <li class="card">
       <h3><a href={specs.language}>Language specification 1.1</a></h3>
       <p>
@@ -40,33 +47,52 @@ import Base from '../layouts/Base.astro';
       </p>
     </li>
     <li class="card">
+      <h3><a href={specs.language13}>Language specification 1.3</a></h3>
+      <p>
+        What 1.3 adds: a required <code>goal</code> block that decides success, the outcome conditions
+        <code>object_at</code>, <code>robot_at</code> and <code>holding</code>, and typed
+        <code>sensor</code> parameters.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language14}>Language specification 1.4</a></h3>
+      <p>
+        What 1.4 adds: bounded <code>if</code> / <code>else if</code> / <code>else</code> in plans,
+        with a goal per branch, and <code>fail "reason";</code> for branches that report and stop.
+      </p>
+    </li>
+    <li class="card">
       <h3>Grammars (EBNF)</h3>
       <p>
         The syntactic and lexical grammar in ISO-style EBNF, including the reserved words:
-        <a href={specs.grammar}>1.1</a> and <a href={specs.grammar12}>1.2</a>.
+        <a href={specs.grammar}>1.1</a>, <a href={specs.grammar12}>1.2</a>,
+        <a href={specs.grammar13}>1.3</a> and <a href={specs.grammar14}>1.4</a>.
       </p>
     </li>
     <li class="card">
       <h3>IR schemas</h3>
       <p>
-        The versioned JSON produced by <code>robolang inspect --json</code>, for tools that consume
-        validated tasks: <a href={specs.irSchema}>1.0</a> for a 1.1 source and
-        <a href={specs.irSchema11}>1.1</a> for a 1.2 source.
+        The versioned JSON produced by <code>robolang inspect --json</code>, one per language version:
+        <a href={specs.irSchema}>1.0</a>, <a href={specs.irSchema11}>1.1</a>,
+        <a href={specs.irSchema12}>1.2</a> and <a href={specs.irSchema13}>1.3</a>. The
+        <a href={specs.irReader}>IR reader</a> defines how <code>--ir</code> reads it back and
+        re-validates it.
       </p>
     </li>
     <li class="card">
       <h3><a href={specs.simulation}>Simulation semantics</a></h3>
       <p>
-        What <code>robolang simulate</code> does: executor states, world file {versions.worldFile} and
-        run record {versions.runRecord}.
+        What <code>robolang simulate</code> does: executor states, goal checking, decisions in
+        branching plans, world file {versions.worldFile} and run record {versions.runRecord}.
       </p>
     </li>
     <li class="card">
       <h3>Decisions</h3>
       <p>
         The recorded design decisions behind the specifications, for example
-        <a href={specs.decisions}>language 1.1</a> and <a href={specs.decisionsLang12}>language 1.2</a>.
-        All of them are in the <a href={specs.decisionsDir}>decision records</a>.
+        <a href={specs.decisions}>language 1.1</a>, <a href={specs.decisionsLang12}>1.2</a>,
+        <a href={specs.decisionsLang13}>1.3</a> and <a href={specs.decisionsLang14}>1.4</a>. All of
+        them are in the <a href={specs.decisionsDir}>decision records</a>.
       </p>
     </li>
   </ul>
@@ -75,9 +101,9 @@ import Base from '../layouts/Base.astro';
   <div class="prose">
     <p>
       Core defines what AI agents and robots exchange, separately from the <code>.rob</code> language.
-      Core {versions.core} is a draft, implemented as per-message checks and exercised only by the
-      in-process reference simulation. It is not a network protocol, and a valid Core document is never
-      permission to operate a robot.
+      Core {versions.core} is a draft, implemented as per-message checks and exercised only in one
+      process, by <code>export-goal</code>, <code>delegate</code> and the reference simulation. It is
+      not a network protocol, and a valid Core document is never permission to operate a robot.
     </p>
   </div>
   <ul class="cards">
@@ -93,6 +119,15 @@ import Base from '../layouts/Base.astro';
       <p>
         JSON Schema draft 2020-12: the <a href={specs.coreMessageSchema}>message</a> envelope for A2R
         and R2R exchanges, and the <a href={specs.coreDescriptorSchema}>capability descriptor</a>.
+      </p>
+    </li>
+    <li class="card">
+      <h3>From a task to Core</h3>
+      <p>
+        How a task's goal becomes a Core <code>propose_goal</code>
+        (<a href={specs.exportGoal}><code>export-goal</code></a>), and how
+        <a href={specs.delegate}><code>delegate</code></a> runs it on a robot's own plan, with a peer
+        robot, commitment, lease and custody.
       </p>
     </li>
     <li class="card">
@@ -119,26 +154,30 @@ import Base from '../layouts/Base.astro';
     </p>
     <ul>
       <li>
-        A file contains one or more <strong>tasks</strong>, optionally preceded by a version marker,
-        <code>robolang 1.1;</code> or <code>robolang 1.2;</code>. Without a marker a file is 1.1.
+        A file contains one or more <strong>tasks</strong>, optionally preceded by a version marker
+        such as <code>robolang 1.4;</code>. Without a marker a file is 1.1.
       </li>
       <li>
-        A task has <strong>typed parameters</strong>. The four types are <code>robot</code>,
-        <code>object</code>, <code>location</code> and <code>region</code>.
+        A task has <strong>typed parameters</strong>: <code>robot</code>, <code>object</code>,
+        <code>location</code> and <code>region</code>, and from 1.3 also <code>sensor</code>.
       </li>
       <li>
         A task may carry <strong><code>@safety</code> annotations</strong> and a
         <strong><code>pre</code> block</strong> of conditions, and must have a
-        <strong><code>plan</code> block</strong> with at least one statement.
+        <strong><code>plan</code> block</strong> with at least one statement. From 1.3 it must also
+        have a <strong><code>goal</code> block</strong>, which decides whether a run succeeded.
       </li>
       <li>
-        The six <strong>statements</strong> are <code>move</code>, <code>grasp</code>,
-        <code>place</code>, <code>inspect</code>, <code>wait</code> and <code>communicate</code>.
+        The six <strong>steps</strong> are <code>move</code>, <code>grasp</code>, <code>place</code>,
+        <code>inspect</code>, <code>wait</code> and <code>communicate</code>. From 1.4 a plan can
+        also branch with <code>if</code> / <code>else</code>, nested at most four deep, and end a
+        branch with <code>fail</code>.
       </li>
       <li>
-        The four <strong>conditions</strong> are <code>robot_ready</code>, <code>region_clear</code>,
-        <code>object_exists</code> and <code>sensor_ok</code>. In language 1.2 they can be combined
-        with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.
+        The <strong>conditions</strong> are <code>robot_ready</code>, <code>region_clear</code>,
+        <code>object_exists</code> and <code>sensor_ok</code>, and from 1.3 the outcome conditions
+        <code>object_at</code>, <code>robot_at</code> and <code>holding</code>. From 1.2 they can be
+        combined with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.
       </li>
       <li>Comments start with <code>//</code> and run to the end of the line.</li>
     </ul>
