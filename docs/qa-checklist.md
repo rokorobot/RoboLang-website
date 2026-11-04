@@ -104,7 +104,7 @@ Firefox or Chrome on Windows, VoiceOver with Safari on macOS or iOS.
 - [ ] The status strip appears on every page, and the full hardware warning
       appears in every footer.
 - [ ] The version numbers on Home, Get Started and the footer agree:
-      distribution 0.1.0a1, language 1.1, IR schema 1.0.
+      distribution 0.2.0, language 1.1 to 1.4, IR schema 1.0 to 1.3.
 - [ ] Following Get Started exactly, on a machine without RoboLang installed,
       produces the output shown on the page.
 - [ ] Each page has a title, a meta description and a canonical URL.

@@ -1,27 +1,32 @@
 // Single source of the technical facts quoted on this site.
 //
-// Every fact here was read from rokorobot/RoboLang at CORE_COMMIT. When the
-// core repository publishes a release, re-verify these values against it and
-// change CORE_COMMIT to the release tag. Nothing else on the site hard-codes a
-// version or a link into the core repository.
+// Every fact here was read from rokorobot/RoboLang at CORE_COMMIT, the commit
+// of the release tag CORE_RELEASE_TAG, which is what `pip install robolang`
+// installs. When the core repository publishes a new release, re-verify these
+// values against it and change CORE_COMMIT to that tag's commit. Nothing else on
+// the site hard-codes a version or a link into the core repository.
 
 export const CORE_REPO = 'https://github.com/rokorobot/RoboLang';
-export const CORE_COMMIT = '1bac8c766be2ae629cbe5e8750491fdf0935e693';
+export const CORE_COMMIT = 'd93a7b3826b8ea033a35c2de51d164affd85c34c';
+export const CORE_RELEASE_TAG = 'v0.2.0';
 export const CORE_COMMIT_SHORT = CORE_COMMIT.slice(0, 7);
+
+export const PYPI_URL = 'https://pypi.org/project/robolang/';
 
 export const WEBSITE_REPO = 'https://github.com/rokorobot/RoboLang-website';
 
 export const versions = {
-  distribution: '0.1.0a1',
-  language: '1.1 and 1.2',
-  irSchema: '1.0 and 1.1',
-  worldFile: '1.0',
-  runRecord: '1.0 and 1.1',
+  distribution: '0.2.0',
+  language: '1.1 to 1.4',
+  latestLanguage: '1.4',
+  irSchema: '1.0 to 1.3',
+  worldFile: '1.0 and 1.1',
+  runRecord: '1.0 to 1.3',
   core: '0.1',
   pythonMinimum: '3.11',
 } as const;
 
-/** The latest milestone signed off in the core repository at CORE_COMMIT. */
+/** The latest gate signed off in the core repository at CORE_COMMIT. */
 export const milestone = {
   name: 'RL-ARCH-02 gate 1',
   date: '2026-10-27',
@@ -34,10 +39,15 @@ export const milestone = {
  * commit pages, never to files at a moving branch.
  */
 export const roadmapSnapshot = {
-  date: '28 October 2026',
-  commit: '6d22085144e3d83d9240d4767c491c1181eb38c3',
-  interop1: `${CORE_REPO}/pull/36`,
-  interop2a: `${CORE_REPO}/pull/38`,
+  date: '4 November 2026',
+  commit: 'c21e48d5d2aae37667f7293c759512921753a7f0',
+  core02Freeze: `${CORE_REPO}/pull/84`,
+  core02Flag: `${CORE_REPO}/pull/83`,
+  h3Acceptance: `${CORE_REPO}/pull/90`,
+  gate2Freeze: `${CORE_REPO}/pull/96`,
+  interop3Protocol: `${CORE_REPO}/pull/97`,
+  lang15: `${CORE_REPO}/pull/102`,
+  teaching15: `${CORE_REPO}/pull/103`,
 } as const;
 
 export const LICENSE_NAME = 'Apache-2.0';
@@ -55,11 +65,21 @@ export function coreTree(path: string): string {
 export const specs = {
   language: coreFile('spec/robolang-v1.1.md'),
   language12: coreFile('spec/robolang-v1.2.md'),
+  language13: coreFile('spec/robolang-v1.3.md'),
+  language14: coreFile('spec/robolang-v1.4.md'),
+  languageReference: coreFile('docs/language-reference.md'),
   grammar: coreFile('spec/grammar.ebnf'),
   grammar12: coreFile('spec/grammar-v1.2.ebnf'),
+  grammar13: coreFile('spec/grammar-v1.3.ebnf'),
+  grammar14: coreFile('spec/grammar-v1.4.ebnf'),
   irSchema: coreFile('spec/ir-schema-v1.0.md'),
   irSchema11: coreFile('spec/ir-schema-v1.1.md'),
+  irSchema12: coreFile('spec/ir-schema-v1.2.md'),
+  irSchema13: coreFile('spec/ir-schema-v1.3.md'),
+  irReader: coreFile('spec/ir-reader-v0.1.md'),
   simulation: coreFile('spec/simulation-v1.0.md'),
+  exportGoal: coreFile('spec/export-goal-v0.1.md'),
+  delegate: coreFile('spec/delegate-v0.2.md'),
   core: coreFile('spec/core-v0.1.md'),
   coreMessageSchema: coreFile('spec/core/message-0.1.schema.json'),
   coreDescriptorSchema: coreFile('spec/core/capability-descriptor-0.1.schema.json'),
@@ -68,10 +88,13 @@ export const specs = {
   rfc001: coreFile('spec/architecture/rfc-001-ai-native-architecture.md'),
   decisions: coreFile('spec/decisions/0001-rl-11a-language-decisions.md'),
   decisionsLang12: coreFile('spec/decisions/0006-lang-1-combined-conditions.md'),
+  decisionsLang13: coreFile('spec/decisions/0014-lang-2-goals-and-typed-sensors.md'),
+  decisionsLang14: coreFile('spec/decisions/0027-bounded-branching.md'),
   decisionsDir: coreTree('spec/decisions'),
   foundation1Evidence: coreFile('docs/evidence/rl-basic-01-exit-gate.md'),
   gate1Evidence: coreFile('docs/evidence/rl-arch-02-exit-gate.md'),
   developmentPlan: coreFile('docs/DEVELOPMENT_PLAN.md'),
+  changelog: coreFile('CHANGELOG.md'),
   readme: coreFile('README.md'),
   license: coreFile('LICENSE'),
 } as const;

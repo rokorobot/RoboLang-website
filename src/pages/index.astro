@@ -1,13 +1,13 @@
 ---
 import CodeBlock from '../components/CodeBlock.astro';
-import { pickAndPlaceSource, pickAndPlaceValidate } from '../data/examples';
-import { CORE_REPO, LICENSE_NAME, milestone, specs, versions } from '../data/facts';
+import { handoverSource, handoverValidate } from '../data/examples';
+import { CORE_REPO, LICENSE_NAME, PYPI_URL, milestone, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="RoboLang: a common language for robotic tasks"
-  description="RoboLang is an open-source, robot-independent language for robotic tasks. Validate tasks, inspect a versioned intermediate representation and run them in a deterministic symbolic simulation. Not for real hardware."
+  description="RoboLang is an open-source, robot-independent language for robotic tasks. Declare a goal, validate the task, and run it in a deterministic symbolic simulation that succeeds only when the goal is verified. Not for real hardware."
 >
   <section slot="head" class="hero on-ink">
     <div class="wrap">
@@ -27,9 +27,12 @@ import Base from '../layouts/Base.astro';
           </p>
           <p>
             RoboLang describes <em>what</em> a robot should do in a small, typed, human-readable text
-            format. Today its tools check a task file, show exactly what it says and run it in a
-            deterministic symbolic simulation. An experimental Core {versions.core} shows, in simulation
-            only, how AI agents and robots could exchange goals, capabilities and verified outcomes.
+            format: what must be true before it starts, the <strong>goal</strong> it must achieve, the
+            steps and the safety limits. Its tools check a task file, show exactly what it says and run
+            it in a deterministic symbolic simulation. A run succeeds only when the goal is verified in
+            the final world, not merely because the steps ran. An experimental Core {versions.core}
+            carries that goal, in simulation only, from an AI planner to a robot and back as a verified
+            outcome.
           </p>
           <div class="actions">
             <a class="button" href="/get-started/">Get started</a>
@@ -37,8 +40,8 @@ import Base from '../layouts/Base.astro';
           </div>
         </div>
         <div class="cropframe">
-          <CodeBlock lang="rob" code={pickAndPlaceSource} label="examples/pick_and_place.rob" />
-          <CodeBlock code={pickAndPlaceValidate} label="$ robolang validate examples/pick_and_place.rob" />
+          <CodeBlock lang="rob" code={handoverSource} label="examples/handover.rob" />
+          <CodeBlock code={handoverValidate} label="$ robolang validate examples/handover.rob" />
         </div>
       </div>
 
@@ -72,10 +75,10 @@ import Base from '../layouts/Base.astro';
     <h2>What works today</h2>
     <div class="section-body">
       <p class="prose">
-        Distribution {versions.distribution} installs one command, <code>robolang</code>, with four
-        subcommands: <code>validate</code>, <code>inspect</code>, <code>simulate</code> and
-        <code>arch02</code>. It needs Python {versions.pythonMinimum} or newer and has no other
-        dependencies. Nothing it does reaches a robot.
+        Distribution {versions.distribution} is on <a href={PYPI_URL}>PyPI</a>:
+        <code>pip install robolang</code> installs one command, <code>robolang</code>. It needs Python
+        {versions.pythonMinimum} or newer and has no other dependencies. Nothing it does reaches a
+        robot.
       </p>
       <h3>Available</h3>
       <ul class="cards">
@@ -83,11 +86,11 @@ import Base from '../layouts/Base.astro';
           <p class="syslabel">A / Language</p>
           <h3>Write</h3>
           <p>
-            Languages {versions.language} have a formal grammar: tasks with typed parameters, <code
-              >@safety</code
-            > annotations, a <code>pre</code> block and a <code>plan</code> of six statement kinds.
-            Language 1.2 adds conditions combined with <code>and</code>, <code>or</code> and
-            <code>not</code>.
+            Languages {versions.language} have a formal grammar: typed parameters, <code>@safety</code>
+            annotations, a <code>pre</code> block, a <code>goal</code> block (1.3) and a
+            <code>plan</code>. 1.2 adds <code>and</code>, <code>or</code> and <code>not</code>; 1.4
+            adds bounded <code>if</code> / <code>else</code> and <code>fail</code>.
+            <code>robolang reference</code> prints the language reference.
           </p>
           <p><a href="/reference/">Language reference</a></p>
         </li>
@@ -95,8 +98,9 @@ import Base from '../layouts/Base.astro';
           <p class="syslabel">B / Validator</p>
           <h3>Validate</h3>
           <p>
-            <code>robolang validate</code> checks syntax, names, types and values, and reports each
-            problem as <code>file:line:column</code> with a stable diagnostic code.
+            <code>robolang validate</code> checks syntax, names, types and values, and reports every
+            problem as <code>file:line:column</code> with a stable diagnostic code. With
+            <code>--world</code> it also reports failures a run would certainly hit in that world.
           </p>
           <p><a href="/examples/#invalid">See diagnostics</a></p>
         </li>
@@ -105,7 +109,8 @@ import Base from '../layouts/Base.astro';
           <h3>Inspect</h3>
           <p>
             <code>robolang inspect</code> shows what a valid file describes, as text or as JSON in IR
-            schema {versions.irSchema}, for use by other tools.
+            schema {versions.irSchema}, for use by other tools. Every command also reads Task IR back
+            with <code>--ir</code> and re-validates it from scratch.
           </p>
           <p><a href="/examples/#json-ir">See the JSON IR</a></p>
         </li>
@@ -114,22 +119,33 @@ import Base from '../layouts/Base.astro';
           <h3>Simulate</h3>
           <p>
             <code>robolang simulate</code> runs a validated task against a declared world file. It
-            fails closed: a false or unknown precondition stops the run. The same inputs always give
-            the same run record and run ID.
+            fails closed on a false or unknown precondition, and succeeds only when every goal
+            condition is true in the final world. The same inputs always give the same run record.
           </p>
-          <p><a href="/examples/#simulate">See a simulation</a></p>
+          <p><a href="/examples/#goals">See a goal checked</a></p>
         </li>
       </ul>
       <h3>Experimental, simulation only</h3>
       <ul class="cards">
         <li class="card">
           <p class="syslabel">E / Core {versions.core}</p>
+          <h3>Delegate</h3>
+          <p>
+            <code>robolang delegate</code> sends a task's goal, never its plan, as a signed Core
+            {versions.core} message. The robot runs a plan from its own <code>.rob</code> library and
+            reports an outcome, and the planner accepts success only after re-checking the evidence.
+            <code>export-goal</code> prints the goal message on its own.
+          </p>
+          <p><a href="/examples/#delegate">See a delegation</a></p>
+        </li>
+        <li class="card">
+          <p class="syslabel">F / Core {versions.core}</p>
           <h3>Exchange</h3>
           <p>
-            A draft Core {versions.core} defines checked messages between AI agents and robots (A2R)
-            and between robots (R2R). <code>robolang arch02</code> runs the reference scenario in one
-            process: stub participants, local authorization, and success only with evidence. Gate
-            1 of RL-ARCH-02 passed on {milestone.date}.
+            Core {versions.core} defines checked messages between AI agents and robots (A2R) and
+            between robots (R2R). <code>robolang arch02</code> runs the reference scenario in one
+            process: stub participants, local authorization, and success only with evidence. Gate 1
+            of RL-ARCH-02 passed on {milestone.date}.
           </p>
           <p><a href="/examples/#arch02">See the reference simulation</a></p>
         </li>
@@ -137,7 +153,9 @@ import Base from '../layouts/Base.astro';
       <h3>Future</h3>
       <p class="prose">
         Real transports and network interoperability, independently built implementations,
-        physical-robot execution and richer world models. None of these exists yet. The
+        physical-robot execution and richer world models. None of these is in the package. Work in
+        the core repository since this release, including language 1.5, Core 0.2 and a ROS 2 backend
+        in a physics simulator, is on the
         <a href="/roadmap/">Vision &amp; Roadmap</a> page shows the status of each stage.
       </p>
     </div>
@@ -180,23 +198,27 @@ import Base from '../layouts/Base.astro';
         <div>
           <dt>ROS 2 <span class="status status--off">Not supported</span></dt>
           <dd>
-            <strong>It has no ROS 2 integration.</strong> The core repository keeps an early, never
-            validated ROS 2 adapter as historical source. It is not installed and not supported.
+            <strong>The installed package has no ROS 2 integration.</strong> A separate, experimental
+            ROS 2 backend runs <code>.rob</code> tasks in the Gazebo physics simulator in the core
+            repository's CI; it is not part of <code>pip install robolang</code> and never drives
+            hardware. See the <a href="/roadmap/#status">roadmap</a>. The early v1 ROS 2 adapter is
+            kept as historical source, never validated and not supported.
           </dd>
         </div>
         <div>
           <dt>AI generation <span class="status status--off">Not included</span></dt>
           <dd>
             <strong>It does not generate tasks with AI.</strong> The language is designed to be easy
-            for language models to write, but no model is included. The planner in the reference
-            simulation is a scripted stub.
+            for language models to write, and the core repository benchmarks how well models write
+            it, but no model is included. The planners in <code>delegate</code> and
+            <code>arch02</code> are scripted stubs.
           </dd>
         </div>
         <div>
           <dt>Release <span class="status status--on">Alpha</span></dt>
           <dd>
-            <strong>It is an alpha.</strong> It is installed from a clone of the repository and is not
-            published on PyPI. Details may change between versions.
+            <strong>It is an alpha.</strong> Version {versions.distribution} is published on PyPI.
+            Details may change between versions.
           </dd>
         </div>
       </dl>

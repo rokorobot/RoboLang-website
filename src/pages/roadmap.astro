@@ -1,6 +1,6 @@
 ---
 import PageHead from '../components/PageHead.astro';
-import { CORE_COMMIT_SHORT, CORE_REPO, roadmapSnapshot, specs, versions } from '../data/facts';
+import { CORE_COMMIT_SHORT, CORE_RELEASE_TAG, CORE_REPO, PYPI_URL, roadmapSnapshot, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 
 const snapshotUrl = `${CORE_REPO}/commit/${roadmapSnapshot.commit}`;
@@ -9,7 +9,7 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
 
 <Base
   title="Vision & Roadmap"
-  description="RoboLang's research direction, its development status on 28 October 2026, the Gate 2 interoperability sequence and the planned work beyond it. Nothing on this page runs on a robot."
+  description="RoboLang's research direction, its development status on 4 November 2026, the horizons it is working through, the Gate 2 interoperability sequence and the planned work beyond it. Nothing on this page runs on a robot."
 >
   <PageHead slot="head" index="05" label="Vision & Roadmap" title="Vision & roadmap">
     Where RoboLang is trying to go, and how that differs from what you can install today.
@@ -18,9 +18,10 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
   <div class="prose">
     <div class="note">
       <p>
-        <strong>Plans and features are marked apart.</strong> Stages marked Delivered or Simulation only
-        are in the core repository today. Nothing on this page runs on a robot, enforces a safety
-        limit or includes an AI model, and plans may change.
+        <strong>Plans and features are marked apart.</strong> Stages marked Released are in the
+        package on PyPI; stages marked Delivered are in the core repository but not yet released.
+        Nothing on this page runs on a robot, enforces a safety limit or includes an AI model, and
+        plans may change.
       </p>
     </div>
 
@@ -54,17 +55,19 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
       <p>
         <strong>A dated snapshot.</strong> The statuses below were read from the core repository at
         commit <a href={snapshotUrl}><code>{snapshotShort}</code></a> on {roadmapSnapshot.date}. The
-        command examples and technical facts elsewhere on this site stay pinned to core
-        commit <code>{CORE_COMMIT_SHORT}</code>, which they were captured and verified against.
+        command examples and technical facts elsewhere on this site stay pinned to release
+        <code>{CORE_RELEASE_TAG}</code> (core commit <code>{CORE_COMMIT_SHORT}</code>), which is what
+        <code>pip install robolang</code> installs and what they were captured and verified against.
       </p>
       <p>
-        <strong>Delivered</strong> means merged into the core repository. <strong>Approved</strong>
-        means a decision is recorded; it does not authorize implementation. <strong>Pending</strong>
-        and <strong>Planned</strong> mean the work has not started.
+        <strong>Released</strong> means in distribution {versions.distribution} on
+        <a href={PYPI_URL}>PyPI</a>. <strong>Delivered</strong> means merged into the core repository
+        after that release. <strong>Approved</strong> means a decision is recorded; it does not
+        authorize implementation. <strong>Planned</strong> means the work has not started.
       </p>
     </div>
 
-    <h3>Milestones</h3>
+    <h3>In release {versions.distribution}</h3>
     <div class="table-scroll">
       <table>
         <thead>
@@ -76,80 +79,118 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
         </thead>
         <tbody>
           <tr>
-            <th scope="row">Language 1.1 (RL-11)</th>
+            <th scope="row">Language 1.1 and 1.2</th>
             <td>
-              Language correctness: specification and grammar, parser, static validation, versioned IR,
-              the <code>validate</code> and <code>inspect</code> commands and an installable package.
+              Specification and grammar, parser, static validation, versioned IR, and conditions
+              combined with <code>and</code>, <code>or</code> and <code>not</code>.
             </td>
-            <td>
-              <strong>Delivered</strong> as distribution {versions.distribution}
-            </td>
+            <td><strong>Released</strong></td>
           </tr>
           <tr>
             <th scope="row">Foundation 1 (RL-BASIC-01)</th>
             <td>
-              Simulation-only execution: an executor with explicit states, preconditions evaluated
-              against a declared world file, fail-closed behavior and a deterministic run record
+              Simulation-only execution: explicit executor states, preconditions evaluated against a
+              declared world file, fail-closed behavior and a deterministic run record
               (<code>robolang simulate</code>).
             </td>
             <td>
-              <strong>Delivered</strong>, simulation only. Signed off 2026-10-27
+              <strong>Released</strong>, simulation only. Signed off 2026-10-27
               (<a href={specs.foundation1Evidence}>evidence</a>)
             </td>
-          </tr>
-          <tr>
-            <th scope="row">Language 1.2 (LANG-1)</th>
-            <td>
-              Conditions combined with <code>and</code>, <code>or</code> and <code>not</code>, and IR
-              schema 1.1. A language version, separate from the milestones in this table.
-            </td>
-            <td><strong>Delivered</strong></td>
           </tr>
           <tr>
             <th scope="row">Gate 1 (RL-ARCH-02)</th>
             <td>
               Core {versions.core} message and capability contracts, and an in-process reference
-              simulation in which an AI planner stub and two robot stubs exchange A2R and R2R messages
-              (<code>robolang arch02</code>).
+              simulation with an AI planner stub and two robot stubs (<code>robolang arch02</code>).
             </td>
             <td>
-              <strong>Simulation only.</strong> Gate 1 passed, signed off 2026-10-27
+              <strong>Released</strong>, simulation only. Signed off 2026-10-27
               (<a href={specs.gate1Evidence}>evidence</a>)
             </td>
           </tr>
           <tr>
-            <th scope="row">Gate 2 specification (RL-INTEROP-01)</th>
+            <th scope="row">Language 1.3 (goals)</th>
             <td>
-              Independent interoperability: a participant built in a different codebase, from the
-              published documents alone, works with the reference implementation.
+              A required <code>goal</code> that decides success, outcome conditions and typed
+              <code>sensor</code> parameters.
+            </td>
+            <td><strong>Released</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">Goal bridge to Core</th>
+            <td>
+              Core-shaped outcomes in every 1.3 run record, <code>export-goal</code>, and
+              <code>delegate</code> with a peer robot, commitment, lease and custody.
+            </td>
+            <td><strong>Released</strong>, simulation only</td>
+          </tr>
+          <tr>
+            <th scope="row">CORE-1</th>
+            <td>Task IR reader with re-validation: <code>--ir</code> on every command.</td>
+            <td><strong>Released</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">Language 1.4 (branching)</th>
+            <td>
+              Bounded <code>if</code> / <code>else</code> and <code>fail</code>, and
+              <code>validate --world</code>, which checks every path against a world before a run.
             </td>
             <td>
-              <strong>Approved</strong> 2026-10-27 (<a href={specs.gate2}>gate 2 specification</a>).
-              Gate 2 itself has not passed
+              <strong>Released.</strong> Accepted on the authoring benchmark 2026-10-29: branching
+              goal correctness 100% with the full reference and 95% with the grammar only
             </td>
           </tr>
           <tr>
-            <th scope="row">
-              <a href={roadmapSnapshot.interop1}>INTEROP-1</a>
-            </th>
+            <th scope="row">First PyPI release</th>
+            <td>Distribution {versions.distribution}: <code>pip install robolang</code>.</td>
+            <td><strong>Released</strong> 2026-10-30</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>In the core repository since the release</h3>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Stage</th>
+            <th scope="col">Focus</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href={roadmapSnapshot.core02Freeze}>Core 0.2</a></th>
             <td>
-              External-process reference self-test: the reference amr-07 runs as a separate process
-              through the <code>robolang-sim-stdio</code> test binding, and all 24 reference cases
-              reproduce their golden records.
+              Alternatives, <code>met_alternative</code> and <code>declared</code> facts. Core 0.1
+              stays the default; <a href={roadmapSnapshot.core02Flag}><code>--core 0.2</code></a> opts
+              in on <code>simulate</code>, <code>export-goal</code> and <code>delegate</code>.
             </td>
-            <td><strong>Delivered</strong> 28 October 2026, simulation only</td>
+            <td><strong>Frozen</strong> 2026-10-30. Not yet released</td>
           </tr>
           <tr>
-            <th scope="row">
-              <a href={roadmapSnapshot.interop2a}>INTEROP-2a</a>
-            </th>
+            <th scope="row"><a href={roadmapSnapshot.h3Acceptance}>ROS 2 backend in physics simulation</a></th>
             <td>
-              Decision review of the Gate 2 specification bundle, and a traceability audit of the
-              reference amr-07 against it.
+              The same <code>.rob</code> tasks and goals run through ROS 2 and MoveIt in Gazebo, with
+              goals verified from camera, TF and gripper observations instead of simulator ground
+              truth. A separate, optional package.
             </td>
             <td>
-              <strong>Completed.</strong> PR #38 merged as <code>{snapshotShort}</code> on 28 October
-              2026
+              <strong>Delivered</strong>, physics simulation only. Acceptance 2026-10-31: 33/33 runs
+              succeeded, 51/51 goal checks agreed with an independent oracle, no false success
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><a href={roadmapSnapshot.lang15}>Language 1.5</a></th>
+            <td>
+              Step failure handlers, <code>&lt;step&gt; else &#123; … &#125;</code>, with Task IR 1.4 and
+              run record 1.4.
+            </td>
+            <td>
+              <strong>Delivered</strong> 2026-11-04 in the front end and simulation. Teaching it in the
+              language reference and the benchmark is <a href={roadmapSnapshot.teaching15}>proposed</a>
             </td>
           </tr>
           <tr>
@@ -161,46 +202,52 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
       </table>
     </div>
 
-    <h3>What INTEROP-2a decided and found</h3>
+    <h2 id="horizons">Horizons</h2>
+    <p>
+      The project works through four horizons. A horizon ends when its exit criteria hold, not on a
+      date. The strategy that defines them is itself still a proposal awaiting owner approval.
+    </p>
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
-            <th scope="col">Item</th>
-            <th scope="col">What it is</th>
+            <th scope="col">Horizon</th>
+            <th scope="col">Exit criteria</th>
             <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <th scope="row">N1–N14</th>
+            <th scope="row">H1 Trust the basics</th>
             <td>
-              Fourteen clarifications to the Gate 2 specification, the reference simulation and
-              Core {versions.core}, recorded in decision record 0011. Writing them into the
-              specification text is separate work.
+              <code>pip install robolang</code> works; the language reference ships and is tested; AI
+              models make the right write-or-decline decision on at least 97% of benchmark tasks.
             </td>
-            <td><strong>Approved</strong> 28 October 2026 (technical approval)</td>
+            <td>Install and reference met. Decision accuracy for every model still being measured</td>
           </tr>
           <tr>
-            <th scope="row">Traceability audit</th>
+            <th scope="row">H2 Express real requests</th>
             <td>
-              Every behavior of the reference amr-07 traced to the specification: 144 rows, of
-              which 59 are traced, 67 ambiguous and 18 missing.
+              Branching goal correctness at least 90%; false programs on inexpressible tasks at most
+              5%, even with the grammar only; Core 0.2 frozen.
             </td>
-            <td><strong>Completed</strong></td>
+            <td><strong>Met</strong> 2026-10-30</td>
           </tr>
           <tr>
-            <th scope="row">D1–D7</th>
+            <th scope="row">H3 Leave the symbolic world</th>
             <td>
-              Defects found in the reference implementation. Their correction approaches have been
-              reviewed.
+              One benchmark task family passes end to end in physics simulation, verified through
+              sensor observations; an independent Core 0.2 implementation interoperates (Gate 2).
             </td>
-            <td>Not implemented. Each needs separate authorization</td>
+            <td>First criterion <strong>met</strong> 2026-11-01. Gate 2 open</td>
           </tr>
           <tr>
-            <th scope="row">H1, H2</th>
-            <td>Refinements to how the test harness compares observations and claims.</td>
-            <td>Pending. Not authorized by the decision approval</td>
+            <th scope="row">H4 Earn hardware</th>
+            <td>
+              A written safety case and owner authorization for physical mode. Never before H3 is
+              met.
+            </td>
+            <td>Not started</td>
           </tr>
         </tbody>
       </table>
@@ -209,10 +256,10 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
     <h2 id="gate-2">Gate 2 development sequence</h2>
     <div class="note">
       <p>
-        <strong>Gate 2 has not passed.</strong> No independent implementation exists yet, and Gate 2
-        verification has not been run. Gate 2 tests interoperability in simulation, through a test
-        binding between processes. It does not cover a real network transport, production
-        authentication (signatures stay simulation-only), hardware safety or physical execution.
+        <strong>Gate 2 has not passed.</strong> No independent implementation exists yet. Gate 2 tests
+        interoperability in simulation, through a test binding between processes. It does not cover a
+        real network transport, production authentication (signatures stay simulation-only), hardware
+        safety or physical execution.
       </p>
     </div>
     <div class="table-scroll">
@@ -226,85 +273,68 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
         </thead>
         <tbody>
           <tr>
-            <th scope="row">1. INTEROP-1</th>
-            <td>External-process binding and the reference self-test.</td>
-            <td><strong>Delivered</strong></td>
-          </tr>
-          <tr>
-            <th scope="row">2. INTEROP-2a</th>
-            <td>Specification decisions and the traceability audit.</td>
-            <td><strong>Approved and merged</strong></td>
-          </tr>
-          <tr>
-            <th scope="row">3. Corrections</th>
+            <th scope="row">Specification</th>
             <td>
-              Reference and harness corrections: silence and hold expiry, receiver-check ordering,
-              the other reference defects, regression tests, and harness refinements H1 and H2.
+              The <a href={specs.gate2}>Gate 2 specification</a>: a participant built in a different
+              codebase, from the published documents alone, works with the reference implementation.
             </td>
-            <td>Pending separate authorization</td>
+            <td><strong>Approved</strong> 2026-10-27</td>
           </tr>
           <tr>
-            <th scope="row">4. INTEROP-2b</th>
+            <th scope="row">INTEROP-1 and 2</th>
             <td>
-              Frozen specification bundle: implementation-independent specifications, examples,
-              conformance fixtures and a SHA-256 manifest.
+              External-process reference self-test, decision review, traceability audit and a first
+              frozen bundle on Core 0.1.
             </td>
-            <td>Planned. Not authorized</td>
+            <td><strong>Completed</strong> by 2026-10-28. The Core 0.1 bundle was never delivered</td>
           </tr>
           <tr>
-            <th scope="row">5. INTEROP-3</th>
+            <th scope="row"><a href={roadmapSnapshot.gate2Freeze}>Core 0.2 bundle</a></th>
             <td>
-              An independent amr-07, written in a separate codebase from the frozen bundle alone,
-              behind an auditable clean-room information barrier. TypeScript is the preferred
-              language.
+              The frozen specification bundle on Core 0.2: specifications, examples, conformance
+              fixtures and a SHA-256 manifest.
             </td>
-            <td>Planned. Not authorized</td>
+            <td><strong>Frozen</strong> 2026-11-02</td>
           </tr>
           <tr>
-            <th scope="row">6. INTEROP-4</th>
+            <th scope="row"><a href={roadmapSnapshot.interop3Protocol}>INTEROP-3</a></th>
+            <td>
+              An independent implementation, written in a separate codebase from the frozen bundle
+              alone, behind an auditable clean-room information barrier.
+            </td>
+            <td>Protocol <strong>approved</strong> 2026-11-02. Launch not yet authorized</td>
+          </tr>
+          <tr>
+            <th scope="row">INTEROP-4</th>
             <td>
               Verification: conformance tests, interoperability scenarios, deterministic repetition,
               evidence and owner sign-off.
             </td>
-            <td>Planned. Not authorized</td>
+            <td>Planned</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <h2 id="beyond">Beyond Gate 2</h2>
+    <h2 id="beyond">Beyond</h2>
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
-            <th scope="col">Priority</th>
             <th scope="col">Workstream</th>
             <th scope="col">Planned capabilities</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>High</td>
-            <th scope="row">CORE-1</th>
-            <td>Task IR reader and re-validation</td>
+            <th scope="row">Language</th>
+            <td>Bounded repetition, typed values and comparisons, local bindings and structured data</td>
           </tr>
           <tr>
-            <td>High</td>
-            <th scope="row">LANG-2 to LANG-6</th>
-            <td>Branching, bounded loops, typed values, local bindings and structured data</td>
-          </tr>
-          <tr>
-            <td>Next</td>
-            <th scope="row">Foundation 2</th>
-            <td>Goals, observations, reasoning, knowledge and bounded recovery</td>
-          </tr>
-          <tr>
-            <td>Later</td>
             <th scope="row">Foundation 3</th>
-            <td>Concurrency, portable skills, ROS 2 backends and heterogeneous robot support</td>
+            <td>Concurrency, portable skills and heterogeneous robot support</td>
           </tr>
           <tr>
-            <td>Later</td>
             <th scope="row">AI-native v2.0</th>
             <td>Provider-independent AI task generation, validation and benchmarking</td>
           </tr>
@@ -312,31 +342,31 @@ const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
       </table>
     </div>
     <p>
-      <strong>These priorities are planning guidance.</strong> They do not authorize implementation
-      and are not release commitments. Each workstream starts only with its own authorization and,
-      where it changes the language, the IR or Core, its own versioned specification. None of them
-      is started today.
+      <strong>These are planning guidance.</strong> They do not authorize implementation and are not
+      release commitments. Each workstream starts only with its own authorization and, where it
+      changes the language, the IR or Core, its own versioned specification. A new language feature
+      also needs benchmark tasks that fail without it.
     </p>
     <p>
-      Milestones are named by their work packages. Language versions (1.1, 1.2) name the syntax
-      of <code>.rob</code> files and are separate from the milestones. An earlier version of this plan
-      used "v1.2" for the execution milestone; that milestone is Foundation 1 above and is unrelated
-      to language 1.2. All of these are separate from the distribution version of the Python package;
+      Language versions (1.1 to 1.5) name the syntax of <code>.rob</code> files and are separate from
+      the milestones above, and both are separate from the distribution version of the Python package;
       see <a href="/get-started/#versions">the version numbers</a>.
     </p>
     <p>
       The full plan, with the scope and exit criteria for each stage, is
       the <a href={specs.developmentPlan}>development plan</a> in the core repository, linked as it was at
-      core commit <code>{CORE_COMMIT_SHORT}</code>; the status snapshot above is newer. The architecture
+      release <code>{CORE_RELEASE_TAG}</code>; the status snapshot above is newer. The architecture
       the stages build toward is <a href={specs.rfc001}>RFC-001</a>.
     </p>
 
     <h2>Physical robots</h2>
     <p>
       Running RoboLang against real hardware is outside the current scope of the project. The supported
-      package cannot do it: its simulations are symbolic and run in one process. The older prototype
-      code in the repository has never been validated against ROS 2 or a robot. Please do not connect
-      RoboLang to physical equipment.
+      package cannot do it: its simulations are symbolic and run in one process. The ROS 2 backend
+      runs only in a physics simulator and is not authorized for hardware; physical mode needs a
+      written safety case and an explicit owner decision first. The older prototype code in the
+      repository has never been validated against ROS 2 or a robot. Please do not connect RoboLang to
+      physical equipment.
     </p>
 
     <h2>Help shape it</h2>

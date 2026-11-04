@@ -17,9 +17,9 @@ const INLINE = 'a, code, strong, em';
 /** Sentences that once rendered without a space, keyed by built page. */
 const expected = {
   'contribute/index.html': ['the full output and the result of robolang --version.'],
-  'index.html': ['with four subcommands: validate, inspect, simulate and arch02.'],
+  'index.html': ['is on PyPI: pip install robolang installs one command, robolang.'],
   'get-started/index.html': ['Use --task NAME to show a single task'],
-  'reference/index.html': ['preceded by a version marker, robolang 1.1; or robolang 1.2;'],
+  'reference/index.html': ['preceded by a version marker such as robolang 1.4;. Without a marker'],
   'examples/index.html': ['is reported as unit_unspecified_not_enforced: checked, recorded'],
   'roadmap/index.html': ['where Core 0.1 is ambiguous. See Contribute.'],
 };

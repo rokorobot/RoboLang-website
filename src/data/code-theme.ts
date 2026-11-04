@@ -19,14 +19,14 @@ export const robGrammar: LanguageRegistration = {
       end: '"',
       patterns: [{ name: 'constant.character.escape.rob', match: '\\\\.' }],
     },
-    { name: 'keyword.control.rob', match: '@safety\\b|\\b(robolang|task|pre|plan)\\b' },
-    { name: 'storage.type.rob', match: '\\b(robot|object|location|region)\\b' },
+    { name: 'keyword.control.rob', match: '@safety\\b|\\b(robolang|task|pre|goal|plan|if|else|fail)\\b' },
+    { name: 'storage.type.rob', match: '\\b(robot|object|location|region|sensor)\\b' },
     { name: 'entity.name.function.rob', match: '\\b(move|grasp|place|inspect|wait|communicate)\\b' },
     {
       name: 'support.function.rob',
-      match: '\\b(robot_ready|region_clear|object_exists|sensor_ok|max_speed)\\b',
+      match: '\\b(robot_ready|region_clear|object_exists|sensor_ok|object_at|robot_at|holding|max_speed)\\b',
     },
-    { name: 'keyword.operator.word.rob', match: '\\b(to|at|using|with|for|until|timeout)\\b' },
+    { name: 'keyword.operator.word.rob', match: '\\b(to|at|using|with|for|until|timeout|and|or|not)\\b' },
     { name: 'constant.numeric.rob', match: '\\b\\d+(\\.\\d+)?\\b' },
   ],
 };
