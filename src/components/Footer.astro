@@ -1,31 +1,56 @@
 ---
-import { CORE_COMMIT_SHORT, CORE_REPO, LICENSE_NAME, WEBSITE_REPO, coreTree, versions } from '../data/facts';
+import { CORE_COMMIT_SHORT, CORE_REPO, LICENSE_NAME, PYPI_URL, WEBSITE_REPO, coreTree, nav, versions } from '../data/facts';
+
+const ticker = 'Simulation only ★ Goal or nothing ★ pip install robolang ★ ';
 ---
 
-<footer class="site-footer on-ink">
+<footer class="site-footer">
+  <div class="ticker" aria-hidden="true"><span class="track">{ticker.repeat(12)}</span></div>
   <div class="wrap">
-    <nav aria-label="Footer">
-      <ul>
-        <li><a href={CORE_REPO}>RoboLang on GitHub</a></li>
-        <li><a href={`${CORE_REPO}/issues`}>Issues</a></li>
-        <li><a href={WEBSITE_REPO}>Website source</a></li>
-        <li><a href="/contribute/">Contribute</a></li>
-      </ul>
-    </nav>
-    <p>
-      RoboLang's tools check and describe task files and run them in a symbolic simulation. They do
-      not run tasks on robots, and neither validation nor a simulated success makes a task safe to run
-      on a robot. Do not use RoboLang to control real hardware.
-    </p>
-    <p>
-      RoboLang is open source under the {LICENSE_NAME} license. It is experimental software, provided
-      without warranty, and is not a robot controller.
-    </p>
-    <p>
-      Technical facts on this site describe distribution {versions.distribution} (language {
-        versions.language
-      }, IR schema {versions.irSchema}, Core {versions.core}) and were verified against core commit
-      <a href={coreTree('')}><code>{CORE_COMMIT_SHORT}</code></a>.
-    </p>
+    <div class="foot-grid">
+      <div>
+        <p class="foot-mark cond" aria-hidden="true">RL</p>
+        <p>
+          RoboLang's tools check and describe task files and run them in a symbolic simulation. They do
+          not run tasks on robots, and neither validation nor a simulated success makes a task safe to run
+          on a robot. Do not use RoboLang to control real hardware.
+        </p>
+        <p>
+          RoboLang is open source under the {LICENSE_NAME} license. It is experimental software, provided
+          without warranty, and is not a robot controller.
+        </p>
+        <p>
+          Technical facts on this site describe distribution {versions.distribution} (language {
+            versions.language
+          }, IR schema {versions.irSchema}, Core {versions.core}) and were verified against core commit
+          <a href={coreTree('')}><code>{CORE_COMMIT_SHORT}</code></a>.
+        </p>
+      </div>
+      <nav aria-labelledby="foot-site">
+        <h2 id="foot-site">On this site</h2>
+        <ul>
+          {
+            nav.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <nav aria-labelledby="foot-elsewhere">
+        <h2 id="foot-elsewhere">Elsewhere</h2>
+        <ul>
+          <li><a href={CORE_REPO}>RoboLang on GitHub ↗</a></li>
+          <li><a href={`${CORE_REPO}/issues`}>Issues ↗</a></li>
+          <li><a href={PYPI_URL}>PyPI ↗</a></li>
+          <li><a href={WEBSITE_REPO}>Website source ↗</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="legal">
+      <p>© 2026 RoboLang · {LICENSE_NAME}</p>
+      <p>Simulation only · not for real hardware</p>
+    </div>
   </div>
 </footer>

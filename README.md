@@ -69,12 +69,20 @@ The checks read the built pages in `dist/`, so run `npm run build` first.
 
 ## Design
 
-Industrial editorial: a warm near-black "ink" surface for the header, page
-heads, code panels and footer, an off-white "paper" surface for the body, and
-one signal orange for key actions, section numbers and markers. Corners are
-square and structure comes from rules, not shadows. The tokens are at the top
-of `src/styles/global.css`; fonts are system stacks, so nothing is loaded from
-another host. Below 64rem the navigation is a `<details>` menu.
+Departures board, a sister design to
+[RentHumanoid](https://renthumanoid.com) and
+[Humanoid.Company](https://humanoid.company): a dark ink surface throughout,
+condensed uppercase display type (Archivo), monospace text (JetBrains Mono),
+numbered "gate" tags for sections, ruled boards for status, and an off-white
+paper ticket for the example task. One signal orange marks actions and live
+states; one green marks verified results. The tokens are at the top of
+`src/styles/global.css`. Fonts are self-hosted in `public/fonts/`, so nothing
+is loaded from another host. The run board on the homepage animates with CSS
+only and shows its final state when reduced motion is requested. Below 64rem
+the navigation is a `<details>` menu.
+
+The previous design (industrial editorial, ink and paper) is kept at the git
+tag `classic-design`.
 
 ## Keeping the site accurate
 

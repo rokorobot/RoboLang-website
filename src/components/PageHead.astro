@@ -9,10 +9,12 @@ interface Props {
 const { index, label, title } = Astro.props;
 ---
 
-<header class="page-head on-ink">
+<header class="page-head">
   <div class="wrap">
-    <p class="syslabel">{index} / {label}</p>
-    <h1>{title}</h1>
-    <p class="lede"><slot /></p>
+    <p class="gate">{index} / {label}</p>
+    <div class="sh">
+      <h1>{title}</h1>
+      <p class="lede"><slot /></p>
+    </div>
   </div>
 </header>

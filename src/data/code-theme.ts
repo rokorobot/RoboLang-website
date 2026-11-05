@@ -1,9 +1,9 @@
 // Syntax highlighting for code panels: a small TextMate grammar for .rob
-// files and a colour theme for the ink surface.
+// files, a colour theme for the ink surface and one for the paper ticket.
 //
 // scripts/check-a11y.mjs reads every highlight colour from the built pages
-// and checks it against the code panel background, so a colour added here
-// that is too dim fails the build.
+// and checks it against the background of its panel (--ink-2, or --paper for
+// a paper panel), so a colour added here that is too dim fails the build.
 import type { LanguageRegistration, ThemeRegistration } from 'shiki';
 
 /** Highlighting only. The authoritative grammar is spec/grammar.ebnf in the core repository. */
@@ -35,17 +35,37 @@ export const inkTheme: ThemeRegistration = {
   name: 'robolang-ink',
   type: 'dark',
   colors: {
-    'editor.background': '#1d1b18',
-    'editor.foreground': '#e7e3d8',
+    'editor.background': '#1a1a18',
+    'editor.foreground': '#ede6d3',
   },
   tokenColors: [
     { scope: ['comment'], settings: { foreground: '#9c968a' } },
     { scope: ['string', 'constant.character.escape'], settings: { foreground: '#d9c58a' } },
-    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#ff7a3d' } },
+    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#ff6a33' } },
     { scope: ['storage', 'storage.type', 'support.type'], settings: { foreground: '#8fc1b5' } },
     { scope: ['entity.name', 'entity.name.function', 'support.function'], settings: { foreground: '#f7f4ec' } },
     { scope: ['keyword.operator', 'keyword.operator.word', 'punctuation'], settings: { foreground: '#bdb7ab' } },
     { scope: ['constant', 'constant.numeric', 'constant.language'], settings: { foreground: '#e8a87c' } },
     { scope: ['variable'], settings: { foreground: '#e7e3d8' } },
+  ],
+};
+
+/** For code printed on the paper ticket (--paper background). */
+export const paperTheme: ThemeRegistration = {
+  name: 'robolang-paper',
+  type: 'light',
+  colors: {
+    'editor.background': '#ede6d3',
+    'editor.foreground': '#111110',
+  },
+  tokenColors: [
+    { scope: ['comment'], settings: { foreground: '#5c5a52' } },
+    { scope: ['string', 'constant.character.escape'], settings: { foreground: '#3d5200' } },
+    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#a3310a' } },
+    { scope: ['storage', 'storage.type', 'support.type'], settings: { foreground: '#1f4f5c' } },
+    { scope: ['entity.name', 'entity.name.function', 'support.function'], settings: { foreground: '#111110' } },
+    { scope: ['keyword.operator', 'keyword.operator.word', 'punctuation'], settings: { foreground: '#4a4a44' } },
+    { scope: ['constant', 'constant.numeric', 'constant.language'], settings: { foreground: '#7a3b12' } },
+    { scope: ['variable'], settings: { foreground: '#111110' } },
   ],
 };
