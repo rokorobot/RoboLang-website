@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Source of public/og.png, the 1200x630 link preview image. To regenerate,
+     serve the repository root, open this file in a browser at 1200x630 and
+     take a screenshot of the viewport. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:Archivo;font-weight:500 900;font-stretch:62% 125%;src:url(../public/fonts/archivo-var-latin.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-weight:400 800;src:url(../public/fonts/jetbrainsmono-var-latin.woff2) format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1200px;height:630px;overflow:hidden}
+body{background:#111110;color:#ede6d3;font:20px/1.5 'JetBrains Mono',monospace;display:flex;flex-direction:column}
+.strip{background:#ff5a1f;color:#111110;font-weight:800;font-size:15px;letter-spacing:.12em;padding:9px 0;white-space:nowrap;overflow:hidden}
+.main{flex:1;padding:44px 64px 0;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:Archivo;font-stretch:125%;font-weight:900;font-size:32px;letter-spacing:-.02em}
+.brand b{color:#ff5a1f}.brand span{color:#9a9586}
+.gate{background:#ff5a1f;color:#111110;font-weight:800;font-size:14px;letter-spacing:.14em;padding:4px 10px}
+h1{font-family:Archivo;font-stretch:62%;font-weight:900;font-size:148px;line-height:.88;text-transform:uppercase;margin-top:40px}
+h1 i{font-style:normal;color:#ff5a1f}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2b2a26;padding:22px 0 30px;color:#bdb6a3;font-size:19px}
+.ok{color:#bfff00;font-weight:800;letter-spacing:.1em}
+.ok:before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:#bfff00;margin-right:10px;vertical-align:1px}
+</style>
+</head>
+<body>
+<div class="strip">DEVELOPER PREVIEW ★ VALIDATION AND SIMULATION ONLY ★ NOT FOR REAL HARDWARE ★ DEVELOPER PREVIEW ★ VALIDATION AND SIMULATION ONLY</div>
+<div class="main">
+  <div class="top"><div class="brand">ROBO<b>LANG</b><span>.DEV</span></div><div class="gate">A COMMON LANGUAGE FOR ROBOTIC TASKS</div></div>
+  <h1><i>00</i> robots moved<br><i>01</i> goal verified</h1>
+  <div class="foot"><span>$ pip install robolang</span><span class="ok">GOAL · OBJECT_AT BOX DST · VERIFIED</span></div>
+</div>
+</body>
+</html>
