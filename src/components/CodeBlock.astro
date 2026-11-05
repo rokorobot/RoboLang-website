@@ -1,18 +1,20 @@
 ---
 import { Code } from 'astro:components';
-import { inkTheme, robGrammar } from '../data/code-theme';
+import { inkTheme, paperTheme, robGrammar } from '../data/code-theme';
 
 interface Props {
   code: string;
   /** `rob` is task source; command output is shown as plain `text`. */
   lang?: 'text' | 'bash' | 'json' | 'rob';
   label?: string;
+  /** `paper` prints the code on the paper ticket instead of an ink panel. */
+  tone?: 'ink' | 'paper';
 }
 
-const { code, lang = 'text', label } = Astro.props;
+const { code, lang = 'text', label, tone = 'ink' } = Astro.props;
 ---
 
-<figure class={`code code--${lang}`}>
+<figure class={`code code--${lang}${tone === 'paper' ? ' code--paper' : ''}`}>
   {label && <figcaption>{label}</figcaption>}
-  <Code code={code} lang={lang === 'rob' ? robGrammar : lang} theme={inkTheme} />
+  <Code code={code} lang={lang === 'rob' ? robGrammar : lang} theme={tone === 'paper' ? paperTheme : inkTheme} />
 </figure>

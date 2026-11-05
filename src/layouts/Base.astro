@@ -19,12 +19,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#131210" />
+    <meta name="theme-color" content="#111110" />
     <meta name="msvalidate.01" content="1840F4A10FABFEF3990B5C2E14054558" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/jetbrainsmono-var-latin.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="RoboLang" />
     <meta property="og:title" content={fullTitle} />
@@ -33,12 +35,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="on-ink">
-      <StatusBanner />
-      <Header />
-    </div>
+    <StatusBanner />
+    <Header />
     <main id="main">
-      <!-- Full-width ink band: the home hero or a PageHead. -->
+      <!-- Full-width head: the home hero or a PageHead. -->
       <slot name="head" />
       <div class="wrap body">
         <slot />

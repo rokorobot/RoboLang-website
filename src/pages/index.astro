@@ -1,25 +1,78 @@
 ---
 import CodeBlock from '../components/CodeBlock.astro';
-import { handoverSource, handoverValidate } from '../data/examples';
+import { handoverSimulate, handoverSource, handoverValidate } from '../data/examples';
 import { CORE_REPO, LICENSE_NAME, PYPI_URL, milestone, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
+
+// The run board replays examples/handover.rob step by step. The rows are the
+// task's own pre, plan and goal blocks (src/data/examples.ts); the run ID is
+// the one printed by `robolang simulate` for that file.
+const runId = handoverSimulate.match(/run (sim-[0-9a-f]+)/)?.[1] ?? '';
+const runShort = `${runId.slice(0, 16)}…`;
+
+const steps = [
+  { code: 'PRE', action: 'Check', robot: 'arm, mobile', target: 'robot_ready · object_exists box', check: 'pre', done: 'Holds' },
+  { code: '01', action: 'Move', robot: 'arm', target: 'src', check: '≤ 0.5 m/s', done: 'Done' },
+  { code: '02', action: 'Grasp', robot: 'arm', target: 'box', check: 'gripper', done: 'Done' },
+  { code: '03', action: 'Move', robot: 'arm', target: 'handoff', check: '≤ 0.5 m/s', done: 'Done' },
+  { code: '04', action: 'Place', robot: 'arm', target: 'box at handoff', check: '—', done: 'Done' },
+  { code: '05', action: 'Communicate', robot: 'arm', target: '"fleet" · BOX_AT_HANDOFF', check: '—', done: 'Done' },
+  { code: '06', action: 'Wait until', robot: '—', target: 'region_clear zone · 30s', check: 'condition', done: 'Done' },
+  { code: '07', action: 'Move', robot: 'mobile', target: 'handoff', check: '≤ 0.5 m/s', done: 'Done' },
+  { code: '08', action: 'Grasp', robot: 'mobile', target: 'box', check: 'gripper', done: 'Done' },
+  { code: '09', action: 'Move', robot: 'mobile', target: 'dst', check: '≤ 0.5 m/s', done: 'Done' },
+  { code: '10', action: 'Place', robot: 'mobile', target: 'box at dst', check: '—', done: 'Done' },
+  { code: 'GOAL', action: 'object_at', robot: '—', target: 'box dst', check: 'goal', done: 'Verified' },
+];
+
+const capabilities = [
+  {
+    code: 'WR', name: 'Write', command: 'robolang reference', state: 'ok', status: 'Available',
+    text: `Languages ${versions.language}: typed parameters, @safety, pre, goal and plan; and/or/not (1.2); bounded if/else and fail (1.4).`,
+    href: '/reference/', link: 'Reference',
+  },
+  {
+    code: 'VA', name: 'Validate', command: 'robolang validate', state: 'ok', status: 'Available',
+    text: 'Checks syntax, names, types and values. Every problem as file:line:column with a stable code.',
+    href: '/examples/#invalid', link: 'Diagnostics',
+  },
+  {
+    code: 'PF', name: 'Pre-flight', command: 'validate --world', state: 'ok', status: 'Available',
+    text: 'Failures a run would certainly hit in that world, before anything runs.',
+    href: '/get-started/', link: 'Get started',
+  },
+  {
+    code: 'IN', name: 'Inspect', command: 'robolang inspect', state: 'ok', status: 'Available',
+    text: `What a valid file describes, as text or JSON in IR schema ${versions.irSchema}. Reads Task IR back with --ir.`,
+    href: '/examples/#json-ir', link: 'JSON IR',
+  },
+  {
+    code: 'SM', name: 'Simulate', command: 'robolang simulate', state: 'ok', status: 'Available',
+    text: 'Runs a validated task against a world file. Fails closed; succeeds only on a verified goal. Same inputs, same record.',
+    href: '/examples/#goals', link: 'A goal checked',
+  },
+  {
+    code: 'DG', name: 'Delegate', command: 'robolang delegate', state: 'exp', status: 'Experimental',
+    text: `Sends a task's goal, never its plan, as a signed Core ${versions.core} message; success only after re-checking evidence.`,
+    href: '/examples/#delegate', link: 'A delegation',
+  },
+  {
+    code: 'XC', name: 'Exchange', command: 'robolang arch02', state: 'exp', status: 'Experimental',
+    text: `Core ${versions.core} reference scenario (A2R and R2R) in one process. Gate 1 of RL-ARCH-02 passed on ${milestone.date}.`,
+    href: '/examples/#arch02', link: 'Reference simulation',
+  },
+];
 ---
 
 <Base
   title="RoboLang: a common language for robotic tasks"
   description="RoboLang is an open-source, robot-independent language for robotic tasks. Declare a goal, validate the task, and run it in a deterministic symbolic simulation that succeeds only when the goal is verified. Not for real hardware."
 >
-  <section slot="head" class="hero on-ink">
+  <section slot="head" class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <ul class="chips" aria-label="Project facts">
-        <li><span class="chip"><span class="marker" aria-hidden="true"></span>Developer preview</span></li>
-        <li><span class="chip">Open source</span></li>
-        <li><span class="chip">Language {versions.language}</span></li>
-      </ul>
-      <h1>A common language for robotic tasks.</h1>
-      <div class="signal-rules" aria-hidden="true"></div>
-
-      <div class="hero-grid">
+      <p class="syslabel">A common language for robotic tasks · open source · language {versions.language}</p>
+      <div class="hero-top">
+        <h1 id="hero-title"><span class="signal">00</span> robots moved<br /><span class="signal">01</span> goal verified</h1>
         <div class="hero-copy">
           <p class="lede">
             Write, validate and simulate structured robot tasks. Built for developers and AI systems.
@@ -28,20 +81,150 @@ import Base from '../layouts/Base.astro';
           <p>
             RoboLang describes <em>what</em> a robot should do in a small, typed, human-readable text
             format: what must be true before it starts, the <strong>goal</strong> it must achieve, the
-            steps and the safety limits. Its tools check a task file, show exactly what it says and run
-            it in a deterministic symbolic simulation. A run succeeds only when the goal is verified in
-            the final world, not merely because the steps ran. An experimental Core {versions.core}
-            carries that goal, in simulation only, from an AI planner to a robot and back as a verified
-            outcome.
+            steps and the safety limits. A run succeeds only when the goal is verified in the final
+            world, not merely because the steps ran.
           </p>
+          <p class="install"><code>pip install robolang</code></p>
           <div class="actions">
-            <a class="button" href="/get-started/">Get started</a>
+            <a class="button" href="/get-started/">Get started →</a>
             <a class="button secondary" href={CORE_REPO}>View on GitHub</a>
           </div>
         </div>
-        <div class="cropframe">
-          <CodeBlock lang="rob" code={handoverSource} label="examples/handover.rob" />
+      </div>
+
+      <div class="board run-board">
+        <div class="board-head">
+          <p class="wide">Run departures · examples/handover.rob</p>
+          <p class="syslabel">Simulation only · world.json</p>
+        </div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Simulated run of examples/handover.rob">
+          <table>
+            <thead>
+              <tr><th scope="col">Step</th><th scope="col">Action</th><th scope="col">Robot</th><th scope="col">Target</th><th scope="col">Check</th><th scope="col">Status</th></tr>
+            </thead>
+            <tbody>
+              {
+                steps.map((step, i) => (
+                  <tr class={step.code === 'GOAL' ? 'goal-row' : undefined} style={`--i: ${i}`}>
+                    <td>
+                      <span class="flap" aria-hidden="true">{[...step.code].map((c) => <i>{c}</i>)}</span>
+                      <span class="sr-only">{step.code}</span>
+                    </td>
+                    <td><strong>{step.action.toUpperCase()}</strong></td>
+                    <td>{step.robot}</td>
+                    <td>{step.target}</td>
+                    <td class="dimlabel">{step.check}</td>
+                    <td>
+                      <span class="run-state">
+                        <span class="light light--wait" aria-hidden="true">Scheduled</span>
+                        <span class="light light--run" aria-hidden="true">Running</span>
+                        <span class="light light--ok">{step.done}</span>
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="board-foot">
+          <span>Same task, world and seed give the same run record · fails closed on a false or unknown precondition</span>
+          <span class="run-done signal">run {runShort} · SUCCEEDED</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="home">
+    <section class="section" aria-labelledby="how">
+      <p class="gate">Gate 01</p>
+      <div class="sh">
+        <h2 id="how">How a task flies</h2>
+        <p class="lede">
+          Nothing it does reaches a robot. Every stage is static or symbolic, and each one can stop the
+          task with a clear message.
+        </p>
+      </div>
+      <div class="problem">
+        <p>
+          Robot tasks are often written as ad hoc scripts or free-form text. A typo, a missing argument
+          or a name that was never declared is found late, usually when something is already running.
+          That gets worse when the task text is produced by a language model instead of a person.
+        </p>
+        <p>
+          RoboLang's purpose is to give a task a precise written form with a published grammar, so that
+          tools can reject a malformed task with a clear message and hand a well-formed one to other
+          software as structured data.
+        </p>
+      </div>
+      <ol class="path">
+        <li>
+          <span class="dot" aria-hidden="true">1</span>
+          <p class="syslabel">Write</p>
+          <h3>Author the task</h3>
+          <p>A person or a model writes a <code>.rob</code> file: typed parameters, <code>pre</code>, <code>goal</code>, <code>plan</code> and <code>@safety</code>.</p>
+          <p><code>robolang reference</code></p>
+        </li>
+        <li>
+          <span class="dot" aria-hidden="true">2</span>
+          <p class="syslabel">Validate</p>
+          <h3>Check the text</h3>
+          <p>Syntax, names, types and values. Every problem is reported, not just the first.</p>
+          <p><code>robolang validate</code></p>
+        </li>
+        <li>
+          <span class="dot" aria-hidden="true">3</span>
+          <p class="syslabel">Pre-flight</p>
+          <h3>Check the world</h3>
+          <p>A speed above a robot's profile, a grasp without a gripper, a sensor on another robot.</p>
+          <p><code>validate --world</code></p>
+        </li>
+        <li>
+          <span class="dot" aria-hidden="true">4</span>
+          <p class="syslabel">Simulate</p>
+          <h3>Run it symbolically</h3>
+          <p>A deterministic run record with a run ID. The same inputs always give the same record.</p>
+          <p><code>robolang simulate</code></p>
+        </li>
+        <li>
+          <span class="dot dot--done" aria-hidden="true">✓</span>
+          <p class="syslabel">Verify</p>
+          <h3>Goal or nothing</h3>
+          <p>Success means every <code>goal</code> condition is true in the final world. A missed goal fails the run.</p>
+          <p><code>SUCCEEDED · FAILED (S301)</code></p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section" aria-labelledby="task">
+      <p class="gate">Gate 02</p>
+      <div class="sh">
+        <h2 id="task">A task is a ticket</h2>
+        <p class="lede">
+          Small, typed and human-readable. Tools reject a malformed task with a clear message and hand a
+          well-formed one to other software as structured data.
+        </p>
+      </div>
+      <div class="ticket-row">
+        <div class="ticket">
+          <div class="ticket-main">
+            <p class="wide">Task · handover</p>
+            <CodeBlock lang="rob" tone="paper" code={handoverSource} label="examples/handover.rob" />
+          </div>
+          <div class="ticket-stub">
+            <dl>
+              <div><dt>Language</dt><dd>1.3</dd></div>
+              <div><dt>Robots</dt><dd>2</dd></div>
+              <div><dt>Plan steps</dt><dd>10</dd></div>
+              <div><dt>Speed limit</dt><dd>0.5 m/s</dd></div>
+              <div><dt>Goal</dt><dd class="small">object_at box dst</dd></div>
+            </dl>
+            <span class="barcode" aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="terminal">
           <CodeBlock code={handoverValidate} label="$ robolang validate examples/handover.rob" />
+          <CodeBlock code={handoverSimulate} label="$ robolang simulate examples/handover.rob --world examples/world.json" />
         </div>
       </div>
 
@@ -52,124 +235,63 @@ import Base from '../layouts/Base.astro';
         <div><dt>Python</dt><dd>{versions.pythonMinimum}+</dd></div>
         <div><dt>License</dt><dd>{LICENSE_NAME}</dd></div>
       </dl>
-    </div>
-  </section>
+    </section>
 
-  <section class="section">
-    <h2>The problem</h2>
-    <div class="section-body prose">
-      <p>
-        Robot tasks are often written as ad hoc scripts or free-form text. A typo, a missing argument
-        or a name that was never declared is found late, usually when something is already running.
-        That gets worse when the task text is produced by a language model instead of a person.
-      </p>
-      <p>
-        RoboLang's purpose is to give a task a precise written form with a published grammar, so that
-        tools can reject a malformed task with a clear message and hand a well-formed one to other
-        software as structured data.
-      </p>
-    </div>
-  </section>
+    <section class="section" aria-labelledby="works">
+      <p class="gate">Gate 03</p>
+      <div class="sh">
+        <h2 id="works">What works today</h2>
+        <p class="lede">
+          Distribution {versions.distribution} is on <a href={PYPI_URL}>PyPI</a>. It installs one
+          command, <code>robolang</code>, needs Python {versions.pythonMinimum} or newer and has no other
+          dependencies. Nothing it does reaches a robot.
+        </p>
+      </div>
+      <div class="board">
+        <div class="board-head">
+          <h3 class="wide">Capabilities</h3>
+          <p class="syslabel">5 available · 2 experimental, simulation only</p>
+        </div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Capabilities">
+          <table>
+            <thead>
+              <tr><th scope="col">Code</th><th scope="col">Capability</th><th scope="col">Command</th><th scope="col">What it does</th><th scope="col">Status</th><th scope="col">See</th></tr>
+            </thead>
+            <tbody>
+              {
+                capabilities.map((cap) => (
+                  <tr>
+                    <td><span class="flap" aria-hidden="true">{[...cap.code].map((c) => <i>{c}</i>)}</span></td>
+                    <th scope="row">{cap.name}</th>
+                    <td><code>{cap.command}</code></td>
+                    <td class="wrap-cell">{cap.text}</td>
+                    <td><span class={`light light--${cap.state}`}>{cap.status}</span></td>
+                    <td><a href={cap.href}>{cap.link} →</a></td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="board-foot">
+          <span>
+            Future: real transports, independent implementations, physical robots and richer world models.
+            None of these is in the package.
+          </span>
+          <a class="signal" href="/roadmap/">Vision &amp; roadmap →</a>
+        </p>
+      </div>
+    </section>
 
-  <section class="section">
-    <h2>What works today</h2>
-    <div class="section-body">
-      <p class="prose">
-        Distribution {versions.distribution} is on <a href={PYPI_URL}>PyPI</a>:
-        <code>pip install robolang</code> installs one command, <code>robolang</code>. It needs Python
-        {versions.pythonMinimum} or newer and has no other dependencies. Nothing it does reaches a
-        robot.
-      </p>
-      <h3>Available</h3>
-      <ul class="cards">
-        <li class="card">
-          <p class="syslabel">A / Language</p>
-          <h3>Write</h3>
-          <p>
-            Languages {versions.language} have a formal grammar: typed parameters, <code>@safety</code>
-            annotations, a <code>pre</code> block, a <code>goal</code> block (1.3) and a
-            <code>plan</code>. 1.2 adds <code>and</code>, <code>or</code> and <code>not</code>; 1.4
-            adds bounded <code>if</code> / <code>else</code> and <code>fail</code>.
-            <code>robolang reference</code> prints the language reference.
-          </p>
-          <p><a href="/reference/">Language reference</a></p>
-        </li>
-        <li class="card">
-          <p class="syslabel">B / Validator</p>
-          <h3>Validate</h3>
-          <p>
-            <code>robolang validate</code> checks syntax, names, types and values, and reports every
-            problem as <code>file:line:column</code> with a stable diagnostic code. With
-            <code>--world</code> it also reports failures a run would certainly hit in that world.
-          </p>
-          <p><a href="/examples/#invalid">See diagnostics</a></p>
-        </li>
-        <li class="card">
-          <p class="syslabel">C / IR</p>
-          <h3>Inspect</h3>
-          <p>
-            <code>robolang inspect</code> shows what a valid file describes, as text or as JSON in IR
-            schema {versions.irSchema}, for use by other tools. Every command also reads Task IR back
-            with <code>--ir</code> and re-validates it from scratch.
-          </p>
-          <p><a href="/examples/#json-ir">See the JSON IR</a></p>
-        </li>
-        <li class="card">
-          <p class="syslabel">D / Simulation</p>
-          <h3>Simulate</h3>
-          <p>
-            <code>robolang simulate</code> runs a validated task against a declared world file. It
-            fails closed on a false or unknown precondition, and succeeds only when every goal
-            condition is true in the final world. The same inputs always give the same run record.
-          </p>
-          <p><a href="/examples/#goals">See a goal checked</a></p>
-        </li>
-      </ul>
-      <h3>Experimental, simulation only</h3>
-      <ul class="cards">
-        <li class="card">
-          <p class="syslabel">E / Core {versions.core}</p>
-          <h3>Delegate</h3>
-          <p>
-            <code>robolang delegate</code> sends a task's goal, never its plan, as a signed Core
-            {versions.core} message. The robot runs a plan from its own <code>.rob</code> library and
-            reports an outcome, and the planner accepts success only after re-checking the evidence.
-            <code>export-goal</code> prints the goal message on its own.
-          </p>
-          <p><a href="/examples/#delegate">See a delegation</a></p>
-        </li>
-        <li class="card">
-          <p class="syslabel">F / Core {versions.core}</p>
-          <h3>Exchange</h3>
-          <p>
-            Core {versions.core} defines checked messages between AI agents and robots (A2R) and
-            between robots (R2R). <code>robolang arch02</code> runs the reference scenario in one
-            process: stub participants, local authorization, and success only with evidence. Gate 1
-            of RL-ARCH-02 passed on {milestone.date}.
-          </p>
-          <p><a href="/examples/#arch02">See the reference simulation</a></p>
-        </li>
-      </ul>
-      <h3>Future</h3>
-      <p class="prose">
-        Real transports and network interoperability, independently built implementations,
-        physical-robot execution and richer world models. None of these is in the package. Work in
-        the core repository since this release, including language 1.5, Core 0.2 and a ROS 2 backend
-        in a physics simulator, is on the
-        <a href="/roadmap/">Vision &amp; Roadmap</a> page shows the status of each stage.
-      </p>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 id="limitations">What it does not do</h2>
-    <div class="section-body">
-      <p class="prose">
-        These limits are deliberate for the developer preview. Please read them before you start.
-      </p>
-      <dl class="readout">
+    <section class="section" aria-labelledby="limitations">
+      <p class="gate">Gate 04</p>
+      <div class="sh">
+        <h2 id="limitations">What it does not do</h2>
+        <p class="lede">These limits are deliberate for the developer preview. Please read them before you start.</p>
+      </div>
+      <dl class="rules">
         <div>
-          <dt>Robot execution <span class="status status--off">Not available</span></dt>
+          <dt>Robot execution <span class="light light--off">Not available</span></dt>
           <dd>
             <strong>It does not run tasks on robots.</strong> Nothing in the supported package moves a
             robot. <code>simulate</code> and <code>arch02</code> track symbolic facts only: no motion
@@ -177,7 +299,7 @@ import Base from '../layouts/Base.astro';
           </dd>
         </div>
         <div>
-          <dt>Safety enforcement <span class="status status--off">Not available</span></dt>
+          <dt>Safety enforcement <span class="light light--off">Not available</span></dt>
           <dd>
             <strong>It does not enforce safety.</strong>
             <code>@safety</code> limits are checked against the simulated robot profile and reported in
@@ -187,7 +309,7 @@ import Base from '../layouts/Base.astro';
           </dd>
         </div>
         <div>
-          <dt>Interoperability <span class="status status--on">Experimental</span></dt>
+          <dt>Interoperability <span class="light light--exp">Experimental</span></dt>
           <dd>
             <strong>It is not a robot protocol.</strong> Core {versions.core} is a draft, exercised only
             in one process with simulation-only signatures. There is no network transport and no
@@ -196,7 +318,7 @@ import Base from '../layouts/Base.astro';
           </dd>
         </div>
         <div>
-          <dt>ROS 2 <span class="status status--off">Not supported</span></dt>
+          <dt>ROS 2 <span class="light light--off">Not supported</span></dt>
           <dd>
             <strong>The installed package has no ROS 2 integration.</strong> A separate, experimental
             ROS 2 backend runs <code>.rob</code> tasks in the Gazebo physics simulator in the core
@@ -206,7 +328,7 @@ import Base from '../layouts/Base.astro';
           </dd>
         </div>
         <div>
-          <dt>AI generation <span class="status status--off">Not included</span></dt>
+          <dt>AI generation <span class="light light--off">Not included</span></dt>
           <dd>
             <strong>It does not generate tasks with AI.</strong> The language is designed to be easy
             for language models to write, and the core repository benchmarks how well models write
@@ -215,32 +337,31 @@ import Base from '../layouts/Base.astro';
           </dd>
         </div>
         <div>
-          <dt>Release <span class="status status--on">Alpha</span></dt>
+          <dt>Release <span class="light light--exp">Alpha</span></dt>
           <dd>
             <strong>It is an alpha.</strong> Version {versions.distribution} is published on PyPI.
             Details may change between versions.
           </dd>
         </div>
       </dl>
-      <p class="prose">
-        Robot execution, networked interoperability and AI-assisted authoring are research
-        directions, described on the <a href="/roadmap/">Vision &amp; Roadmap</a> page.
-      </p>
-    </div>
-  </section>
+    </section>
 
-  <section class="section">
-    <h2>Who it is for</h2>
-    <div class="section-body prose">
-      <p>
-        Robotics developers, ROS 2 engineers and researchers who want to experiment with a checkable
-        task format, including as a target for tasks written by language models. Feedback on the
-        language and the tools is the main thing the project needs right now.
-      </p>
-      <div class="actions">
-        <a class="button" href="/get-started/">Install and try it</a>
-        <a class="button secondary" href="/contribute/">Give feedback</a>
+    <section class="section" aria-labelledby="who">
+      <p class="gate">Gate 05</p>
+      <div class="sh sh--top">
+        <h2 id="who">Who it is for</h2>
+        <div>
+          <p class="lede">
+            Robotics developers, ROS 2 engineers and researchers who want to experiment with a checkable
+            task format, including as a target for tasks written by language models. Feedback on the
+            language and the tools is the main thing the project needs right now.
+          </p>
+          <div class="actions">
+            <a class="button" href="/get-started/">Install and try it →</a>
+            <a class="button secondary" href="/contribute/">Give feedback</a>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </Base>

@@ -1,48 +1,70 @@
 /* RoboLang.dev design tokens and styles.
 
-   Visual language: industrial editorial. Two surfaces are used together on
-   every page: a warm near-black "ink" surface (header, page head, code,
-   footer) and an off-white "paper" surface (body). One signal orange is kept
-   for key actions, section numbers and live markers.
+   Visual language: departures board. A dark "ink" surface everywhere, with
+   condensed uppercase display type, monospace text, numbered gates for
+   sections, ruled boards for status, and an off-white "paper" card for the
+   task ticket. One signal orange marks actions, gates and live states; one
+   green marks verified results. It is a sister design to RentHumanoid and
+   Humanoid.Company.
+
+   Fonts are self-hosted from /fonts (SIL Open Font License, see
+   public/fonts/README.md), so nothing is loaded from another host.
 
    scripts/check-a11y.mjs reads the colour tokens from :root below and fails
    the build if a text/background pair it lists drops under WCAG AA contrast,
    so keep the colours as plain six-digit hex values. */
 :root {
   /* Surfaces */
-  --ink: #131210;
-  --ink-2: #1d1b18;
-  --paper: #efebe2;
-  --paper-2: #f7f4ec;
+  --ink: #111110;
+  --ink-2: #1a1a18; /* panels and code */
+  --ink-3: #22211d; /* row hover */
+  --paper: #ede6d3; /* ticket card */
+  --paper-2: #e2dac4;
 
   /* Text */
-  --paper-ink: #e7e3d8; /* text on ink */
-  --dim: #bdb7ab; /* secondary text on ink */
-  --muted: #635e53; /* secondary text on paper */
+  --paper-ink: #ede6d3; /* text on ink */
+  --mute: #bdb6a3; /* body copy on ink */
+  --dim: #9a9586; /* labels on ink */
+  --muted: #4a4a44; /* secondary text on paper */
 
   /* Signal */
-  --signal: #ff4a00; /* fills and rules; text only on ink */
-  --signal-ink: #c33200; /* signal as text on paper */
+  --signal: #ff5a1f; /* fills, gates, live states; text only on ink */
+  --signal-ink: #a3310a; /* signal as text on paper */
+  --ok: #bfff00; /* verified / available */
 
   /* Rules */
-  --line: #131210;
-  --line-soft: #d6d1c6;
-  --line-ink: #47433b; /* hairlines on ink */
+  --line-ink: #2b2a26;
+  --line-soft: #24231f;
 
-  --font-display: 'Didot', 'Bodoni MT', 'Bodoni 72', Georgia, 'Times New Roman', serif;
-  --font-heading: Bahnschrift, 'Avenir Next Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, SFMono-Regular, Menlo, monospace;
+  --font-cond: 'Archivo', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, SFMono-Regular, Menlo, monospace;
 
-  --fs-label: 0.72rem;
+  --fs-label: 0.6875rem;
   --tracking-label: 0.14em;
-  --width: 76rem;
+  --width: 85rem;
   --gutter: 1.25rem;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('/fonts/archivo-var-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/jetbrainsmono-var-latin.woff2') format('woff2');
 }
 
 @media (min-width: 48rem) {
   :root {
-    --gutter: 2rem;
+    --gutter: 3rem;
   }
 }
 
@@ -53,18 +75,18 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: 1rem;
+  scroll-padding-top: 5rem;
 }
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.65;
+  background: var(--ink);
+  color: var(--paper-ink);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
 }
 
 .wrap {
@@ -74,35 +96,31 @@ body {
   padding-inline: var(--gutter);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ---- Links and focus ----------------------------------------------------- */
 a {
-  color: var(--ink);
+  color: var(--paper-ink);
   text-decoration: underline;
-  text-decoration-color: var(--signal-ink);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
+  text-decoration-color: var(--signal);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
 }
 
 a:hover {
-  color: var(--signal-ink);
-}
-
-.on-ink a {
-  color: var(--paper-ink);
-  text-decoration-color: var(--signal);
-}
-
-.on-ink a:hover {
   color: var(--signal);
 }
 
 :focus-visible {
-  outline: 3px solid var(--ink);
+  outline: 2px solid var(--signal);
   outline-offset: 3px;
-}
-
-.on-ink :focus-visible {
-  outline-color: var(--signal);
 }
 
 /* ---- Type ---------------------------------------------------------------- */
@@ -113,29 +131,43 @@ h3 {
   text-wrap: balance;
 }
 
+/* Condensed display type. */
 h1,
-h2 {
-  font-family: var(--font-heading);
-  font-stretch: 80%;
-  font-weight: 700;
-  line-height: 1.05;
+h2,
+.cond {
+  font-family: var(--font-cond);
+  font-stretch: 62%;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.005em;
   text-transform: uppercase;
 }
 
 h1 {
-  font-size: clamp(2.25rem, 1.5rem + 4vw, 4.25rem);
-  letter-spacing: -0.01em;
+  font-size: clamp(3.5rem, 2rem + 7vw, 8rem);
 }
 
 h2 {
-  font-size: clamp(1.6rem, 1.3rem + 1.4vw, 2.25rem);
+  font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
 }
 
 h3 {
-  font-size: 1.0625rem;
-  font-weight: 700;
-  line-height: 1.3;
-  margin: 2.25rem 0 0.6rem;
+  font-family: var(--font-cond);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 1.75rem;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 2.25rem 0 0.75rem;
+}
+
+/* Wide display type: wordmark and panel titles. */
+.wide {
+  font-family: var(--font-cond);
+  font-stretch: 125%;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
 p,
@@ -158,27 +190,26 @@ li + li {
 }
 
 li::marker {
-  color: var(--signal-ink);
+  color: var(--signal);
+}
+
+strong {
+  color: var(--paper-ink);
 }
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.875em;
+  font-size: 0.92em;
 }
 
 :not(pre) > code {
-  background: var(--paper-2);
-  border: 1px solid var(--line-soft);
+  background: var(--ink-2);
+  border: 1px solid var(--line-ink);
   padding: 0.05em 0.35em;
   overflow-wrap: anywhere;
 }
 
-.on-ink :not(pre) > code {
-  background: var(--ink-2);
-  border-color: var(--line-ink);
-}
-
-/* Machine layer: uppercase monospace labels. */
+/* Machine layer: small uppercase monospace labels. */
 .syslabel,
 .chip,
 .site-nav a,
@@ -186,38 +217,47 @@ code {
 .mmenu-panel a,
 .code figcaption,
 th,
-.site-footer nav a,
+.site-footer h2,
 .readout dt,
 .specstrip dt,
-.status {
+.status,
+.board-foot,
+.legal {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .syslabel {
   margin: 0 0 0.75rem;
-  color: var(--signal-ink);
-}
-
-.on-ink .syslabel {
   color: var(--signal);
 }
 
-.marker {
+/* Gate tag: a filled signal label above a section heading. */
+.gate {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 0.6em;
+  margin: 0 0 0.9rem;
+  padding: 0.15rem 0.5rem;
   background: var(--signal);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .lede {
-  font-size: 1.125rem;
-  line-height: 1.55;
-  max-width: 38rem;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--mute);
+  max-width: 40rem;
+}
+
+.signal {
+  color: var(--signal);
 }
 
 .skip-link {
@@ -235,36 +275,48 @@ th,
   top: 0.5rem;
 }
 
-/* ---- Ink surface --------------------------------------------------------- */
-.on-ink {
-  background: var(--ink);
-  color: var(--paper-ink);
-}
-
-/* Status strip: the developer-preview and hardware warning, kept to one or
-   two lines at phone width. */
+/* ---- Status strip -------------------------------------------------------- */
+/* The developer-preview and hardware warning, as a scrolling signal strip.
+   The moving copy is decorative; screen readers get the sentence once. */
 .status-banner {
-  background: var(--ink-2);
-  border-bottom: 1px solid var(--line-ink);
-  font-family: var(--font-mono);
+  overflow: hidden;
+  background: var(--signal);
+  color: var(--ink);
   font-size: var(--fs-label);
-  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .status-banner p {
   margin: 0;
-  padding-block: 0.45rem;
 }
 
-.status-banner strong {
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  margin-right: 0.5em;
+.status-banner .track {
+  display: inline-block;
+  padding-block: 0.4rem;
 }
 
-/* Header */
+@media (prefers-reduced-motion: no-preference) {
+  .status-banner .track,
+  .ticker .track {
+    animation: ticker 60s linear infinite;
+  }
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---- Header -------------------------------------------------------------- */
 .site-header {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--ink);
   border-bottom: 1px solid var(--line-ink);
 }
 
@@ -273,34 +325,26 @@ th,
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 3.5rem;
+  min-height: 4rem;
 }
 
 .site-header a.brand {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   min-height: 44px;
-  padding-block: 0.6rem;
   color: var(--paper-ink);
-  font-family: var(--font-heading);
-  font-stretch: 80%;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.25rem;
   line-height: 1;
   text-decoration: none;
 }
 
-.brand .marker {
-  align-self: center;
+.brand b {
+  color: var(--signal);
+  font-weight: inherit;
 }
 
 .brand .tld {
   color: var(--dim);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  margin-left: 0.15em;
 }
 
 .site-nav {
@@ -322,8 +366,8 @@ th,
 
 .site-nav a {
   display: block;
-  padding: 0.9rem 0.6rem;
-  color: var(--dim);
+  padding: 0.9rem 0.7rem;
+  color: var(--paper-ink);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -331,6 +375,28 @@ th,
 .site-nav a:hover,
 .site-nav a[aria-current='page'] {
   color: var(--signal);
+}
+
+.header-tag {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.header-tag strong {
+  margin-left: 0.4rem;
+  color: var(--signal);
+  font-family: var(--font-cond);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: 0;
+  text-transform: none;
+  vertical-align: middle;
 }
 
 /* Compact menu below 64rem: a <details> element, so it needs no JavaScript. */
@@ -352,7 +418,8 @@ th,
 }
 
 .mmenu[open] summary {
-  background: var(--paper-ink);
+  background: var(--signal);
+  border-color: var(--signal);
   color: var(--ink);
 }
 
@@ -391,7 +458,7 @@ th,
   align-items: center;
   min-height: 48px;
   padding-inline: var(--gutter);
-  border-bottom: 1px solid var(--ink-2);
+  border-bottom: 1px solid var(--line-soft);
   text-decoration: none;
 }
 
@@ -409,198 +476,596 @@ th,
   }
 }
 
-/* Page head (inner pages) */
-.page-head {
-  padding-block: 2.75rem 3rem;
-  border-bottom: 3px solid var(--signal);
-}
-
-.page-head .lede {
-  margin: 1.25rem 0 0;
-  color: var(--dim);
-}
-
-/* ---- Home hero ----------------------------------------------------------- */
-.hero {
-  padding-block: 2.5rem 0;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  list-style: none;
-  margin: 0 0 2rem;
-  padding: 0;
-}
-
-.chips li {
-  margin: 0;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--line-ink);
-  padding: 0.25rem 0.6rem;
-  color: var(--paper-ink);
-}
-
-.hero h1 {
-  font-family: var(--font-display);
-  font-stretch: normal;
-  font-weight: 500;
-  font-size: clamp(2.75rem, 1rem + 8.4vw, 7.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.02em;
-  text-transform: none;
-  max-width: 13ch;
-}
-
-.signal-rules {
-  width: 7rem;
-  margin: 2rem 0;
-  border-top: 3px solid var(--signal);
-  border-bottom: 1px solid var(--signal);
-  height: 8px;
-}
-
-.hero-grid {
-  display: grid;
-  gap: 2.5rem;
-  padding-bottom: 3rem;
-}
-
-.hero-grid > * {
-  min-width: 0;
-}
-
-@media (min-width: 60rem) {
-  .hero-grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 4rem;
-    align-items: start;
+@media (min-width: 80rem) {
+  .header-tag {
+    display: block;
   }
 }
 
-.hero .lede {
-  color: var(--paper-ink);
-  font-size: 1.25rem;
+/* ---- Section and page heads ---------------------------------------------- */
+/* Heading on the left, a short lede on the right, bottom-aligned. */
+.sh {
+  display: grid;
+  gap: 1.25rem 3rem;
+  margin-bottom: 2.25rem;
 }
 
-.hero-copy p:not(.lede) {
-  color: var(--dim);
-  max-width: 34rem;
+.sh > * {
+  min-width: 0;
 }
 
+.sh .lede {
+  margin: 0;
+}
+
+@media (min-width: 60rem) {
+  .sh {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    align-items: end;
+  }
+}
+
+.page-head {
+  padding-block: 3.5rem 3rem;
+  border-bottom: 1px solid var(--line-ink);
+}
+
+.page-head .sh {
+  margin: 0;
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.75rem;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
 }
 
 a.button {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0.5rem 1.15rem;
-  border: 2px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper-ink);
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--signal);
+  background: var(--signal);
+  color: var(--ink);
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   text-decoration: none;
   text-transform: uppercase;
 }
 
 a.button:hover {
-  background: var(--signal);
-  border-color: var(--signal);
+  background: var(--paper-ink);
+  border-color: var(--paper-ink);
   color: var(--ink);
 }
 
 a.button.secondary {
   background: transparent;
-  color: var(--ink);
+  color: var(--signal);
 }
 
 a.button.secondary:hover {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--paper-ink);
-}
-
-.on-ink a.button {
   background: var(--signal);
-  border-color: var(--signal);
   color: var(--ink);
 }
 
-.on-ink a.button:hover {
-  background: var(--paper-ink);
-  border-color: var(--paper-ink);
-  color: var(--ink);
+/* ---- Home: hero ---------------------------------------------------------- */
+.hero {
+  padding-block: 3rem 1rem;
 }
 
-.on-ink a.button.secondary {
-  background: transparent;
-  border-color: var(--paper-ink);
+.hero-top {
+  display: grid;
+  gap: 2rem 3rem;
+}
+
+.hero-top > * {
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .hero-top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    align-items: end;
+  }
+}
+
+.hero h1 {
+  font-size: clamp(3.25rem, 1.25rem + 6vw, 7.25rem);
+}
+
+.hero .lede {
   color: var(--paper-ink);
 }
 
-.on-ink a.button.secondary:hover {
-  background: var(--paper-ink);
-  color: var(--ink);
+.hero-copy p:not(.lede) {
+  color: var(--mute);
+  font-size: 0.8125rem;
 }
 
-/* Crop-mark corners around the hero code demonstration. */
-.cropframe {
-  position: relative;
+.install {
+  display: flex;
+  gap: 0.6rem;
+  margin: 1.25rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: var(--ink-2);
+  border: 1px solid var(--line-ink);
 }
 
-.cropframe::before,
-.cropframe::after {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border: 0 solid var(--signal);
-  pointer-events: none;
+.install::before {
+  content: '$';
+  color: var(--signal);
 }
 
-.cropframe::before {
-  top: -7px;
-  left: -7px;
-  border-width: 2px 0 0 2px;
+.install code {
+  background: none;
+  border: 0;
+  padding: 0;
 }
 
-.cropframe::after {
-  right: -7px;
-  bottom: -7px;
-  border-width: 0 2px 2px 0;
+/* ---- Boards: ruled tables on a panel ------------------------------------- */
+.board {
+  margin: 2.5rem 0 0;
+  background: var(--ink-2);
+  border: 1px solid var(--line-ink);
 }
 
-.cropframe .code {
+.board-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--line-ink);
+}
+
+.board-head h2,
+.board-head h3,
+.board-head p {
   margin: 0;
 }
 
-.cropframe .code + .code {
-  border-top: 0;
+.board-head .wide {
+  font-size: 0.9375rem;
+  line-height: 1.2;
 }
 
-/* Machine readout along the foot of the hero. */
+.board-head .syslabel {
+  margin: 0;
+  color: var(--dim);
+}
+
+.board .table-scroll {
+  margin: 0;
+}
+
+.board table {
+  border: 0;
+}
+
+.board th,
+.board td {
+  padding: 0.6rem 1.1rem;
+  white-space: nowrap;
+}
+
+.board tbody tr:hover > * {
+  background: var(--ink-3);
+}
+
+.board td.wrap-cell {
+  white-space: normal;
+  min-width: 16rem;
+  color: var(--mute);
+}
+
+.board-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0.75rem 1.1rem;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+/* Split-flap tiles for short codes. */
+.flap {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.flap i {
+  display: inline-block;
+  min-width: 1.15rem;
+  background: var(--ink);
+  border: 1px solid var(--line-ink);
+  color: var(--signal);
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
+/* Status lights. */
+.light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.light::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+}
+
+.light--ok {
+  color: var(--ok);
+}
+
+.light--ok::before {
+  background: var(--ok);
+}
+
+.light--run {
+  color: var(--signal);
+}
+
+.light--run::before {
+  background: var(--signal);
+}
+
+.light--exp {
+  color: var(--signal);
+}
+
+.light--off,
+.light--wait {
+  color: var(--dim);
+}
+
+.goal-row > * {
+  border-top: 1px solid var(--line-ink);
+  background: var(--ink);
+}
+
+/* Run board animation: CSS only. The three states are stacked in one cell,
+   each with a solid background: Running at the bottom, Scheduled over it,
+   the final state on top. Row --i hides Scheduled at --t and shows the final
+   state half a second later. Without motion, only the final state shows. */
+.run-state {
+  display: grid;
+}
+
+.run-state > * {
+  grid-area: 1 / 1;
+  background: var(--ink-2);
+}
+
+.board tbody tr:hover .run-state > * {
+  background: var(--ink-3);
+}
+
+.goal-row .run-state > * {
+  background: var(--ink);
+}
+
+.run-state .light--wait,
+.run-state .light--run {
+  visibility: hidden;
+}
+
+.run-state .light--wait {
+  z-index: 1;
+}
+
+.run-state .light--ok {
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .run-state,
+  .run-done {
+    --t: calc(0.6s + var(--i, 12) * 0.5s);
+  }
+
+  .run-state .light--wait,
+  .run-state .light--run {
+    visibility: visible;
+  }
+
+  .run-state .light--wait {
+    animation: run-off var(--t) steps(1, end) both;
+  }
+
+  .run-state .light--run::before {
+    animation: blink 0.5s steps(2) infinite;
+  }
+
+  .run-state .light--ok,
+  .run-done {
+    animation: run-on calc(var(--t) + 0.5s) steps(1, end) both;
+  }
+}
+
+@keyframes run-off {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes run-on {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---- Home: sections ------------------------------------------------------ */
+.section {
+  padding-top: 5rem;
+}
+
+.section .sh h2 {
+  font-size: clamp(3rem, 1.6rem + 5vw, 6.5rem);
+}
+
+/* Numbered pathway. */
+.path {
+  position: relative;
+  display: grid;
+  gap: 2rem 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.path li {
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .path {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .path {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .path::before {
+    content: '';
+    position: absolute;
+    top: 0.85rem;
+    left: 1rem;
+    right: 1rem;
+    border-top: 1px dashed var(--line-ink);
+  }
+}
+
+.dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: 1.1rem;
+  border: 1.5px solid var(--signal);
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--signal);
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+.dot--done {
+  background: var(--signal);
+  color: var(--ink);
+}
+
+.path .syslabel {
+  margin: 0;
+}
+
+.path h3 {
+  margin: 0.25rem 0 0.6rem;
+}
+
+.path p {
+  margin: 0 0 0.6rem;
+  color: var(--mute);
+  font-size: 0.8125rem;
+}
+
+.path code {
+  color: var(--dim);
+}
+
+.problem {
+  display: grid;
+  gap: 0 3rem;
+  margin-bottom: 3rem;
+  color: var(--mute);
+}
+
+@media (min-width: 60rem) {
+  .problem {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Ticket: the task on paper, with a signal stub. */
+.ticket-row {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.ticket-row > * {
+  min-width: 0;
+}
+
+@media (min-width: 72rem) {
+  .ticket-row {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+.ticket {
+  display: grid;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+@media (min-width: 40rem) {
+  .ticket {
+    grid-template-columns: minmax(0, 1fr) 12rem;
+  }
+}
+
+.ticket-main {
+  min-width: 0;
+  padding: 1.5rem 1.5rem 1.25rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.ticket-main .wide {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+}
+
+.ticket-main .code {
+  margin: 0;
+}
+
+.ticket-stub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 1.5rem 1.25rem;
+  background: var(--signal);
+  color: var(--ink);
+  border-top: 2px dashed var(--ink);
+}
+
+@media (min-width: 40rem) {
+  .ticket-stub {
+    border-top: 0;
+    border-left: 2px dashed var(--ink);
+  }
+}
+
+.ticket-stub dl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+}
+
+.ticket-stub dt {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.ticket-stub dd {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.ticket-stub dd.small {
+  font-size: 0.8125rem;
+}
+
+.barcode {
+  min-height: 4rem;
+  margin-top: auto;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 4px,
+    var(--ink) 4px 5px,
+    transparent 5px 8px,
+    var(--ink) 8px 11px,
+    transparent 11px 13px
+  );
+}
+
+.terminal {
+  display: flex;
+  flex-direction: column;
+  background: var(--ink-2);
+  border: 1px solid var(--line-ink);
+}
+
+.terminal .code {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line-ink);
+}
+
+.terminal .code:last-child {
+  flex: 1;
+  border-bottom: 0;
+}
+
+.dimlabel {
+  color: var(--dim);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.sh--top {
+  align-items: start;
+}
+
+/* Spec strip: big numbers in a ruled row. */
 .specstrip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-  margin: 0;
-  border-top: 1px solid var(--line-ink);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 1.5rem 0 0;
+  border: 1px solid var(--line-ink);
 }
 
 .specstrip div {
-  padding: 0.9rem 1rem 1rem 0;
+  padding: 1.25rem 1.25rem 1.1rem;
+  border-right: 1px solid var(--line-ink);
+  border-bottom: 1px solid var(--line-ink);
+  margin-bottom: -1px;
 }
 
 .specstrip dt {
@@ -608,39 +1073,107 @@ a.button.secondary:hover {
 }
 
 .specstrip dd {
-  margin: 0.2rem 0 0;
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
+  margin: 0.4rem 0 0;
+  color: var(--signal);
+  font-family: var(--font-cond);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 2.5rem;
+  line-height: 1;
 }
 
-/* ---- Paper body ---------------------------------------------------------- */
+/* Rule grid: two columns of ruled items with a signal triangle. */
+.rules {
+  display: grid;
+  gap: 0 3rem;
+  margin: 0;
+}
+
+@media (min-width: 60rem) {
+  .rules {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.rules > div {
+  position: relative;
+  padding: 1.1rem 0 1.25rem 1.6rem;
+  border-top: 1px solid var(--line-ink);
+}
+
+.rules > div::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  top: 1.05rem;
+  color: var(--signal);
+}
+
+.rules dt {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rules dd {
+  margin: 0.4rem 0 0;
+  color: var(--mute);
+  font-size: 0.8125rem;
+}
+
+.rules dd strong {
+  color: var(--paper-ink);
+}
+
+/* ---- Inner pages: body --------------------------------------------------- */
 .body {
   padding-block: 1rem 5rem;
   counter-reset: section;
 }
 
 .prose {
-  max-width: 46rem;
+  max-width: 50rem;
 }
 
-/* Numbered sections: a 2px ink rule, a signal index, then the heading. */
+.prose > p,
+.prose > ul,
+.prose > ol {
+  color: var(--mute);
+}
+
+/* Numbered sections: a gate tag above each condensed heading. */
 .body h2 {
   counter-increment: section;
-  margin: 4rem 0 1.25rem;
-  padding-top: 0.85rem;
-  border-top: 2px solid var(--line);
+  margin: 4.5rem 0 1.25rem;
+  font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.5rem);
 }
 
 .body h2::before {
-  content: counter(section, decimal-leading-zero) ' /';
-  display: block;
-  margin-bottom: 0.6rem;
-  color: var(--signal-ink);
+  content: 'Gate ' counter(section, decimal-leading-zero);
+  display: table;
+  margin-bottom: 0.9rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--signal);
+  color: var(--ink);
   font-family: var(--font-mono);
-  font-size: var(--fs-label);
+  font-size: 0.625rem;
   font-stretch: normal;
-  font-weight: 500;
+  font-weight: 800;
   letter-spacing: var(--tracking-label);
+  line-height: 1.6;
+}
+
+/* Home sections number themselves with .gate tags instead. */
+.home h2 {
+  margin: 0;
+}
+
+.home h2::before {
+  content: none;
 }
 
 .body > :first-child > h2:first-child,
@@ -648,67 +1181,33 @@ a.button.secondary:hover {
   margin-top: 2.5rem;
 }
 
-/* Home sections: heading in a narrow left column, content on the right. */
-.section {
-  display: grid;
-  gap: 0 3rem;
-  margin-top: 4rem;
-  border-top: 2px solid var(--line);
-}
-
-.section > * {
-  min-width: 0;
-}
-
-.section > h2 {
-  margin: 0 0 1.25rem;
-  border-top: 0;
-}
-
-.section-body {
-  padding-top: 0.85rem;
-}
-
-.section-body > :last-child {
-  margin-bottom: 0;
-}
-
-@media (min-width: 60rem) {
-  .section {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-  }
-
-  .section-body {
-    padding-top: 2.4rem;
-  }
-}
-
-/* Technical panels: one ruled grid, square, no shadows. */
+/* Cards: one ruled grid of panels. */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   list-style: none;
   margin: 1.5rem 0;
   padding: 0;
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line-ink);
+  border-left: 1px solid var(--line-ink);
 }
 
 .card {
   margin: 0;
-  padding: 1.1rem 1.25rem 1.35rem;
-  background: var(--paper-2);
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  padding: 1.25rem 1.25rem 1.4rem;
+  background: var(--ink-2);
+  border-right: 1px solid var(--line-ink);
+  border-bottom: 1px solid var(--line-ink);
+  color: var(--mute);
+}
+
+li.card + li.card {
+  margin-top: 0;
 }
 
 .card h3 {
   margin: 0 0 0.6rem;
-  font-family: var(--font-heading);
-  font-stretch: 80%;
-  font-size: 1.5rem;
-  line-height: 1.1;
-  text-transform: uppercase;
+  color: var(--paper-ink);
 }
 
 .card p:last-child {
@@ -729,58 +1228,27 @@ a.button.secondary:hover {
 }
 
 .status--off {
-  color: var(--muted);
+  color: var(--dim);
 }
 
 .status--on {
-  color: var(--signal-ink);
-}
-
-/* Label / description rows for limitations. */
-.readout {
-  margin: 1.25rem 0;
-  border-top: 1px solid var(--line);
-}
-
-.readout > div {
-  display: grid;
-  gap: 0.4rem 2rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.readout > div:last-child {
-  border-bottom-color: var(--line);
-}
-
-.readout dt .status {
-  display: block;
-  margin-top: 0.3rem;
-}
-
-.readout dd {
-  margin: 0;
-}
-
-@media (min-width: 40rem) {
-  .readout > div {
-    grid-template-columns: 13rem minmax(0, 1fr);
-  }
+  color: var(--signal);
 }
 
 .note {
   margin: 1.75rem 0;
   padding: 1rem 1.25rem;
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--signal);
+  background: var(--ink-2);
+  border: 1px solid var(--line-ink);
+  border-left: 3px solid var(--signal);
+  color: var(--mute);
 }
 
 .note p:last-child {
   margin-bottom: 0;
 }
 
-/* ---- Code panels (always on ink) ----------------------------------------- */
+/* ---- Code panels --------------------------------------------------------- */
 .code {
   margin: 1rem 0 1.5rem;
   background: var(--ink-2);
@@ -789,7 +1257,7 @@ a.button.secondary:hover {
 }
 
 .code figcaption {
-  padding: 0.5rem 0.9rem;
+  padding: 0.55rem 0.9rem;
   border-bottom: 1px solid var(--line-ink);
   color: var(--dim);
   overflow-wrap: anywhere;
@@ -802,7 +1270,7 @@ a.button.secondary:hover {
   background: transparent !important;
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  line-height: 1.6;
+  line-height: 1.65;
   tab-size: 4;
   color-scheme: dark;
   scrollbar-color: var(--line-ink) var(--ink-2);
@@ -810,12 +1278,31 @@ a.button.secondary:hover {
 }
 
 .code pre:focus-visible {
-  outline: 3px solid var(--signal);
-  outline-offset: -3px;
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
 }
 
 .code pre code {
   font-size: inherit;
+}
+
+/* Code printed on the paper ticket. */
+.code--paper {
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+}
+
+.code--paper figcaption {
+  padding: 0 0 0.5rem;
+  border-color: var(--paper-2);
+  color: var(--muted);
+}
+
+.code--paper pre {
+  padding: 0.75rem 0 0;
+  color-scheme: light;
+  scrollbar-color: var(--paper-2) var(--paper);
 }
 
 /* Shell prompt for commands. It is generated content, so it is not copied. */
@@ -833,9 +1320,9 @@ a.button.secondary:hover {
 table {
   width: 100%;
   border-collapse: collapse;
-  border-top: 2px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  font-size: 0.9375rem;
+  border-top: 1px solid var(--line-ink);
+  border-bottom: 1px solid var(--line-ink);
+  font-size: 0.8125rem;
 }
 
 th,
@@ -847,28 +1334,68 @@ td {
 }
 
 thead th {
-  border-bottom: 1px solid var(--line);
-  color: var(--muted);
+  border-bottom: 1px solid var(--line-ink);
+  color: var(--dim);
 }
 
 tbody th {
-  color: var(--ink);
+  color: var(--paper-ink);
+  font-weight: 700;
+}
+
+td {
+  color: var(--mute);
 }
 
 /* ---- Footer -------------------------------------------------------------- */
 .site-footer {
-  padding-block: 2.5rem 3rem;
-  border-top: 3px solid var(--signal);
+  margin-top: 4rem;
+  border-top: 1px solid var(--line-ink);
+  color: var(--mute);
+  font-size: 0.8125rem;
+}
+
+.ticker {
+  overflow: hidden;
+  border-bottom: 1px solid var(--line-ink);
+  color: var(--signal);
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.ticker .track {
+  display: inline-block;
+  padding-block: 0.6rem;
+}
+
+.foot-grid {
+  display: grid;
+  gap: 2rem 3rem;
+  padding-block: 3rem;
+}
+
+@media (min-width: 60rem) {
+  .foot-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.foot-mark {
+  margin: 0 0 1rem;
+  color: var(--signal);
+  font-size: 6rem;
+}
+
+.site-footer h2 {
+  margin: 0 0 0.6rem;
   color: var(--dim);
-  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 .site-footer ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.75rem;
   list-style: none;
-  margin: 0 0 1.5rem;
+  margin: 0;
   padding: 0;
 }
 
@@ -879,20 +1406,42 @@ tbody th {
 .site-footer nav a {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
+  min-height: 36px;
   text-decoration: none;
 }
 
 .site-footer p {
-  max-width: 46rem;
+  max-width: 40rem;
 }
 
-.site-footer p:last-child {
-  margin-bottom: 0;
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  padding-block: 1.25rem 2rem;
+  border-top: 1px solid var(--line-ink);
+  color: var(--dim);
+}
+
+.legal p {
+  margin: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .skip-link {
     transition: top 0.15s ease;
+  }
+}
+
+/* Phones: the run board keeps step, action and status in view. */
+@media (max-width: 40rem) {
+  .run-board th:nth-child(3),
+  .run-board td:nth-child(3),
+  .run-board th:nth-child(4),
+  .run-board td:nth-child(4),
+  .run-board th:nth-child(5),
+  .run-board td:nth-child(5) {
+    display: none;
   }
 }

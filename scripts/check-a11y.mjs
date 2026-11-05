@@ -50,21 +50,27 @@ const tokens = Object.fromEntries(
 
 // [foreground, background] pairs that are used together in global.css.
 const pairs = [
-  // paper surface
-  ['ink', 'paper'],
-  ['ink', 'paper-2'],
-  ['muted', 'paper'],
-  ['muted', 'paper-2'],
-  ['signal-ink', 'paper'],
-  ['signal-ink', 'paper-2'],
-  // ink surface
+  // ink surface: page, panels and hovered rows
   ['paper-ink', 'ink'],
   ['paper-ink', 'ink-2'],
+  ['paper-ink', 'ink-3'],
+  ['mute', 'ink'],
+  ['mute', 'ink-2'],
+  ['mute', 'ink-3'],
   ['dim', 'ink'],
   ['dim', 'ink-2'],
+  ['dim', 'ink-3'],
   ['signal', 'ink'],
   ['signal', 'ink-2'],
-  // buttons
+  ['signal', 'ink-3'],
+  ['ok', 'ink'],
+  ['ok', 'ink-2'],
+  ['ok', 'ink-3'],
+  // paper ticket
+  ['ink', 'paper'],
+  ['muted', 'paper'],
+  ['signal-ink', 'paper'],
+  // signal fills: buttons, gate tags, status strip, ticket stub
   ['ink', 'signal'],
   ['ink', 'paper-ink'],
 ];
@@ -96,21 +102,24 @@ for (const [fg, bg] of pairs) {
 }
 
 // ---- 3. contrast of syntax highlighting in the built pages ----------------
-// Code panels sit on --ink-2. Every colour the highlighter wrote into the
-// built HTML must be readable on it.
+// Code panels sit on --ink-2, or on --paper inside a .code--paper panel.
+// Every colour the highlighter wrote into the built HTML must be readable on
+// the background it is shown on.
 const codeColours = new Set();
 for (const path of pages) {
   const document = new JSDOM(read(path)).window.document;
   for (const el of document.querySelectorAll('pre.astro-code, pre.astro-code span[style]')) {
     const colour = el.getAttribute('style')?.match(/(?:^|;)\s*color:\s*(#[0-9a-fA-F]{6})/)?.[1];
-    if (colour) codeColours.add(colour.toLowerCase());
+    const background = el.closest('.code--paper') ? 'paper' : 'ink-2';
+    if (colour) codeColours.add(`${colour.toLowerCase()} ${background}`);
   }
 }
 if (codeColours.size === 0) failures.push('contrast: found no syntax highlighting colours in the built pages');
-for (const colour of codeColours) {
-  const ratio = contrast(colour, tokens['ink-2']);
+for (const entry of codeColours) {
+  const [colour, background] = entry.split(' ');
+  const ratio = contrast(colour, tokens[background]);
   if (ratio < 4.5) {
-    failures.push(`contrast: code colour ${colour} on --ink-2 is ${ratio.toFixed(2)}:1 (needs 4.5:1)`);
+    failures.push(`contrast: code colour ${colour} on --${background} is ${ratio.toFixed(2)}:1 (needs 4.5:1)`);
   }
 }
 

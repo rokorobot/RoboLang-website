@@ -1,13 +1,11 @@
 ---
-// Shown on every page. Kept short so it takes one or two lines on a phone;
-// the full statement is in the footer and on the homepage.
+// Shown on every page: the developer-preview and hardware warning. The
+// scrolling copy is decorative and hidden from screen readers, which read the
+// sentence once. The full statement is in the footer and on the homepage.
+const message = 'Developer preview ★ Validation and simulation only ★ Neither makes a task safe ★ Not for real hardware ★ ';
 ---
 
 <aside class="status-banner" aria-label="Project status">
-  <div class="wrap">
-    <p>
-      <span class="marker" aria-hidden="true"></span><strong>Developer preview</strong>
-      Validation and simulation only. Neither makes a task safe. Not for real hardware.
-    </p>
-  </div>
+  <p class="sr-only">Developer preview. Validation and simulation only. Neither makes a task safe. Not for real hardware.</p>
+  <p aria-hidden="true"><span class="track">{message.repeat(8)}</span></p>
 </aside>
