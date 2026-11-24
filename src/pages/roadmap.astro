@@ -15,14 +15,14 @@ const evolutionRules = specs.languageEvolutionRules;
 
 // The language iterations, read from docs/LANGUAGE_ROADMAP.md at the snapshot
 // commit. One gap per iteration; each runs L1 to L6 and ends in a release.
-// state: ok = released on PyPI, exp = tagged or in progress, wait = not started.
+// state: ok = released on PyPI, run = in progress, wait = not started, off = proposed.
 const iterations = [
   { code: 'I1', gap: 'G-PATH', direction: 'Safety', adds: 'Region limits: stay inside or outside a region while moving', language: '1.7', state: 'ok', status: 'Departed', when: '0.4.0 · 2026-11-17' },
   { code: 'I2', gap: 'G-ACT', direction: 'Action', adds: 'Declared actions: open, set a device, print, from the robot profile', language: '1.8', state: 'ok', status: 'Departed', when: '0.5.0 · 2026-11-17' },
   { code: 'I3', gap: 'G-CLOCK', direction: 'Reasoning', adds: 'Clock readings and times of day in conditions', language: '1.9', state: 'ok', status: 'Departed', when: '0.6.0 · 2026-11-17' },
   { code: 'I4', gap: 'G-LOOP', direction: 'Reasoning', adds: 'Missions: bounded, verified repetition with a stop condition', language: '2.0', state: 'ok', status: 'Departed', when: '0.7.0 · 2026-11-18' },
   { code: 'I5', gap: 'G-MSG', direction: 'Communication', adds: 'Waiting for, and checking, an incoming message', language: '2.1', state: 'ok', status: 'Departed', when: '0.8.0 · 2026-11-18' },
-  { code: 'I6', gap: 'G-PERCEIVE', direction: 'Perception', adds: 'More measured kinds: fill, confidence, pressure, count', language: '2.2', state: 'exp', status: 'Tagged', when: '0.9.0 · PyPI pending' },
+  { code: 'I6', gap: 'G-PERCEIVE', direction: 'Perception', adds: 'More measured kinds: fill, confidence, pressure, count', language: '2.2', state: 'ok', status: 'Departed', when: '0.9.0 · 2026-11-24' },
   { code: 'I7', gap: 'G-CHOOSE', direction: 'Perception', adds: 'Properties of robots and locations; choosing the nearest or best', language: '2.3', state: 'run', status: 'Boarding · L3', when: 'L4 build next' },
   { code: 'I8', gap: 'G-SELF', direction: 'Autonomy', adds: "The robot's battery as a reading and condition", language: '2.4', state: 'wait', status: 'Scheduled', when: '—' },
   { code: 'I9', gap: 'G-CALC', direction: 'Reasoning', adds: 'Minimal arithmetic, counting and text built from values', language: '2.5', state: 'wait', status: 'Scheduled', when: '—' },
@@ -152,7 +152,7 @@ const cycle = [
     </div>
     <p class="board-foot">
       <span>
-        Departed: on PyPI · Tagged: released on GitHub, PyPI upload pending · Boarding: in progress ·
+        Departed: on PyPI · Boarding: in progress ·
         I11 to I20 are proposals until the research confirms them
       </span>
       <a class="signal" href={languageRoadmap}>Language roadmap →</a>
@@ -221,14 +221,15 @@ const cycle = [
             <td><strong>Released</strong> in 0.3.0, 2026-11-11</td>
           </tr>
           <tr>
-            <th scope="row">Language 1.7 to 2.1</th>
+            <th scope="row">Language 1.7 to 2.2</th>
             <td>
-              Iterations I1 to I5 above: region limits, declared actions, clock readings, the mission
-              layer and incoming messages. Also the physical-run authorization documents and optional
+              Iterations I1 to I6 above: region limits, declared actions, clock readings, the mission
+              layer, incoming messages and more measured kinds (<code>fill</code>,
+              <code>confidence</code>, <code>pressure</code>, <code>count</code>). Also the physical-run authorization documents and optional
               Ed25519 signatures (<code>robolang[ed25519]</code>); physical mode stays disabled
               (<code>A731</code>).
             </td>
-            <td><strong>Released</strong> in 0.4.0 to {versions.distribution}, 2026-11-17 to 2026-11-18</td>
+            <td><strong>Released</strong> in 0.4.0 to {versions.distribution}, 2026-11-17 to 2026-11-24</td>
           </tr>
         </tbody>
       </table>
@@ -245,18 +246,6 @@ const cycle = [
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row"><a href={roadmapSnapshot.lang22}>Language {roadmapSnapshot.pendingLanguage}</a></th>
-            <td>
-              More measured kinds: <code>fill</code> and <code>confidence</code> in <code>%</code>,
-              <code>pressure</code> and <code>count</code> (iteration I6).
-            </td>
-            <td>
-              <strong>Delivered</strong> and <a href={roadmapSnapshot.release090}>accepted</a>
-              2026-11-18, tagged <code>v{roadmapSnapshot.pendingRelease}</code>. The PyPI upload waits for
-              the owner's approval
-            </td>
-          </tr>
           <tr>
             <th scope="row"><a href={roadmapSnapshot.decision0045Draft}>Language 2.3</a></th>
             <td>Choosing robots and locations at run time (iteration I7).</td>
@@ -293,6 +282,14 @@ const cycle = [
               run only at milestones, so no prompt or model is tuned on them.
             </td>
             <td>Rules and writers' brief merged 2026-11-22. Set not yet frozen</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href={roadmapSnapshot.decision0047}>Low-energy bench pilot</a></th>
+            <td>
+              The first physical runs, on a desktop robot too weak to injure anyone, with the owner
+              present: limits on voltage, speed, force and mass, measured on the unit (decision 0047).
+            </td>
+            <td>Decision <strong>proposed</strong> 2026-11-24. Not approved; physical mode stays disabled</td>
           </tr>
           <tr>
             <th scope="row">Physical robots</th>
@@ -419,7 +416,7 @@ const cycle = [
       </table>
     </div>
     <p>
-      Language versions ({versions.language} released, {roadmapSnapshot.pendingLanguage} tagged) name the
+      Language versions ({versions.language} released) name the
       syntax of <code>.rob</code> files and are separate from the milestones above, and both are
       separate from the distribution version of the Python package; see
       <a href="/get-started/#versions">the version numbers</a>.

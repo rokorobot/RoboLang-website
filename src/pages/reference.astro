@@ -6,7 +6,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Language Reference"
-  description="Where RoboLang is specified: the language 1.1 to 2.1 specifications, grammars, Task and Mission IR schemas, simulation semantics, the goal bridge and the experimental Core 0.1 and 0.2 contracts, each linked at a fixed version in the core repository."
+  description="Where RoboLang is specified: the language 1.1 to 2.2 specifications, grammars, Task and Mission IR schemas, simulation semantics, the goal bridge and the experimental Core 0.1 and 0.2 contracts, each linked at a fixed version in the core repository."
 >
   <PageHead slot="head" index="03" label="Language Reference" title="Language reference">
     The specifications live in the RoboLang core repository. This page points to them at a fixed version and gives a short orientation.
@@ -113,6 +113,14 @@ import Base from '../layouts/Base.astro';
       </p>
     </li>
     <li class="card">
+      <h3><a href={specs.language22}>Language specification 2.2</a></h3>
+      <p>
+        What 2.2 adds: four more kinds for <code>measure</code>, <code>fill</code> and
+        <code>confidence</code> in <code>%</code>, <code>pressure</code>, and an exact
+        <code>count</code>.
+      </p>
+    </li>
+    <li class="card">
       <h3>Grammars (EBNF)</h3>
       <p>
         The syntactic and lexical grammar in ISO-style EBNF, including the reserved words:
@@ -120,8 +128,8 @@ import Base from '../layouts/Base.astro';
         <a href={specs.grammar13}>1.3</a>, <a href={specs.grammar14}>1.4</a>,
         <a href={specs.grammar15}>1.5</a>, <a href={specs.grammar16}>1.6</a>,
         <a href={specs.grammar17}>1.7</a>, <a href={specs.grammar18}>1.8</a>,
-        <a href={specs.grammar19}>1.9</a>, <a href={specs.grammar20}>2.0</a> and
-        <a href={specs.grammar21}>2.1</a>.
+        <a href={specs.grammar19}>1.9</a>, <a href={specs.grammar20}>2.0</a>,
+        <a href={specs.grammar21}>2.1</a> and <a href={specs.grammar22}>2.2</a>.
       </p>
     </li>
     <li class="card">
@@ -132,7 +140,8 @@ import Base from '../layouts/Base.astro';
         <a href={specs.irSchema12}>1.2</a>, <a href={specs.irSchema13}>1.3</a>,
         <a href={specs.irSchema14}>1.4</a>, <a href={specs.irSchema15}>1.5</a>,
         <a href={specs.irSchema16}>1.6</a>, <a href={specs.irSchema17}>1.7</a>,
-        <a href={specs.irSchema18}>1.8</a> and <a href={specs.irSchema19}>1.9</a>, and
+        <a href={specs.irSchema18}>1.8</a>, <a href={specs.irSchema19}>1.9</a> and
+        <a href={specs.irSchema110}>1.10</a>, and
         <a href={specs.missionIr}>Mission IR</a> {versions.missionIr} for files with missions. The
         <a href={specs.irReader}>IR reader</a> defines how <code>--ir</code> reads it back and
         re-validates it.
@@ -154,8 +163,8 @@ import Base from '../layouts/Base.astro';
         <a href={specs.decisionsLang13}>1.3</a>, <a href={specs.decisionsLang14}>1.4</a>,
         <a href={specs.decisionsLang15}>1.5</a>, <a href={specs.decisionsLang16}>1.6</a>,
         <a href={specs.decisionsLang17}>1.7</a>, <a href={specs.decisionsLang18}>1.8</a>,
-        <a href={specs.decisionsLang19}>1.9</a>, <a href={specs.decisionsLang20}>2.0</a> and
-        <a href={specs.decisionsLang21}>2.1</a>. All of
+        <a href={specs.decisionsLang19}>1.9</a>, <a href={specs.decisionsLang20}>2.0</a>,
+        <a href={specs.decisionsLang21}>2.1</a> and <a href={specs.decisionsLang22}>2.2</a>. All of
         them are in the <a href={specs.decisionsDir}>decision records</a>.
       </p>
     </li>
@@ -231,7 +240,7 @@ import Base from '../layouts/Base.astro';
     <ul>
       <li>
         A file contains one or more <strong>tasks</strong>, optionally preceded by a version marker
-        such as <code>robolang 2.1;</code>. Without a marker a file is 1.1. From 2.0 a file can also
+        such as <code>robolang 2.2;</code>. Without a marker a file is 1.1. From 2.0 a file can also
         contain <strong>missions</strong>, which repeat its tasks within a hard bound.
       </li>
       <li>
@@ -256,8 +265,8 @@ import Base from '../layouts/Base.astro';
         <code>object_exists</code> and <code>sensor_ok</code>, and from 1.3 the outcome conditions
         <code>object_at</code>, <code>robot_at</code> and <code>holding</code>. From 1.2 they can be
         combined with <code>and</code>, <code>or</code>, <code>not</code> and parentheses. Later
-        versions add comparisons of measured values (1.6), <code>in_state</code> (1.8) and
-        <code>message_received</code> (2.1).
+        versions add comparisons of measured values (1.6, with more kinds in 2.2),
+        <code>in_state</code> (1.8) and <code>message_received</code> (2.1).
       </li>
       <li>Comments start with <code>//</code> and run to the end of the line.</li>
     </ul>
