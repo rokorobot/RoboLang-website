@@ -65,6 +65,9 @@ export const roadmapSnapshot = {
   g1Phase3: `${CORE_REPO}/pull/176`,
   heldout: `${CORE_REPO}/pull/177`,
   h3Acceptance: `${CORE_REPO}/pull/90`,
+  // The development history (src/data/history.ts) was read at this core commit.
+  historyCommit: '3dbe03542ea954828789a75009b37151043f8347',
+  developmentSteps: `${CORE_REPO}/pull/183`,
 } as const;
 
 export const LICENSE_NAME = 'Apache-2.0';

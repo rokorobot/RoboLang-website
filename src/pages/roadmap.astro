@@ -1,10 +1,13 @@
 ---
 import PageHead from '../components/PageHead.astro';
 import { CORE_COMMIT_SHORT, CORE_RELEASE_TAG, CORE_REPO, PYPI_URL, milestone, roadmapSnapshot, specs, versions } from '../data/facts';
+import { history } from '../data/history';
 import Base from '../layouts/Base.astro';
 
 const snapshotUrl = `${CORE_REPO}/commit/${roadmapSnapshot.commit}`;
 const snapshotShort = roadmapSnapshot.commit.slice(0, 7);
+const historyUrl = `${CORE_REPO}/commit/${roadmapSnapshot.historyCommit}`;
+const historyShort = roadmapSnapshot.historyCommit.slice(0, 7);
 // File links stay pinned to the release (CORE_COMMIT), as everywhere on the
 // site; the board below is newer than the roadmap file at that release.
 const languageRoadmap = specs.languageRoadmap;
@@ -300,6 +303,58 @@ const cycle = [
       </table>
     </div>
 
+    <h2 id="history">How it got here</h2>
+    <p>
+      Every step from the first prototype to today, oldest first, from the core repository's
+      <a href={roadmapSnapshot.developmentSteps}>development timeline</a>. Everything in it ran in
+      simulation; nothing has run on a robot.
+    </p>
+  </div>
+
+  <div class="board">
+    <div class="board-head">
+      <h3 class="wide">Arrivals · steps 0 to {history.at(-1)?.step}</h3>
+      <p class="syslabel">Read from core <a href={historyUrl}><code>{historyShort}</code></a></p>
+    </div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Development history">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Step</th>
+            <th scope="col">Date</th>
+            <th scope="col">Milestone</th>
+            <th scope="col">What happened</th>
+            <th scope="col">Area</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            history.map((h) => (
+              <tr>
+                <td>
+                  <span class="flap" aria-hidden="true">{[...String(h.step).padStart(2, '0')].map((c) => <i>{c}</i>)}</span>
+                  <span class="sr-only">{h.step}</span>
+                </td>
+                <td class="dimlabel">{h.date}</td>
+                <th scope="row" class="wrap-cell history-title">
+                  {h.title}
+                  {h.tag && <span class="history-tag">{h.tag}</span>}
+                </th>
+                <td class="wrap-cell">{h.text}</td>
+                <td class="dimlabel">{h.area}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="board-foot">
+      <span>The next steps are on the language board above and in the status tables</span>
+      <a class="signal" href={roadmapSnapshot.developmentSteps}>Timeline source →</a>
+    </p>
+  </div>
+
+  <div class="prose">
     <h2 id="horizons">Horizons</h2>
     <p>
       The project works through four horizons, set in its <a href={specs.strategy}>strategy</a>,

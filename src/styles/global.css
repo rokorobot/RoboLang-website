@@ -1460,3 +1460,20 @@ td {
 .board + .prose {
   margin-top: 2rem;
 }
+
+/* Development history board (roadmap page). */
+.board th.history-title {
+  min-width: 14rem;
+  color: var(--paper-ink);
+}
+
+.history-tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--line-ink);
+  color: var(--dim);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  white-space: nowrap;
+}
