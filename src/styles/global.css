@@ -1445,3 +1445,18 @@ td {
     display: none;
   }
 }
+
+/* The six steps of a language iteration (roadmap page). */
+@media (min-width: 64rem) {
+  .path--six {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.path--six {
+  margin: 2rem 0 0;
+}
+
+.board + .prose {
+  margin-top: 2rem;
+}

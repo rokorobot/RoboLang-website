@@ -19,7 +19,7 @@ const expected = {
   'contribute/index.html': ['the full output and the result of robolang --version.'],
   'index.html': ['is on PyPI. It installs one command, robolang, needs Python'],
   'get-started/index.html': ['Use --task NAME to show a single task'],
-  'reference/index.html': ['preceded by a version marker such as robolang 1.4;. Without a marker'],
+  'reference/index.html': ['preceded by a version marker such as robolang 2.1;. Without a marker'],
   'examples/index.html': ['is reported as unit_unspecified_not_enforced: checked, recorded'],
   'roadmap/index.html': ['where Core 0.1 is ambiguous. See Contribute.'],
 };

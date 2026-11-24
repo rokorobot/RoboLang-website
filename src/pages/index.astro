@@ -28,8 +28,13 @@ const steps = [
 const capabilities = [
   {
     code: 'WR', name: 'Write', command: 'robolang reference', state: 'ok', status: 'Available',
-    text: `Languages ${versions.language}: typed parameters, @safety, pre, goal and plan; and/or/not (1.2); bounded if/else and fail (1.4).`,
+    text: `Languages ${versions.language}: goals (1.3), branching (1.4), failure handlers (1.5), measured values (1.6), region limits (1.7), declared actions (1.8), clock readings (1.9), missions (2.0) and incoming messages (2.1).`,
     href: '/reference/', link: 'Reference',
+  },
+  {
+    code: 'EX', name: 'Start', command: 'robolang example', state: 'ok', status: 'Available',
+    text: 'Writes a sample task and a world file for it, so the first validate and simulate work from PyPI alone.',
+    href: '/get-started/', link: 'Get started',
   },
   {
     code: 'VA', name: 'Validate', command: 'robolang validate', state: 'ok', status: 'Available',
@@ -43,22 +48,22 @@ const capabilities = [
   },
   {
     code: 'IN', name: 'Inspect', command: 'robolang inspect', state: 'ok', status: 'Available',
-    text: `What a valid file describes, as text or JSON in IR schema ${versions.irSchema}. Reads Task IR back with --ir.`,
+    text: `What a valid file describes, as text or JSON: Task IR ${versions.irSchema}, Mission IR ${versions.missionIr}. Reads Task IR back with --ir.`,
     href: '/examples/#json-ir', link: 'JSON IR',
   },
   {
     code: 'SM', name: 'Simulate', command: 'robolang simulate', state: 'ok', status: 'Available',
-    text: 'Runs a validated task against a world file. Fails closed; succeeds only on a verified goal. Same inputs, same record.',
+    text: 'Runs a validated task, or with --mission a bounded mission, against a world file. Fails closed; succeeds only on a verified goal. Same inputs, same record.',
     href: '/examples/#goals', link: 'A goal checked',
   },
   {
     code: 'DG', name: 'Delegate', command: 'robolang delegate', state: 'exp', status: 'Experimental',
-    text: `Sends a task's goal, never its plan, as a signed Core ${versions.core} message; success only after re-checking evidence.`,
+    text: `Sends a task's goal, never its plan, as a signed Core message (${versions.coreDefault} by default, 0.2 with --core 0.2); success only after re-checking evidence.`,
     href: '/examples/#delegate', link: 'A delegation',
   },
   {
     code: 'XC', name: 'Exchange', command: 'robolang arch02', state: 'exp', status: 'Experimental',
-    text: `Core ${versions.core} reference scenario (A2R and R2R) in one process. Gate 1 of RL-ARCH-02 passed on ${milestone.date}.`,
+    text: `Core ${versions.coreDefault} reference scenario (A2R and R2R) in one process. Gate 1 of RL-ARCH-02 passed on 2026-10-27.`,
     href: '/examples/#arch02', link: 'Reference simulation',
   },
 ];
@@ -250,7 +255,7 @@ const capabilities = [
       <div class="board">
         <div class="board-head">
           <h3 class="wide">Capabilities</h3>
-          <p class="syslabel">5 available · 2 experimental, simulation only</p>
+          <p class="syslabel">6 available · 2 experimental, simulation only</p>
         </div>
         <div class="table-scroll" tabindex="0" role="region" aria-label="Capabilities">
           <table>
@@ -304,17 +309,22 @@ const capabilities = [
             <strong>It does not enforce safety.</strong>
             <code>@safety</code> limits are checked against the simulated robot profile and reported in
             the run record, never enforced. <code>pre</code> conditions are evaluated only against the
-            symbolic world file. A file that validates, or a run that succeeds in simulation, is not
-            thereby safe to run on hardware.
+            symbolic world file. Region limits (1.7) are requests, checked and recorded the same way. A
+            file that validates, or a run that succeeds in simulation, is not thereby safe to run on
+            hardware. Physical mode is not enabled: even a valid, signed physical-run authorization chain
+            ends in <code>A731</code>.
           </dd>
         </div>
         <div>
           <dt>Interoperability <span class="light light--exp">Experimental</span></dt>
           <dd>
-            <strong>It is not a robot protocol.</strong> Core {versions.core} is a draft, exercised only
-            in one process with simulation-only signatures. There is no network transport and no
-            independent implementation yet. A valid Core message is never permission to operate a
-            robot. See the <a href={specs.core}>Core {versions.core} specification</a>.
+            <strong>It is not a robot protocol.</strong> Core {versions.core} are drafts, exercised in
+            simulation only. An independent Core 0.2 implementation passed the Gate 2
+            interoperability test on {milestone.date}, through a test binding between processes. There is
+            no network transport. Signatures are simulation-only by default; real Ed25519 signatures are
+            an optional extra (<code>robolang[ed25519]</code>). A valid Core message is never permission
+            to operate a robot. See the <a href={specs.core}>Core 0.1</a> and
+            <a href={specs.core02}>Core 0.2</a> specifications.
           </dd>
         </div>
         <div>
@@ -323,8 +333,8 @@ const capabilities = [
             <strong>The installed package has no ROS 2 integration.</strong> A separate, experimental
             ROS 2 backend runs <code>.rob</code> tasks in the Gazebo physics simulator in the core
             repository's CI; it is not part of <code>pip install robolang</code> and never drives
-            hardware. See the <a href="/roadmap/#status">roadmap</a>. The early v1 ROS 2 adapter is
-            kept as historical source, never validated and not supported.
+            hardware. See the <a href="/roadmap/#status">roadmap</a>. The early v1 prototype is kept as
+            historical source, never validated and not supported; its ROS 2 adapter was removed.
           </dd>
         </div>
         <div>

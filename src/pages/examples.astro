@@ -8,7 +8,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Examples"
-  description="Valid and invalid RoboLang task files, goals, branching plans, symbolic simulations, goal delegation and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
+  description="Valid and invalid RoboLang task files: goals, branching, failure handlers, measured values, region limits, declared actions, clock readings, missions and incoming messages, with symbolic simulations, goal delegation and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
 >
   <PageHead slot="head" index="04" label="Examples" title="Examples">
     Task files and what the tools say about them. Every output on this page was produced by the real <code>robolang</code> command, distribution {versions.distribution}.
@@ -168,7 +168,7 @@ import Base from '../layouts/Base.astro';
     />
     <p>
       Every 1.3 run record ends with <code>core_outcome</code>: the same verdict as a Core
-      {versions.core} outcome, citing signed observations of the final world as its evidence.
+      {versions.coreDefault} outcome (Core 0.2 with <code>--core 0.2</code>), citing signed observations of the final world as its evidence.
     </p>
     <CodeBlock
       lang="json"
@@ -243,10 +243,135 @@ import Base from '../layouts/Base.astro';
       specification</a>.
     </p>
 
+    <h2 id="failure-handlers">Failure handlers (language 1.5)</h2>
+    <p>
+      This is <a href={coreFile('tests/fixtures/v1.5/valid/retry_grasp.rob')}><code>retry_grasp.rob</code></a>
+      from the core repository's tests, unchanged. A step can carry its own <code>else</code> block,
+      which runs only when that step fails.
+    </p>
+    <CodeBlock lang="rob" code={ex.retrySource} label="tests/fixtures/v1.5/valid/retry_grasp.rob" />
+    <p>
+      To see the handler run, this world file, written for this page, makes step 2 (the first
+      <code>grasp</code>) fail once with a scripted fault:
+    </p>
+    <CodeBlock lang="json" code={ex.retryWorld} label="retry_world.json" />
+    <CodeBlock lang="bash" code="robolang simulate tests/fixtures/v1.5/valid/retry_grasp.rob --world retry_world.json" />
+    <CodeBlock code={ex.retrySimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.retryRecord}
+      label="Standard output: selected fields of the run record, each step cut down to its index, path, status and handled"
+    />
+    <p>
+      The first grasp failed with <code>S251</code> and was <em>handled</em>, the retry at path
+      <code>2.else.1</code> succeeded, and the run still succeeds only because the goal holds. The
+      rules are in the <a href={specs.language15}>language 1.5 specification</a>.
+    </p>
+
+    <h2 id="later-versions">What 1.6 to 1.9 add</h2>
+    <p>
+      Each of these files is from the core repository's tests, unchanged, and validates as shown. A
+      file uses a newer feature only with that version's marker; older files keep their meaning.
+    </p>
+
+    <h3 id="measured-values">Measured values (1.6)</h3>
+    <p>
+      <code>measure</code> reads a typed value with a unit, binds it to a name and compares it in a
+      condition. A reading near a threshold is unknown and fails closed.
+    </p>
+    <CodeBlock lang="rob" code={ex.weighSource} label="tests/fixtures/v1.6/valid/weigh_and_compare.rob" />
+    <CodeBlock code={ex.weighValidate} label="Output of robolang validate (exit status 0)" />
+
+    <h3 id="region-limits">Region limits (1.7)</h3>
+    <p>
+      <code>@safety no_go_region</code> and <code>in_region</code> are requests: checked against the
+      world and recorded, never enforced by RoboLang. Keeping a robot out of a region is the job of
+      its motion planner and safety controller.
+    </p>
+    <CodeBlock lang="rob" code={ex.wetFloorSource} label="tests/fixtures/v1.7/valid/keep_out_of_wet_floor.rob" />
+    <CodeBlock code={ex.wetFloorValidate} label="Output of robolang validate (exit status 0)" />
+
+    <h3 id="declared-actions">Declared actions (1.8)</h3>
+    <p>
+      <code>do</code> asks for an action that the robot's profile declares, beyond the built-in steps.
+      A new action needs a profile entry, never a new keyword. The goal verifies the result with
+      <code>in_state</code>.
+    </p>
+    <CodeBlock lang="rob" code={ex.openClosetSource} label="tests/fixtures/v1.8/valid/open_then_fetch.rob" />
+    <CodeBlock code={ex.openClosetValidate} label="Output of robolang validate (exit status 0)" />
+
+    <h3 id="clock-readings">Clock readings (1.9)</h3>
+    <p>
+      <code>measure r time</code> reads the local time of day, like any other value, and a time such
+      as <code>21:30</code> can be compared in a condition.
+    </p>
+    <CodeBlock lang="rob" code={ex.cutoffSource} label="tests/fixtures/v1.9/valid/shift_cutoff.rob" />
+    <CodeBlock code={ex.cutoffValidate} label="Output of robolang validate (exit status 0)" />
+    <p>
+      The specifications: <a href={specs.language16}>1.6</a>, <a href={specs.language17}>1.7</a>,
+      <a href={specs.language18}>1.8</a> and <a href={specs.language19}>1.9</a>.
+    </p>
+
+    <h2 id="missions">Missions (language 2.0)</h2>
+    <p>
+      A <code>mission</code> repeats bounded, verified task runs. It always has a hard bound, here 30
+      runs, and every run is a complete task run with its own goal check. This is
+      <a href={coreFile('tests/fixtures/v2.0/valid/shuttle_rounds.rob')}><code>shuttle_rounds.rob</code></a>,
+      unchanged.
+    </p>
+    <CodeBlock lang="rob" code={ex.shuttleSource} label="tests/fixtures/v2.0/valid/shuttle_rounds.rob" />
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate tests/fixtures/v2.0/valid/shuttle_rounds.rob --mission shuttle --world examples/world.json --bind r=arm1 home=shelf far=table"
+    />
+    <CodeBlock code={ex.shuttleSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.shuttleRecord}
+      label="Standard output: selected fields of the mission record"
+    />
+    <p>
+      The mission ended <code>bounded</code>: it reached its bound of 30 runs, and all 30 verified
+      their goal. A failed run stops the mission unless it says <code>continue</code> or
+      <code>retry N</code>. The rules are in the <a href={specs.language20}>language 2.0
+      specification</a> and the <a href={specs.missionIr}>Mission IR</a>.
+    </p>
+
+    <h2 id="messages">Incoming messages (language 2.1)</h2>
+    <p>
+      <code>message_received</code> waits for, or checks, a message on a channel. Here it ends a
+      mission. This is
+      <a href={coreFile('tests/fixtures/v2.1/valid/mission_until_a_message.rob')}><code
+        >mission_until_a_message.rob</code
+      ></a>, unchanged.
+    </p>
+    <CodeBlock lang="rob" code={ex.shiftSource} label="tests/fixtures/v2.1/valid/mission_until_a_message.rob" />
+    <p>
+      Which senders a channel trusts is the world's configuration, never the task's. This world file,
+      written for this page, declares one channel and delivers <code>SHIFT END</code> at 32 seconds:
+    </p>
+    <CodeBlock lang="json" code={ex.shiftWorld} label="shift_world.json" />
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate tests/fixtures/v2.1/valid/mission_until_a_message.rob --mission shift --world shift_world.json --bind r=amr1 home=home far=far"
+    />
+    <CodeBlock code={ex.shiftSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.shiftRecord}
+      label="Standard output: selected fields of the mission record, each run cut down to its index, times, state and until"
+    />
+    <p>
+      The message arrived during run 7, so <code>until</code> became true after that run and the
+      mission ended <code>completed</code>, well before its bound of 12. A world with no channels has
+      no message service: there, <code>message_received</code> is unknown and fails closed. The rules
+      are in the <a href={specs.language21}>language 2.1 specification</a>.
+    </p>
+
     <h2 id="delegate">Delegating a goal (experimental)</h2>
     <p>
       <code>robolang delegate</code> sends the goal of <code>handover.rob</code>, not its plan, to the
-      arm as a signed Core {versions.core} <code>propose_goal</code>. The arm looks in its own plan
+      arm as a signed Core {versions.coreDefault} <code>propose_goal</code>. The arm looks in its own plan
       library, <a href={coreTree('examples/plans')}><code>examples/plans</code></a>, finds
       <code>relocate_box</code> with the same goal, runs it and reports an outcome. The planner
       accepts <code>succeeded</code> only after re-checking the signed evidence itself.
@@ -270,7 +395,7 @@ import Base from '../layouts/Base.astro';
     <h2 id="arch02">Reference simulation (experimental)</h2>
     <p>
       <code>robolang arch02</code> runs one case of the RFC-001 reference scenario with
-      Core {versions.core} messages between an AI planner stub, a fixed arm and a mobile robot, in one
+      Core {versions.coreDefault} messages between an AI planner stub, a fixed arm and a mobile robot, in one
       process. The scenario and cases are in
       <a href={coreFile('tests/fixtures/arch02/README.md')}><code>tests/fixtures/arch02</code></a>.
     </p>
@@ -280,7 +405,7 @@ import Base from '../layouts/Base.astro';
     />
     <CodeBlock code={ex.arch02HappyPath} label="Standard error (exit status 0)" />
     <p>
-      In the happy path the planner records the goal as succeeded, which Core {versions.core} allows
+      In the happy path the planner records the goal as succeeded, which Core {versions.coreDefault} allows
       only with a verification that cites observations. Case
       <code>v06_partition_before_release</code> cuts the link between the two robots during the
       custody handover:
