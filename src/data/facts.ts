@@ -7,8 +7,8 @@
 // the site hard-codes a version or a link into the core repository.
 
 export const CORE_REPO = 'https://github.com/rokorobot/RoboLang';
-export const CORE_COMMIT = '342c47b9cf30cd04bb6fb874097b4e00a65ff3e7';
-export const CORE_RELEASE_TAG = 'v0.8.0';
+export const CORE_COMMIT = 'dc145c32f5340ee518faae38ef182afe0758d911';
+export const CORE_RELEASE_TAG = 'v0.9.0';
 export const CORE_COMMIT_SHORT = CORE_COMMIT.slice(0, 7);
 
 export const PYPI_URL = 'https://pypi.org/project/robolang/';
@@ -16,14 +16,14 @@ export const PYPI_URL = 'https://pypi.org/project/robolang/';
 export const WEBSITE_REPO = 'https://github.com/rokorobot/RoboLang-website';
 
 export const versions = {
-  distribution: '0.8.0',
-  language: '1.1 to 2.1',
-  latestLanguage: '2.1',
-  irSchema: '1.0 to 1.9',
-  missionIr: '1.0 and 1.1',
-  worldFile: '1.0 to 1.6',
-  runRecord: '1.0 to 1.9',
-  missionRecord: '1.0 and 1.1',
+  distribution: '0.9.0',
+  language: '1.1 to 2.2',
+  latestLanguage: '2.2',
+  irSchema: '1.0 to 1.10',
+  missionIr: '1.0 to 1.2',
+  worldFile: '1.0 to 1.7',
+  runRecord: '1.0 to 1.10',
+  missionRecord: '1.0 to 1.2',
   core: '0.1 and 0.2',
   coreDefault: '0.1',
   pythonMinimum: '3.11',
@@ -43,12 +43,7 @@ export const milestone = {
  */
 export const roadmapSnapshot = {
   date: '24 November 2026',
-  commit: 'a902c0df2a9cbf78d6fc9c992ec26de76399131b',
-  // Tagged and on GitHub, not yet on PyPI on the snapshot date.
-  pendingRelease: '0.9.0',
-  pendingLanguage: '2.2',
-  release090: `${CORE_REPO}/pull/168`,
-  lang22: `${CORE_REPO}/pull/167`,
+  commit: '27d6d2e7e912dbbbee212f5a9b609e23d198615a',
   decision0045: `${CORE_REPO}/commit/2c86db36dbe4cada42187e8e27ed0d6ba0415c47`,
   decision0045Draft: `${CORE_REPO}/pull/169`,
   proposedI11: `${CORE_REPO}/pull/170`,
@@ -64,10 +59,11 @@ export const roadmapSnapshot = {
   g1Proposal: `${CORE_REPO}/pull/173`,
   g1Phase3: `${CORE_REPO}/pull/176`,
   heldout: `${CORE_REPO}/pull/177`,
+  decision0047: `${CORE_REPO}/pull/184`,
   h3Acceptance: `${CORE_REPO}/pull/90`,
   // The development history (src/data/history.ts) was read at this core commit.
-  historyCommit: '3dbe03542ea954828789a75009b37151043f8347',
-  developmentSteps: `${CORE_REPO}/pull/183`,
+  historyCommit: '3570ccfc902d584101312cc7b3ae6f9d73ce4d4f',
+  developmentSteps: `${CORE_REPO}/pull/185`,
 } as const;
 
 export const LICENSE_NAME = 'Apache-2.0';
@@ -99,6 +95,7 @@ export const specs = {
   language19: lang('1.9'),
   language20: lang('2.0'),
   language21: lang('2.1'),
+  language22: lang('2.2'),
   languageReference: coreFile('docs/language-reference.md'),
   grammar: coreFile('spec/grammar.ebnf'),
   grammar12: grammar('1.2'),
@@ -111,6 +108,7 @@ export const specs = {
   grammar19: grammar('1.9'),
   grammar20: grammar('2.0'),
   grammar21: grammar('2.1'),
+  grammar22: grammar('2.2'),
   irSchema: ir('1.0'),
   irSchema11: ir('1.1'),
   irSchema12: ir('1.2'),
@@ -121,6 +119,7 @@ export const specs = {
   irSchema17: ir('1.7'),
   irSchema18: ir('1.8'),
   irSchema19: ir('1.9'),
+  irSchema110: ir('1.10'),
   missionIr: coreFile('spec/mission-ir-v1.0.md'),
   irReader: coreFile('spec/ir-reader-v0.1.md'),
   simulation: coreFile('spec/simulation-v1.0.md'),
@@ -149,6 +148,7 @@ export const specs = {
   decisionsLang19: decision('0042-clock-readings'),
   decisionsLang20: decision('0041-mission-layer'),
   decisionsLang21: decision('0043-incoming-messages'),
+  decisionsLang22: decision('0044-more-measured-kinds'),
   decisionsDir: coreTree('spec/decisions'),
   foundation1Evidence: coreFile('docs/evidence/rl-basic-01-exit-gate.md'),
   gate1Evidence: coreFile('docs/evidence/rl-arch-02-exit-gate.md'),

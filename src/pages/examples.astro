@@ -8,7 +8,7 @@ import Base from '../layouts/Base.astro';
 
 <Base
   title="Examples"
-  description="Valid and invalid RoboLang task files: goals, branching, failure handlers, measured values, region limits, declared actions, clock readings, missions and incoming messages, with symbolic simulations, goal delegation and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
+  description="Valid and invalid RoboLang task files: goals, branching, failure handlers, measured values, region limits, declared actions, clock readings, missions, incoming messages and more measured kinds, with symbolic simulations, goal delegation and the Core 0.1 reference simulation, each shown with the real output of the robolang command."
 >
   <PageHead slot="head" index="04" label="Examples" title="Examples">
     Task files and what the tools say about them. Every output on this page was produced by the real <code>robolang</code> command, distribution {versions.distribution}.
@@ -366,6 +366,39 @@ import Base from '../layouts/Base.astro';
       mission ended <code>completed</code>, well before its bound of 12. A world with no channels has
       no message service: there, <code>message_received</code> is unknown and fails closed. The rules
       are in the <a href={specs.language21}>language 2.1 specification</a>.
+    </p>
+
+    <h2 id="more-kinds">More measured kinds (language 2.2)</h2>
+    <p>
+      2.2 adds four kinds to <code>measure</code>: <code>fill</code> and <code>confidence</code> in
+      <code>%</code>, <code>pressure</code>, and an exact <code>count</code>. This is
+      <a href={coreFile('tests/fixtures/v2.2/valid/fill_below_a_quarter.rob')}><code
+        >fill_below_a_quarter.rob</code
+      ></a>, unchanged.
+    </p>
+    <CodeBlock lang="rob" code={ex.fillSource} label="tests/fixtures/v2.2/valid/fill_below_a_quarter.rob" />
+    <CodeBlock code={ex.fillValidate} label="Output of robolang validate (exit status 0)" />
+    <p>
+      This world file, written for this page, gives the robot a camera that measures fill with an
+      uncertainty of 2 % and a shelf that is 12 % full:
+    </p>
+    <CodeBlock lang="json" code={ex.fillWorld} label="fill_world.json" />
+    <CodeBlock
+      lang="bash"
+      code="robolang simulate tests/fixtures/v2.2/valid/fill_below_a_quarter.rob --world fill_world.json --bind r=scanbot1 shelf=shelf_a aisle=aisle_3 cam=cam_scan1 tag=tag_scan1"
+    />
+    <CodeBlock code={ex.fillSimulate} label="Standard error (exit status 0)" />
+    <CodeBlock
+      lang="json"
+      code={ex.fillRecord}
+      label="Standard output: selected fields of the run record, each step cut down to its index, path, status, reading and message"
+    />
+    <p>
+      The reading, 12 % with its uncertainty, is clearly below 25 %, so the <code>if</code> takes its
+      branch and the message is recorded. A reading whose range, value plus or minus its uncertainty,
+      straddles the threshold is unknown: in an <code>if</code> it fails the run with
+      <code>S261</code>. The rules are in the <a href={specs.language22}>language 2.2
+      specification</a>.
     </p>
 
     <h2 id="delegate">Delegating a goal (experimental)</h2>

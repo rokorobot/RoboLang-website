@@ -1,8 +1,8 @@
 // Example programs and the output of the real `robolang` command for each.
 //
-// Every output below was captured by running distribution 0.8.0 as published
+// Every output below was captured by running distribution 0.9.0 as published
 // on PyPI, in a checkout of rokorobot/RoboLang at the commit pinned in facts.ts
-// (tag v0.8.0). Do not edit an output
+// (tag v0.9.0); scripts/capture-examples.py re-checks them. Do not edit an output
 // by hand: re-run the command and paste the result. Two kinds of display
 // change are allowed, and each is labelled where it is shown: JSON line breaks
 // condensed (keys, values and their order unchanged), and a run record cut
@@ -91,7 +91,7 @@ export const pickAndPlaceJson = `{
   ]
 }`;
 
-export const versionOutput = `robolang 0.8.0 (language 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0 and 2.1, IR schema 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 and 1.9, mission IR 1.0 and 1.1)`;
+export const versionOutput = `robolang 0.9.0 (language 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1 and 2.2, IR schema 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9 and 1.10, mission IR 1.0, 1.1 and 1.2)`;
 
 /** Standard error of `robolang simulate` with tests/fixtures/simulation/worlds/base.json. */
 export const pickAndPlaceSimulate = `examples/pick_and_place.rob:5:23: warning[W401]: 'max_speed' has no unit; write 'm/s' or 'rad/s'. A unitless limit is deprecated and is never treated as an enforced limit
@@ -1003,6 +1003,106 @@ export const shiftRecord = `{
       "t_end_ms": "35000",
       "state": "SUCCEEDED",
       "until": "true"
+    }
+  ]
+}`;
+
+/** tests/fixtures/v2.2/valid/fill_below_a_quarter.rob in the core repository, unchanged. */
+export const fillSource = `// RoboLang v2.2 fixture: valid
+// expect: ok
+// why: a fill is compared in % (K1, K2)
+
+robolang 2.2;
+
+task t(robot r, object shelf, location aisle, sensor cam, sensor tag) {
+    goal { robot_at r aisle; }
+    plan {
+        move r to aisle;
+        measure r fill of shelf using cam as level;
+        if level < 25 % { communicate r to "lead" with "restock shelf_a"; }
+    }
+}`;
+
+/** Output of `robolang validate tests/fixtures/v2.2/valid/fill_below_a_quarter.rob` (exit status 0). */
+export const fillValidate = `tests/fixtures/v2.2/valid/fill_below_a_quarter.rob: valid RoboLang 2.2 (1 task)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** Written for this site: a world file 1.7 with a camera that measures fill, and a shelf 12 % full. */
+export const fillWorld = `{
+  "world_schema": "robolang.sim.world",
+  "world_schema_version": "1.7",
+  "locations": ["dock", "aisle_3"],
+  "robots": {
+    "scanbot1": { "ready": true, "location": "dock", "gripper": false, "max_speed": [{ "value": "1", "unit": "m/s" }] }
+  },
+  "objects": {
+    "shelf_a": { "present": true, "location": "aisle_3", "properties": { "fill": { "value": "12", "unit": "%" } } }
+  },
+  "sensors": {
+    "cam_scan1": { "robot": "scanbot1", "available": true, "measures": {
+      "fill": { "unit": "%", "uncertainty": "2", "contact": false } } },
+    "tag_scan1": { "robot": "scanbot1", "available": true, "measures": { "count": { "contact": false } } }
+  },
+  "tasks": {}
+}`;
+
+/** Standard error of `robolang simulate` for fill_below_a_quarter.rob with fill_world.json and --bind. */
+export const fillSimulate = `simulation only: run sim-85392be20ff00122f13ae531a581c80e3747a91302f3325d94844644d47f7f02: SUCCEEDED`;
+
+/** Selected fields of the run record; each step is cut down to its index, path, status, reading and message. */
+export const fillRecord = `{
+  "run_record_schema_version": "1.10",
+  "state": "SUCCEEDED",
+  "decisions": [
+    {
+      "step": "3",
+      "condition_result": "true",
+      "branch": "then",
+      "t_ms": "0"
+    }
+  ],
+  "steps": [
+    {
+      "index": 1,
+      "path": "1",
+      "status": "succeeded",
+      "reading": null,
+      "message": null
+    },
+    {
+      "index": 2,
+      "path": "2",
+      "status": "succeeded",
+      "reading": {
+        "subject": "shelf_a",
+        "kind": "fill",
+        "value": "12",
+        "unit": "%",
+        "uncertainty": "2",
+        "sensor": "cam_scan1",
+        "t_ms": "0"
+      },
+      "message": null
+    },
+    {
+      "index": 3,
+      "path": "3",
+      "status": "succeeded",
+      "reading": null,
+      "message": null
+    },
+    {
+      "index": 4,
+      "path": "3.then.1",
+      "status": "succeeded",
+      "reading": null,
+      "message": {
+        "robot": "scanbot1",
+        "channel": "lead",
+        "message": "restock shelf_a",
+        "status": "recorded",
+        "value": null
+      }
     }
   ]
 }`;

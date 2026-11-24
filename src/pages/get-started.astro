@@ -228,7 +228,7 @@ import Base from '../layouts/Base.astro';
             <td><code>{versions.language}</code></td>
             <td>
               The syntax and rules of <code>.rob</code> files. A file without a marker is 1.1; a later
-              version needs its marker, for example <code>robolang 2.1;</code>.
+              version needs its marker, for example <code>robolang 2.2;</code>.
             </td>
           </tr>
           <tr>
@@ -236,8 +236,8 @@ import Base from '../layouts/Base.astro';
             <td><code>{versions.irSchema}</code> / <code>{versions.missionIr}</code></td>
             <td>
               The shape of the JSON printed by <code>inspect --json</code>: Task IR 1.0 for a 1.1 source
-              up to 1.9 for a 2.1 source, and Mission IR for a file with missions (1.0 for 2.0, 1.1 for
-              2.1).
+              up to 1.10 for a 2.2 source, and Mission IR for a file with missions (1.0 for 2.0, 1.1 for
+              2.1, 1.2 for 2.2).
             </td>
           </tr>
           <tr>
@@ -245,7 +245,7 @@ import Base from '../layouts/Base.astro';
             <td><code>{versions.worldFile}</code> / <code>{versions.runRecord}</code></td>
             <td>
               The input and output of <code>simulate</code>. The run record version also follows the
-              language: 1.0 for a 1.1 source up to 1.9 for a 2.1 source. A mission writes a mission
+              language: 1.0 for a 1.1 source up to 1.10 for a 2.2 source. A mission writes a mission
               record ({versions.missionRecord}) with one run record per task run.
             </td>
           </tr>
