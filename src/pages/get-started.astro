@@ -49,6 +49,11 @@ import Base from '../layouts/Base.astro';
     <p>Then confirm the command is available:</p>
     <CodeBlock lang="bash" code="robolang --version" />
     <CodeBlock code={versionOutput} label="Output" />
+    <p>
+      Without the clone, <code>robolang example</code> writes a sample task and a world file for it
+      into the current directory, so <code>validate</code> and <code>simulate</code> work from PyPI
+      alone. The steps below use the repository's files.
+    </p>
 
     <h2>2. Validate a task file</h2>
     <p>The repository includes a small example. From the clone, run:</p>
@@ -125,7 +130,7 @@ import Base from '../layouts/Base.astro';
     <h2 id="delegate">6. Delegate the goal (experimental)</h2>
     <p>
       <code>delegate</code> sends only the task's goal to a simulated robot as a signed
-      Core {versions.core} message. The robot matches it to a plan in its own library, runs it and
+      Core {versions.coreDefault} message (Core 0.2 with <code>--core 0.2</code>). The robot matches it to a plan in its own library, runs it and
       reports an outcome with evidence, and the planner checks that evidence before it accepts
       success.
     </p>
@@ -139,7 +144,7 @@ import Base from '../layouts/Base.astro';
     <p>
       <code>arch02</code> runs one case of the RFC-001 reference scenario. An AI planner stub asks a
       fixed arm to deliver a container, the arm hands custody to a mobile robot, and every message is a
-      checked Core {versions.core} document.
+      checked Core {versions.coreDefault} document.
     </p>
     <CodeBlock
       lang="bash"
@@ -169,7 +174,7 @@ import Base from '../layouts/Base.astro';
         </tbody>
       </table>
     </div>
-    <p><code>simulate</code> reports how the run ended:</p>
+    <p><code>simulate</code> reports how the run ended (for a <code>--mission</code> run, see the note below the table):</p>
     <div class="table-scroll">
       <table>
         <thead>
@@ -185,6 +190,10 @@ import Base from '../layouts/Base.astro';
         </tbody>
       </table>
     </div>
+    <p>
+      A mission that ended <code>completed</code> or <code>bounded</code> returns <code>0</code>, one
+      that <code>failed</code> returns <code>4</code> and one that was stopped returns <code>5</code>.
+    </p>
     <p>
       <code>export-goal</code> and <code>delegate</code> use the same codes <code>1</code> to
       <code>3</code>, and add <code>6</code> when the goal has no Core form. <code>delegate</code>
@@ -219,15 +228,16 @@ import Base from '../layouts/Base.astro';
             <td><code>{versions.language}</code></td>
             <td>
               The syntax and rules of <code>.rob</code> files. A file without a marker is 1.1; a later
-              version needs its marker, for example <code>robolang 1.4;</code>.
+              version needs its marker, for example <code>robolang 2.1;</code>.
             </td>
           </tr>
           <tr>
-            <th scope="row">IR schema</th>
-            <td><code>{versions.irSchema}</code></td>
+            <th scope="row">Task IR and Mission IR</th>
+            <td><code>{versions.irSchema}</code> / <code>{versions.missionIr}</code></td>
             <td>
-              The shape of the JSON printed by <code>inspect --json</code>, one per language version:
-              1.0 for a 1.1 source up to 1.3 for a 1.4 source.
+              The shape of the JSON printed by <code>inspect --json</code>: Task IR 1.0 for a 1.1 source
+              up to 1.9 for a 2.1 source, and Mission IR for a file with missions (1.0 for 2.0, 1.1 for
+              2.1).
             </td>
           </tr>
           <tr>
@@ -235,7 +245,8 @@ import Base from '../layouts/Base.astro';
             <td><code>{versions.worldFile}</code> / <code>{versions.runRecord}</code></td>
             <td>
               The input and output of <code>simulate</code>. The run record version also follows the
-              language: 1.0 for a 1.1 source up to 1.3 for a 1.4 source.
+              language: 1.0 for a 1.1 source up to 1.9 for a 2.1 source. A mission writes a mission
+              record ({versions.missionRecord}) with one run record per task run.
             </td>
           </tr>
           <tr>
@@ -243,7 +254,9 @@ import Base from '../layouts/Base.astro';
             <td><code>{versions.core}</code></td>
             <td>
               The experimental message and capability contracts used by <code>export-goal</code>,
-              <code>delegate</code> and <code>arch02</code>.
+              <code>delegate</code> and <code>arch02</code>. Core {versions.coreDefault} is the default;
+              <code>--core 0.2</code> opts in on <code>simulate</code>, <code>export-goal</code> and
+              <code>delegate</code>.
             </td>
           </tr>
         </tbody>
@@ -262,12 +275,11 @@ import Base from '../layouts/Base.astro';
       <p>
         <strong>What is installed.</strong> The installed package is the <code>robolang</code> tooling
         only: lexer, parser, validator, IR reader, the symbolic simulator, the Core {versions.core}
-        checks, the goal bridge and the reference simulation, behind the seven commands
-        <code>reference</code>, <code>validate</code>, <code>inspect</code>, <code>simulate</code>,
-        <code>export-goal</code>, <code>delegate</code> and <code>arch02</code>. The repository also
-        contains an older
-        v1 prototype interpreter and an unvalidated ROS 2 adapter. They are kept as historical source,
-        are not installed and are not supported. The
+        checks, the goal bridge and the reference simulation, behind the eight commands
+        <code>reference</code>, <code>example</code>, <code>validate</code>, <code>inspect</code>,
+        <code>simulate</code>, <code>export-goal</code>, <code>delegate</code> and <code>arch02</code>.
+        The repository also contains the experimental ROS 2 / Gazebo backend, which is not installed,
+        and an older v1 prototype interpreter, kept as historical source and not supported. The
         <a href={specs.readme}>core README</a> explains the split.
       </p>
     </div>

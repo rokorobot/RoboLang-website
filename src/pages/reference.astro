@@ -1,12 +1,12 @@
 ---
 import PageHead from '../components/PageHead.astro';
-import { CORE_COMMIT_SHORT, CORE_RELEASE_TAG, specs, versions } from '../data/facts';
+import { CORE_COMMIT_SHORT, CORE_RELEASE_TAG, milestone, specs, versions } from '../data/facts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base
   title="Language Reference"
-  description="Where RoboLang is specified: the language 1.1 to 1.4 specifications, grammars, IR schemas, simulation semantics, the goal bridge and the experimental Core 0.1 contracts, each linked at a fixed version in the core repository."
+  description="Where RoboLang is specified: the language 1.1 to 2.1 specifications, grammars, Task and Mission IR schemas, simulation semantics, the goal bridge and the experimental Core 0.1 and 0.2 contracts, each linked at a fixed version in the core repository."
 >
   <PageHead slot="head" index="03" label="Language Reference" title="Language reference">
     The specifications live in the RoboLang core repository. This page points to them at a fixed version and gives a short orientation.
@@ -62,19 +62,78 @@ import Base from '../layouts/Base.astro';
       </p>
     </li>
     <li class="card">
+      <h3><a href={specs.language15}>Language specification 1.5</a></h3>
+      <p>
+        What 1.5 adds: a failure handler on a step, <code>&lt;step&gt; else &#123; … &#125;</code>,
+        which runs only when that step fails.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language16}>Language specification 1.6</a></h3>
+      <p>
+        What 1.6 adds: <code>measure</code>, typed values with units bound to a name, and comparisons
+        in conditions. A reading near a threshold is unknown and fails closed.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language17}>Language specification 1.7</a></h3>
+      <p>
+        What 1.7 adds: region limits, <code>@safety no_go_region</code> and <code>in_region</code>.
+        Requests checked against the world, never enforced by RoboLang.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language18}>Language specification 1.8</a></h3>
+      <p>
+        What 1.8 adds: declared actions with <code>do</code>, from the robot's profile, and the
+        condition <code>in_state</code> to verify their result.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language19}>Language specification 1.9</a></h3>
+      <p>
+        What 1.9 adds: clock readings, the local time of day and the time elapsed, read with
+        <code>measure</code> and compared in conditions.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language20}>Language specification 2.0</a></h3>
+      <p>
+        What 2.0 adds: the mission layer. A <code>mission</code> repeats bounded, verified task runs
+        with a hard bound, an optional <code>until</code>, and <code>stop</code>,
+        <code>continue</code> or <code>retry N</code> on a failed run.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.language21}>Language specification 2.1</a></h3>
+      <p>
+        What 2.1 adds: incoming messages, <code>message_received "CH"</code> with an optional exact
+        text, in a <code>pre</code>, an <code>if</code>, a <code>wait until</code> or a mission's
+        <code>until</code>.
+      </p>
+    </li>
+    <li class="card">
       <h3>Grammars (EBNF)</h3>
       <p>
         The syntactic and lexical grammar in ISO-style EBNF, including the reserved words:
         <a href={specs.grammar}>1.1</a>, <a href={specs.grammar12}>1.2</a>,
-        <a href={specs.grammar13}>1.3</a> and <a href={specs.grammar14}>1.4</a>.
+        <a href={specs.grammar13}>1.3</a>, <a href={specs.grammar14}>1.4</a>,
+        <a href={specs.grammar15}>1.5</a>, <a href={specs.grammar16}>1.6</a>,
+        <a href={specs.grammar17}>1.7</a>, <a href={specs.grammar18}>1.8</a>,
+        <a href={specs.grammar19}>1.9</a>, <a href={specs.grammar20}>2.0</a> and
+        <a href={specs.grammar21}>2.1</a>.
       </p>
     </li>
     <li class="card">
       <h3>IR schemas</h3>
       <p>
-        The versioned JSON produced by <code>robolang inspect --json</code>, one per language version:
+        The versioned JSON produced by <code>robolang inspect --json</code>. Task IR
         <a href={specs.irSchema}>1.0</a>, <a href={specs.irSchema11}>1.1</a>,
-        <a href={specs.irSchema12}>1.2</a> and <a href={specs.irSchema13}>1.3</a>. The
+        <a href={specs.irSchema12}>1.2</a>, <a href={specs.irSchema13}>1.3</a>,
+        <a href={specs.irSchema14}>1.4</a>, <a href={specs.irSchema15}>1.5</a>,
+        <a href={specs.irSchema16}>1.6</a>, <a href={specs.irSchema17}>1.7</a>,
+        <a href={specs.irSchema18}>1.8</a> and <a href={specs.irSchema19}>1.9</a>, and
+        <a href={specs.missionIr}>Mission IR</a> {versions.missionIr} for files with missions. The
         <a href={specs.irReader}>IR reader</a> defines how <code>--ir</code> reads it back and
         re-validates it.
       </p>
@@ -83,7 +142,8 @@ import Base from '../layouts/Base.astro';
       <h3><a href={specs.simulation}>Simulation semantics</a></h3>
       <p>
         What <code>robolang simulate</code> does: executor states, goal checking, decisions in
-        branching plans, world file {versions.worldFile} and run record {versions.runRecord}.
+        branching plans, missions, world file {versions.worldFile}, run record {versions.runRecord}
+        and mission record {versions.missionRecord}.
       </p>
     </li>
     <li class="card">
@@ -91,7 +151,11 @@ import Base from '../layouts/Base.astro';
       <p>
         The recorded design decisions behind the specifications, for example
         <a href={specs.decisions}>language 1.1</a>, <a href={specs.decisionsLang12}>1.2</a>,
-        <a href={specs.decisionsLang13}>1.3</a> and <a href={specs.decisionsLang14}>1.4</a>. All of
+        <a href={specs.decisionsLang13}>1.3</a>, <a href={specs.decisionsLang14}>1.4</a>,
+        <a href={specs.decisionsLang15}>1.5</a>, <a href={specs.decisionsLang16}>1.6</a>,
+        <a href={specs.decisionsLang17}>1.7</a>, <a href={specs.decisionsLang18}>1.8</a>,
+        <a href={specs.decisionsLang19}>1.9</a>, <a href={specs.decisionsLang20}>2.0</a> and
+        <a href={specs.decisionsLang21}>2.1</a>. All of
         them are in the <a href={specs.decisionsDir}>decision records</a>.
       </p>
     </li>
@@ -101,24 +165,28 @@ import Base from '../layouts/Base.astro';
   <div class="prose">
     <p>
       Core defines what AI agents and robots exchange, separately from the <code>.rob</code> language.
-      Core {versions.core} is a draft, implemented as per-message checks and exercised only in one
-      process, by <code>export-goal</code>, <code>delegate</code> and the reference simulation. It is
-      not a network protocol, and a valid Core document is never permission to operate a robot.
+      Core {versions.core} are drafts, implemented as per-message checks and exercised in simulation
+      only, by <code>export-goal</code>, <code>delegate</code> and the reference simulation. Core
+      {versions.coreDefault} is the default; <code>--core 0.2</code> opts in. An independent Core 0.2
+      implementation passed the Gate 2 interoperability test on {milestone.date}. Core is not a
+      network protocol, and a valid Core document is never permission to operate a robot.
     </p>
   </div>
   <ul class="cards">
     <li class="card">
-      <h3><a href={specs.core}>Core {versions.core}</a></h3>
+      <h3><a href={specs.core}>Core 0.1</a> and <a href={specs.core02}>Core 0.2</a></h3>
       <p>
         Goals, capabilities, messages, authority, commitments and custody, and evidence-backed
         outcomes, with the order in which a receiver checks each message and its rejection codes.
+        Core 0.2 adds alternatives, <code>met_alternative</code> and <code>declared</code> facts.
       </p>
     </li>
     <li class="card">
       <h3>Core schemas</h3>
       <p>
-        JSON Schema draft 2020-12: the <a href={specs.coreMessageSchema}>message</a> envelope for A2R
-        and R2R exchanges, and the <a href={specs.coreDescriptorSchema}>capability descriptor</a>.
+        JSON Schema draft 2020-12: the message envelope for A2R and R2R exchanges
+        (<a href={specs.coreMessageSchema}>0.1</a>, <a href={specs.coreMessageSchema02}>0.2</a>), and
+        the <a href={specs.coreDescriptorSchema}>capability descriptor</a>.
       </p>
     </li>
     <li class="card">
@@ -127,7 +195,7 @@ import Base from '../layouts/Base.astro';
         How a task's goal becomes a Core <code>propose_goal</code>
         (<a href={specs.exportGoal}><code>export-goal</code></a>), and how
         <a href={specs.delegate}><code>delegate</code></a> runs it on a robot's own plan, with a peer
-        robot, commitment, lease and custody.
+        robot, commitment, lease and custody (<a href={specs.delegateCore02}>on Core 0.2</a>).
       </p>
     </li>
     <li class="card">
@@ -140,8 +208,16 @@ import Base from '../layouts/Base.astro';
     <li class="card">
       <h3>Evidence</h3>
       <p>
-        The signed-off exit gates: <a href={specs.foundation1Evidence}>Foundation 1</a> and
-        <a href={specs.gate1Evidence}>RL-ARCH-02 gate 1</a>.
+        The signed-off exit gates: <a href={specs.foundation1Evidence}>Foundation 1</a>,
+        <a href={specs.gate1Evidence}>RL-ARCH-02 gate 1</a> and
+        <a href={specs.gate2Evidence}>Gate 2</a>, independent interoperability on Core 0.2.
+      </p>
+    </li>
+    <li class="card">
+      <h3><a href={specs.authorization}>Physical-run authorization 0.1</a></h3>
+      <p>
+        A signed cell configuration, task approval and run grant, and the check of the whole chain.
+        Even a valid chain ends in <code>A731</code>: physical mode is not enabled.
       </p>
     </li>
   </ul>
@@ -155,7 +231,8 @@ import Base from '../layouts/Base.astro';
     <ul>
       <li>
         A file contains one or more <strong>tasks</strong>, optionally preceded by a version marker
-        such as <code>robolang 1.4;</code>. Without a marker a file is 1.1.
+        such as <code>robolang 2.1;</code>. Without a marker a file is 1.1. From 2.0 a file can also
+        contain <strong>missions</strong>, which repeat its tasks within a hard bound.
       </li>
       <li>
         A task has <strong>typed parameters</strong>: <code>robot</code>, <code>object</code>,
@@ -168,16 +245,19 @@ import Base from '../layouts/Base.astro';
         have a <strong><code>goal</code> block</strong>, which decides whether a run succeeded.
       </li>
       <li>
-        The six <strong>steps</strong> are <code>move</code>, <code>grasp</code>, <code>place</code>,
-        <code>inspect</code>, <code>wait</code> and <code>communicate</code>. From 1.4 a plan can
-        also branch with <code>if</code> / <code>else</code>, nested at most four deep, and end a
-        branch with <code>fail</code>.
+        The <strong>steps</strong> are <code>move</code>, <code>grasp</code>, <code>place</code>,
+        <code>inspect</code>, <code>wait</code> and <code>communicate</code>, plus
+        <code>measure</code> from 1.6 and <code>do</code> (a declared action) from 1.8. From 1.4 a
+        plan can also branch with <code>if</code> / <code>else</code>, nested at most four deep, and
+        end a branch with <code>fail</code>; from 1.5 a step can have its own failure handler.
       </li>
       <li>
         The <strong>conditions</strong> are <code>robot_ready</code>, <code>region_clear</code>,
         <code>object_exists</code> and <code>sensor_ok</code>, and from 1.3 the outcome conditions
         <code>object_at</code>, <code>robot_at</code> and <code>holding</code>. From 1.2 they can be
-        combined with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.
+        combined with <code>and</code>, <code>or</code>, <code>not</code> and parentheses. Later
+        versions add comparisons of measured values (1.6), <code>in_state</code> (1.8) and
+        <code>message_received</code> (2.1).
       </li>
       <li>Comments start with <code>//</code> and run to the end of the line.</li>
     </ul>

@@ -1,12 +1,13 @@
 // Example programs and the output of the real `robolang` command for each.
 //
-// Every output below was captured by running distribution 0.2.0 as published
+// Every output below was captured by running distribution 0.8.0 as published
 // on PyPI, in a checkout of rokorobot/RoboLang at the commit pinned in facts.ts
-// (tag v0.2.0). Do not edit an output
+// (tag v0.8.0). Do not edit an output
 // by hand: re-run the command and paste the result. Two kinds of display
 // change are allowed, and each is labelled where it is shown: JSON line breaks
 // condensed (keys, values and their order unchanged), and a run record cut
-// down to selected top-level fields (each field shown exactly as printed).
+// down to selected top-level fields (each field shown exactly as printed;
+// where a field's entries are cut down too, the label says which keys stay).
 
 /** examples/pick_and_place.rob in the core repository, unchanged. */
 export const pickAndPlaceSource = `// examples/pick_and_place.rob
@@ -90,7 +91,7 @@ export const pickAndPlaceJson = `{
   ]
 }`;
 
-export const versionOutput = `robolang 0.2.0 (language 1.1, 1.2, 1.3 and 1.4, IR schema 1.0, 1.1, 1.2 and 1.3)`;
+export const versionOutput = `robolang 0.8.0 (language 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0 and 2.1, IR schema 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 and 1.9, mission IR 1.0 and 1.1)`;
 
 /** Standard error of `robolang simulate` with tests/fixtures/simulation/worlds/base.json. */
 export const pickAndPlaceSimulate = `examples/pick_and_place.rob:5:23: warning[W401]: 'max_speed' has no unit; write 'm/s' or 'rad/s'. A unitless limit is deprecated and is never treated as an enforced limit
@@ -125,7 +126,7 @@ export const pickAndPlaceSimulateRecord = `{
 
 /** Standard error with tests/fixtures/simulation/worlds/not_ready.json, where arm1 is not ready. */
 export const pickAndPlaceNotReady = `examples/pick_and_place.rob:5:23: warning[W401]: 'max_speed' has no unit; write 'm/s' or 'rad/s'. A unitless limit is deprecated and is never treated as an enforced limit
-simulation only: run sim-78c53744434b0be82fc1836b772eab433cb1f0b1aafe2d8ff7f49a67eb7deabe: FAILED (S101)`;
+simulation only: run sim-78c53744434b0be82fc1836b772eab433cb1f0b1aafe2d8ff7f49a67eb7deabe: FAILED (S101): a pre condition is false`;
 
 /** Selected top-level fields of the run record printed by the same run. */
 export const pickAndPlaceNotReadyRecord = `{
@@ -357,7 +358,7 @@ export const handoverSimulateRecord = `{
   ]
 }`;
 
-/** The outcome part of core_outcome in the same run record; the evidence list is omitted. */
+/** The outcome part of core_outcome in the same run record; the evidence list beside it is omitted. */
 export const handoverCoreOutcome = `{
   "core_outcome": {
     "outcome": {
@@ -377,7 +378,10 @@ export const handoverCoreOutcome = `{
             ]
           }
         ]
-      }
+      },
+      "reasons": [],
+      "reported_by": "rl:sim:world",
+      "reported_at": "2000-01-01T00:00:05.000Z"
     }
   }
 }`;
@@ -400,7 +404,7 @@ task deliver_and_return(robot r, object box, location src, location dst) {
 }`;
 
 /** Standard error of the run with examples/world.json and --bind. */
-export const goalMissSimulate = `simulation only: run sim-79d4afd717627f5e80666bd171fb0795211f59bf47b5dc6a0f021c9173839342: FAILED (S301)`;
+export const goalMissSimulate = `simulation only: run sim-79d4afd717627f5e80666bd171fb0795211f59bf47b5dc6a0f021c9173839342: FAILED (S301): a goal condition is false after the last step`;
 
 /** Selected fields of the run record; each step is cut down to its index and status. */
 export const goalMissRecord = `{
@@ -653,4 +657,352 @@ export const handoverDelegateRecord = `{
     ],
     "reasons": []
   }
+}`;
+
+/** tests/fixtures/v1.5/valid/retry_grasp.rob in the core repository, unchanged. */
+export const retrySource = `// RoboLang v1.5 fixture: valid
+// expect: ok
+// why: a failed grasp is retried once by its handler (decision 0033 F5)
+
+robolang 1.5;
+
+task pick(robot r, object box, location src, location dst) {
+    goal { object_at box dst; }
+    plan {
+        move r to src;
+        grasp r box else {
+            grasp r box;
+        }
+        move r to dst;
+        place r box at dst;
+    }
+}`;
+
+/** Output of `robolang validate tests/fixtures/v1.5/valid/retry_grasp.rob` (exit status 0). */
+export const retryValidate = `tests/fixtures/v1.5/valid/retry_grasp.rob: valid RoboLang 1.5 (1 task)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** tests/fixtures/v1.6/valid/weigh_and_compare.rob in the core repository, unchanged. */
+export const weighSource = `// RoboLang v1.6 fixture: valid
+// expect: ok
+// why: units convert within a kind; a binding is compared with a literal and with another binding (V5, V6, V7)
+
+robolang 1.6;
+
+task weigh_and_compare(robot r, object a, object b, sensor scale, location bench) {
+    goal { robot_at r bench; }
+    plan {
+        move r to bench;
+        measure r mass of a using scale as ma;
+        measure r mass of b using scale as mb;
+        if ma > 1.2 kg and ma < 2000 g and not mb >= ma {
+            communicate r to "ops" with ma;
+        } else {
+            fail "unexpected weights";
+        }
+    }
+}`;
+
+/** Output of `robolang validate tests/fixtures/v1.6/valid/weigh_and_compare.rob` (exit status 0). */
+export const weighValidate = `tests/fixtures/v1.6/valid/weigh_and_compare.rob: valid RoboLang 1.6 (1 task)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** tests/fixtures/v1.7/valid/keep_out_of_wet_floor.rob in the core repository, unchanged. */
+export const wetFloorSource = `// RoboLang v1.7 fixture: valid
+// expect: ok
+// why: a no_go_region on a region parameter, for the whole task (P1, P2)
+
+robolang 1.7;
+
+task to_lobby(robot r, location lobby, region wet) {
+    @safety no_go_region wet;
+    goal { robot_at r lobby; }
+    plan { move r to lobby; }
+}`;
+
+/** Output of `robolang validate tests/fixtures/v1.7/valid/keep_out_of_wet_floor.rob` (exit status 0). */
+export const wetFloorValidate = `tests/fixtures/v1.7/valid/keep_out_of_wet_floor.rob: valid RoboLang 1.7 (1 task)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** tests/fixtures/v1.8/valid/open_then_fetch.rob in the core repository, unchanged. */
+export const openClosetSource = `// RoboLang v1.8 fixture: valid
+// expect: ok
+// why: a do on an object, then plain steps; the goal verifies the state with in_state
+
+robolang 1.8;
+
+task restock(robot r, object closet, object kit, location ward) {
+    goal { in_state closet "open"; object_at kit ward; }
+    plan {
+        do r open closet;
+        grasp r kit;
+        move r to ward;
+        place r kit at ward;
+    }
+}`;
+
+/** Output of `robolang validate tests/fixtures/v1.8/valid/open_then_fetch.rob` (exit status 0). */
+export const openClosetValidate = `tests/fixtures/v1.8/valid/open_then_fetch.rob: valid RoboLang 1.8 (1 task)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** tests/fixtures/v1.9/valid/shift_cutoff.rob in the core repository, unchanged. */
+export const cutoffSource = `// RoboLang v1.9 fixture: valid
+// expect: ok
+// why: a cutoff with if: a time binding against a time literal (T3)
+
+robolang 1.9;
+
+task shift_cutoff(robot r, object tote, location inb, location outb) {
+    plan {
+        measure r time as now;
+        if now < 21:30 {
+            goal { object_at tote outb; }
+            move r to inb;
+            grasp r tote;
+            move r to outb;
+            place r tote at outb;
+        } else {
+            communicate r to "lead" with "after cutoff";
+            fail "the shift has ended";
+        }
+    }
+}`;
+
+/** Output of `robolang validate tests/fixtures/v1.9/valid/shift_cutoff.rob` (exit status 0). */
+export const cutoffValidate = `tests/fixtures/v1.9/valid/shift_cutoff.rob: valid RoboLang 1.9 (1 task)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** tests/fixtures/v2.0/valid/shuttle_rounds.rob in the core repository, unchanged. */
+export const shuttleSource = `// RoboLang v2.0 fixture: valid
+// expect: ok
+// why: a count bound, the default policy (stop)
+
+robolang 2.0;
+
+task round(robot r, location home, location far) {
+    goal { robot_at r home; }
+    plan { move r to far; wait for 5 s; move r to home; }
+}
+
+mission shuttle(robot r, location home, location far) {
+    repeat at most 30 runs {
+        run round(r, home, far);
+    };
+}`;
+
+/** Output of `robolang validate tests/fixtures/v2.0/valid/shuttle_rounds.rob` (exit status 0). */
+export const shuttleValidate = `tests/fixtures/v2.0/valid/shuttle_rounds.rob: valid RoboLang 2.0 (1 task, 1 mission)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** tests/fixtures/v2.1/valid/mission_until_a_message.rob in the core repository, unchanged. */
+export const shiftSource = `// RoboLang v2.1 fixture: valid
+// expect: ok
+// why: a mission's until takes a message condition (S1, S2)
+
+robolang 2.1;
+
+task round(robot r, location home, location far) {
+    goal { robot_at r home; }
+    plan { move r to far; wait for 5 s; move r to home; }
+}
+
+mission shift(robot r, location home, location far) {
+    repeat at most 12 runs {
+        run round(r, home, far);
+    } until message_received "ops" with "SHIFT END";
+}`;
+
+/** Output of `robolang validate tests/fixtures/v2.1/valid/mission_until_a_message.rob` (exit status 0). */
+export const shiftValidate = `tests/fixtures/v2.1/valid/mission_until_a_message.rob: valid RoboLang 2.1 (1 task, 1 mission)
+Validation covers the text of the program only. It does not make a task safe to run on a robot.`;
+
+/** Written for this site: grasp (step 2) fails once by a scripted fault, so its handler runs. */
+export const retryWorld = `{
+  "world_schema": "robolang.sim.world",
+  "world_schema_version": "1.1",
+  "locations": ["shelf", "table"],
+  "robots": {
+    "arm1": { "ready": true, "location": "shelf", "gripper": true, "max_speed": [{ "value": "1", "unit": "m/s" }] }
+  },
+  "objects": {
+    "box1": { "present": true, "location": "shelf" }
+  },
+  "tasks": {
+    "pick": {
+      "bindings": { "r": "arm1", "box": "box1", "src": "shelf", "dst": "table" },
+      "faults": [{ "step": 2 }]
+    }
+  }
+}`;
+
+/** Standard error of `robolang simulate` for retry_grasp.rob with retry_world.json. */
+export const retrySimulate = `simulation only: run sim-391b3bf811058aaadc2058dd3744d8853e4da57005eb1e00e3af526eddb9ec81: SUCCEEDED`;
+
+/** Selected fields of the run record; each step is cut down to its index, path, status and handled. */
+export const retryRecord = `{
+  "run_record_schema_version": "1.4",
+  "state": "SUCCEEDED",
+  "steps": [
+    {
+      "index": 1,
+      "path": "1",
+      "status": "succeeded",
+      "handled": null
+    },
+    {
+      "index": 2,
+      "path": "2",
+      "status": "failed",
+      "handled": "S251"
+    },
+    {
+      "index": 3,
+      "path": "2.else.1",
+      "status": "succeeded",
+      "handled": null
+    },
+    {
+      "index": 4,
+      "path": "3",
+      "status": "succeeded",
+      "handled": null
+    },
+    {
+      "index": 5,
+      "path": "4",
+      "status": "succeeded",
+      "handled": null
+    }
+  ]
+}`;
+
+/** Standard error of `robolang simulate --mission shuttle` with examples/world.json and --bind. */
+export const shuttleSimulate = `simulation only: mission run sim-49a3f4235401b3c35e03d314ad8be1e933f523bd97a240a019518d14d0c4ab51: bounded (run_bound; 30 task runs, 30 verified)`;
+
+/** Selected top-level fields of the mission record printed by the same run. */
+export const shuttleRecord = `{
+  "mission_record_schema_version": "1.0",
+  "outcome": "bounded",
+  "ended_by": "run_bound",
+  "failure": null,
+  "runs_started": 30,
+  "runs_verified": 30,
+  "runs_failed": 0,
+  "end_t_ms": "150000"
+}`;
+
+/** Written for this site: a world file 1.6 with one channel and one incoming message at 32 s. */
+export const shiftWorld = `{
+  "world_schema": "robolang.sim.world",
+  "world_schema_version": "1.6",
+  "locations": [
+    "home",
+    "far"
+  ],
+  "robots": {
+    "amr1": {
+      "ready": true,
+      "location": "home",
+      "gripper": false,
+      "max_speed": [
+        {
+          "value": "1",
+          "unit": "m/s"
+        }
+      ]
+    }
+  },
+  "channels": {
+    "ops": {
+      "from": [
+        "rl:agent:ops"
+      ]
+    }
+  },
+  "messages": [
+    {
+      "at": {
+        "value": "32",
+        "unit": "s"
+      },
+      "channel": "ops",
+      "text": "SHIFT END",
+      "from": "rl:agent:ops"
+    }
+  ],
+  "tasks": {}
+}`;
+
+/** Standard error of `robolang simulate --mission shift` with shift_world.json and --bind. */
+export const shiftSimulate = `simulation only: mission run sim-b5a6bd55c5797926d6eb582e98a1a300e7e20023d0d78b52bdc209056c0118bc: completed (until; 7 task runs, 7 verified)`;
+
+/** Selected top-level fields of the mission record; each run is cut down to its index, times, state and until. */
+export const shiftRecord = `{
+  "mission_record_schema_version": "1.1",
+  "outcome": "completed",
+  "ended_by": "until",
+  "failure": null,
+  "runs_started": 7,
+  "runs_verified": 7,
+  "end_t_ms": "35000",
+  "messages": [
+    {
+      "t_ms": "32000",
+      "channel": "ops",
+      "text": "SHIFT END",
+      "from": "rl:agent:ops",
+      "status": "accepted"
+    }
+  ],
+  "runs": [
+    {
+      "index": 1,
+      "t_start_ms": "0",
+      "t_end_ms": "5000",
+      "state": "SUCCEEDED",
+      "until": "false"
+    },
+    {
+      "index": 2,
+      "t_start_ms": "5000",
+      "t_end_ms": "10000",
+      "state": "SUCCEEDED",
+      "until": "false"
+    },
+    {
+      "index": 3,
+      "t_start_ms": "10000",
+      "t_end_ms": "15000",
+      "state": "SUCCEEDED",
+      "until": "false"
+    },
+    {
+      "index": 4,
+      "t_start_ms": "15000",
+      "t_end_ms": "20000",
+      "state": "SUCCEEDED",
+      "until": "false"
+    },
+    {
+      "index": 5,
+      "t_start_ms": "20000",
+      "t_end_ms": "25000",
+      "state": "SUCCEEDED",
+      "until": "false"
+    },
+    {
+      "index": 6,
+      "t_start_ms": "25000",
+      "t_end_ms": "30000",
+      "state": "SUCCEEDED",
+      "until": "false"
+    },
+    {
+      "index": 7,
+      "t_start_ms": "30000",
+      "t_end_ms": "35000",
+      "state": "SUCCEEDED",
+      "until": "true"
+    }
+  ]
 }`;
